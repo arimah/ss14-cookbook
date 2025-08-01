@@ -21,12 +21,9 @@ import {
   ResetIcon,
   SearchTextIcon,
   InformationIcon,
-  SaveIcon,
-  OpenIcon,
 } from '../icons';
 import {InputGroup} from '../input-group';
 import {Checkbox} from '../checkbox';
-import {DropdownList, DropdownListItem} from '../dropdown-list';
 import {Tooltip} from '../tooltip';
 import {NeutralCollator} from '../helpers';
 
@@ -37,7 +34,6 @@ import {
   filterIngredientsByName,
   filterReagentsByName,
 } from './filter';
-import {useSavedFilters} from './saved-filters';
 
 export interface Props {
   open: boolean;
@@ -97,7 +93,6 @@ export const FilterEditor = memo((props: Props): JSX.Element => {
         filter={filter}
         update={updateFilter}
       />
-      {/*<FilterActions filter={filter} setFilter={setFilter}/>*/}
     </div>
   </>;
 });
@@ -547,63 +542,5 @@ const IngredientToolbar = (props: IngredientToolbarProps): JSX.Element => {
         </button>
       </Tooltip>
     </span>
-  );
-};
-
-interface FilterActionsProps {
-  filter: RecipeFilter;
-  setFilter: Dispatch<SetStateAction<RecipeFilter>>;
-}
-
-const FilterActions = (props: FilterActionsProps): JSX.Element => {
-  const {filter, setFilter} = props;
-
-  const storage = useSavedFilters();
-
-  const [loadDropdown, setLoadDropdown] = useState<JSX.Element | null>(null);
-  const handleLoad = useCallback(() => {
-    const filters = storage.loadAll();
-
-    let items: DropdownListItem[] = [];
-    if (filters.length > 0) {
-      items = filters.map((filter, i) => ({
-        name: filter.name,
-        activate: close => {
-          setFilter(storage.load(i));
-          close();
-        },
-      }));
-    } else {
-      items = [{
-        name: 'Save a filter to load it here',
-        activate: close => close(),
-      }];
-    }
-
-    setLoadDropdown(
-      <DropdownList
-        className='dropdown_list--above'
-        initialIndex={0}
-        items={items}
-        onClose={() => setLoadDropdown(null)}
-      />
-    );
-  }, []);
-
-  return (
-    <div className='recipe-search_row recipe-search_row--actions'>
-      <button>
-        <SaveIcon/>
-        <span>Save filter</span>
-      </button>
-
-      <div className='dropdown'>
-        <button aria-haspopup='menu' onClick={handleLoad}>
-          <OpenIcon/>
-          <span>Load filter</span>
-        </button>
-        {loadDropdown}
-      </div>
-    </div>
   );
 };
