@@ -1,0 +1,16 @@
+BlankMediPen: XMediPen
+AirlossAutoInjector: XMediPenAirloss
+AntiPoisonMedipen: XMediPenPoison
+BruizAutoInjector: XMediPenBruiz
+BruteAutoInjector: XMediPenBrute
+BurnAutoInjector: XMediPenBurn
+CrisisAutoInjector: XMediPenCrisis
+EmergencyMedipen: XMediPenEmergency
+EthylredoxrazineAutoInjector: XMediPenBarkeepers
+HemostasisAutoInjector: XMediPenHemostasis
+LacerAutoInjector: XMediPenLacer
+PolyAutoInjector: XMediPenPolypyrylium
+PunctAutoInjector: XMediPenPunct
+PyraAutoInjector: XMediPenPyra
+RadAutoInjector: XMediPenRad
+StimulantAutoInjector: "XMediPenStimulant

@@ -1,0 +1,46 @@
+{
+  "name": "ss14-cookbook",
+  "private": true,
+  "scripts": {
+    "build": "env-cmd rollup -c",
+    "gen:recipes": "node ./bin/recipe-gen.js sources.yml",
+    "diff:recipes": "node ./bin/recipe-diff.js",
+    "watch": "env-cmd -f .env.development rollup -c --watch",
+    "start": "http-server --port 5514 --proxy http://localhost:5514/index.html?"
+  },
+  "bin": {
+    "ss14-cookbook-server": "./bin/server.js"
+  },
+  "devDependencies": {
+    "@fluent/bundle": "^0.18.0",
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-html": "^1.0.4",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-replace": "^6.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.1",
+    "@types/imagemin-webp": "^7.0.3",
+    "@types/node": "^20.11.25",
+    "@types/prompts": "^2.4.9",
+    "@types/react": "^18.2.64",
+    "@types/react-dom": "^18.2.21",
+    "env-cmd": "^10.1.0",
+    "glob": "^11.0.0",
+    "http-server": "^14.1.1",
+    "imagemin-webp": "^8.0.0",
+    "immer": "^10.0.3",
+    "jimp": "^1.6.0",
+    "nanoid": "^5.0.6",
+    "npm-run-all": "^4.1.5",
+    "postcss-nested": "^7.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.28.0",
+    "rollup": "^4.12.1",
+    "rollup-plugin-postcss": "^4.0.2",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.2",
+    "yaml": "^2.4.1"
+  }
+}

@@ -1,0 +1,139 @@
+# This is a documented example file showing all possible fork options. For a
+# realistic example, see `sources.real.yml`. This contains the real, actual
+# configuration used by the SS14 Cookbook on heurl.in.
+#
+# While large parts of the cookbook are configurable, some things are hardcoded.
+# Please see `src/gen/constants.ts` for hardcoded things, which may be necessary
+# to modify if you're doing heavy customisation.
+
+# The unique ID of this fork. It must be stable over time.
+# It is used in the URL when you select the fork (unless `default: true`),
+# saved in menus, and of course present in file names.
+# You are strongly recommended to make it all lowercase, a-z, 0-9, maybe with
+# a dash or underscore somewhere.
+# Forks are listed in the same order as in this file.
+mystation:
+  # The display name of the fork, shown in the fork dropdown. Keep it short,
+  # or the fork selector will look bad.
+  name: "MyStation"
+  # Description, also shown in the fork dropdown. Also keep this one short.
+  description: "MRP server focused on cool stuff in space. Probably dragons."
+  # Path to the local copy of the repository. The cookbook DOES NOT clone
+  # or update the repo; these tasks must be managed separately.
+  path: "../path/to/mystation-14"
+  # Path to the repository on GitHub, of the form "username/repo". Various
+  # parts of the cookbook will prepend "https://github.com/", and append
+  # paths to commits, files, etc.
+  # Sites other than GitHub are not currently supported.
+  repo: "arimah/mystation-14"
+  # If true, this will be the *default* fork. When someone visits the page
+  # without a `fork` parameter in the URL, the default fork is chosen.
+  # If there is no default fork, the cookbook uses the first fork in the list.
+  # Optional. Default value: false
+  default: true
+  # Maps cooking methods to entities. The entity is used exclusively to find
+  # an appropriate sprite for the cooking method.
+  # I strongly suggest using the below values.
+  methodEntities:
+    microwave: KitchenMicrowave
+    mix: LargeBeaker
+    cut: KitchenKnife
+    roll: RollingPin
+    heat: KitchenElectricGrill
+    # FRONTIER-SPECIFIC.
+    # This cooking method is unique to Frontier and should be `null` unless
+    # the fork has explicitly and specifically ported Frontier's deep frying.
+    # When `null`, the deep fry method is not shown in the UI.
+    deepFry: null
+  # The sprite state that is used to fill beakers, for reagent ingredients.
+  # This state must be in the same RSI as the main sprite of whatever entity
+  # is used for `methodEntities.mix`. Usually the below value is fine.
+  mixFillState: beakerlarge4
+  # FRONTIER-SPECIFIC.
+  # If your fork has ported Frontier's microwave recipe types system, then
+  # you need to configure them under this key. For all other forks, omit
+  # this key altogether.
+  microwaveRecipeTypes:
+    # The recipe type is the key.
+    Microwave:
+      # If true, this type is the fallback for when the recipe doesn't
+      # explicitly specify a recipe type.
+      default: true
+      # The entity prototype ID used to represent this cooking method, taken
+      # for its sprite alone.
+      machine: KitchenMicrowave
+      # The label of the corresponding button in the filter, as well as the
+      # word shown under the cooking method sprite on the recipe. Should be
+      # a verb in the imperative.
+      verb: "Microwave"
+      # A brief summary of the diet, shown only when there are no matching
+      # recipes, in the text "Couldn’t find any (filterSummary) recipes ...".
+      # Example: "Couldn’t find any microwave recipes ...""
+      filterSummary: "microwave"
+    Oven:
+      machine: KitchenElectricRange
+      verb: "Bake"
+      filterSummary: "oven"
+    Assembler:
+      machine: KitchenAssembler
+      verb: "Assemble"
+      filterSummary: "food-o-mat"
+    MedicalAssembler:
+      machine: MedicalAssembler
+      verb: "Medical"
+      filterSummary: "medical assembler"
+  # Special diets!
+  # Diets work by finding the stomach organ of the species that the diet is
+  # for and looking at the tags associated with its `Stomach` component.
+  # Any food that matches the stomach's entity whitelist (of which the cookbook
+  # only supports tags and components) is deemed to belong to the diet.
+  # Optional. Default value: []
+  specialDiets:
+      # The entity prototype ID of the species' stomach organ. If the species
+      # has no stomach organ, then tough luck!
+    - organ: OrganReptilianStomach
+      # The colour of the little wedge shown on matching recipes.
+      color: "#2e6b2e"
+      # The tooltip shown when hovering over the wedge.
+      hint: "Reptilians can eat this food."
+      # The label of the filter button.
+      filterName: "Reptilian-edible"
+      # A brief summary of the diet, shown only when there are no matching
+      # recipes, in the text "Couldn’t find any (filterSummary) recipes ...".
+      # Example: "Couldn’t find any reptilian-edible recipes ..."
+      filterSummary: "reptilian-edible"
+      # IMPSTATION-SPECIFIC.
+      # If present, excludes foods that contain the specified reagents, even if
+      # they otherwise match the stomach's whitelist. Useful if the species has
+      # an allergy to a reagent commonly present in foods the species can
+      # *technically* eat but shouldn't. For example, kodepiiae on Impstation.
+      # Optional. Default value: null
+      excludeFoodsWith:
+        - TableSalt
+  # Special reagents!
+  # Any food containing the reagents listed here will be highlighted.
+  # Optional. Default value: []
+  specialReagents:
+      # The reagent ID. Must match the game's ID for the reagent.
+    - id: Theobromine
+      # The colour of the little wedge shown on matching recipes.
+      # I normally try to keep this the same as the in-game colour, *but* it's
+      # worth noting that many reagents are white or off-white. Theobromine is
+      # one case where I recoloured it to resemble chocolate and coffee, common
+      # sources of theobromine.
+      color: "#b9643b"
+      # The tooltip shown when hovering over the wedge.
+      hint: "This food contains theobromine, poisonous to some species."
+      # The label of the 'special property' button in the filter.
+      filterName: "Contains Theobromine"
+      # A brief summary of the diet, shown only when there are no matching
+      # recipes, in the text "Couldn’t find any (filterSummary) recipes ...".
+      # Example: "Couldn’t find any theobromine-containing recipes ..."
+      filterSummary: "theobromine-containing"
+  # List of paths to files with sorting ID rewrites.
+  # These files rewrite entity prototype IDs to get a better default order in
+  # the recipe listing. The repository comes with two files for this purpose:
+  # "rewrites_base.yml" and "rewrites_frontier.yml". Feel free to add your own!
+  # Optional. Default value: []
+  sortingIdRewrites:
+    - "rewrites_base.yml"

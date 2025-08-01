@@ -1,0 +1,186 @@
+base:
+  name: "WizDen"
+  description: "Original, vanilla Space Station 14 à la Wizard's Den."
+  path: "../cookbook-sources/base"
+  repo: "space-wizards/space-station-14"
+  default: true
+  methodEntities: &baseMethods
+    microwave: KitchenMicrowave
+    mix: LargeBeaker
+    cut: KitchenKnife
+    roll: RollingPin
+    heat: KitchenElectricGrill
+    deepFry: null
+  mixFillState: beakerlarge4
+  specialDiets:
+    - &reptilianDiet
+      organ: OrganReptilianStomach
+      color: "#2e6b2e"
+      hint: "Reptilians can eat this food."
+      filterName: "Reptilian-edible"
+      filterSummary: "reptilian-edible"
+    - &mothDiet
+      organ: OrganMothStomach
+      color: "#e3c7aa"
+      hint: "Moths can eat this food."
+      filterName: "Moth-edible"
+      filterSummary: "moth-edible"
+  specialReagents:
+    - &theobromine
+      id: Theobromine
+      color: "#b9643b"
+      hint: "This food contains theobromine, poisonous to some species."
+      filterName: "Contains Theobromine"
+      filterSummary: "theobromine-containing"
+  sortingIdRewrites: &baseRewrites
+    - "rewrites_base.yml"
+
+frontier:
+  name: "Frontier"
+  description: "Ship-focused fork developed for Frontier Station 14."
+  path: "../cookbook-sources/frontier"
+  repo: "new-frontiers-14/frontier-station-14"
+  methodEntities:
+    microwave: KitchenMicrowave
+    mix: LargeBeaker
+    cut: KitchenKnife
+    roll: RollingPin
+    heat: KitchenElectricGrill
+    deepFry: KitchenDeepFryer
+  mixFillState: beakerlarge4
+  microwaveRecipeTypes: &microwaveRecipeTypes
+    Microwave:
+      default: true
+      machine: KitchenMicrowave
+      verb: "Microwave"
+      filterSummary: "microwave"
+    Oven:
+      machine: KitchenElectricRange
+      verb: "Bake"
+      filterSummary: "oven"
+    Assembler:
+      machine: KitchenAssembler
+      verb: "Assemble"
+      filterSummary: "food-o-mat"
+    MedicalAssembler:
+      machine: MedicalAssembler
+      verb: "Medical"
+      filterSummary: "medical assembler"
+  specialDiets:
+    # Not *mothDiet - different description
+    - organ: OrganMothStomach
+      color: "#e3c7aa"
+      hint: "Only moths can eat this food."
+      filterName: "Moth-edible"
+      filterSummary: "moth-edible"
+  specialReagents:
+    - id: Flavorol
+      color: "#775441"
+      hint: "This food contains flavorol, a beneficial chemical."
+      filterName: "Contains Flavorol"
+      filterSummary: "flavorol-containing"
+    - *theobromine
+  sortingIdRewrites:
+    - "rewrites_base.yml"
+    - "rewrites_frontier.yml"
+  ignoredRecipes:
+    - NFRecipeBuildABuddyHuman
+    - NFRecipeBuildABuddyGoblin
+    - NFRecipeBuildABuddyReptilian
+    - NFRecipeBuildABuddySlime
+    - NFRecipeBuildABuddyVulpkanin
+
+delta-v:
+  name: "Delta-V"
+  description: "Station-based fork featuring psionics and other unique mechanics."
+  path: "../cookbook-sources/delta-v"
+  repo: "DeltaV-Station/Delta-v"
+  methodEntities: *baseMethods
+  mixFillState: beakerlarge4
+  specialDiets:
+    - *reptilianDiet
+    - *mothDiet
+    - organ: OrganFeroxiStomach
+      color: "#8db9d6"
+      hint: "Feroxi can eat this food."
+      filterName: "Feroxi-edible"
+      filterSummary: "feroxi-edible"
+  specialReagents:
+    - *theobromine
+  sortingIdRewrites: *baseRewrites
+
+rmc-14:
+  name: "RMC-14"
+  description: "Asymmetric combat fork, marines versus xenos. Oorah!"
+  path: "../cookbook-sources/rmc"
+  repo: "RMC-14/RMC-14"
+  methodEntities: *baseMethods
+  mixFillState: beakerlarge4
+  specialDiets:
+    - *reptilianDiet
+    - *mothDiet
+  specialReagents:
+    - *theobromine
+  sortingIdRewrites: *baseRewrites
+
+floof:
+  name: "Floof"
+  description: "Furry-friendly 18+ server. (Hidden unless selected)"
+  hidden: true
+  path: "../cookbook-sources/floof"
+  repo: "Fansana/floofstation1"
+  methodEntities: *baseMethods
+  mixFillState: beakerlarge4
+  specialDiets:
+    # Not *reptilianDiet - Floof calls them unathi
+    - organ: OrganReptilianStomach
+      color: "#2e6b2e"
+      hint: "Unathi can eat this food."
+      filterName: "Unathi-edible"
+      filterSummary: "unathi-edible"
+    - *mothDiet
+  specialReagents:
+    - *theobromine
+  sortingIdRewrites: *baseRewrites
+
+impstation:
+  name: "Impstation"
+  description: "Server for fans of RTVS. (Hidden unless selected)"
+  hidden: true
+  path: "../cookbook-sources/impstation"
+  repo: "impstation/imp-station-14"
+  methodEntities: *baseMethods
+  mixFillState: beakerlarge4
+  microwaveRecipeTypes: *microwaveRecipeTypes
+  specialDiets:
+    - *reptilianDiet
+    - *mothDiet
+    - organ: OrganKodepiiaStomach
+      color: "#967bb6"
+      hint: "Kodepiiae can eat this food."
+      filterName: "Kodepiia-edible"
+      filterSummary: "kodepiia-edible"
+      excludeFoodsWith:
+        - Protein
+  specialReagents:
+    - id: TableSalt
+      color: "#ffffff"
+      hint: "This food contains salt and is DEADLY to gastropoids."
+      filterName: "Contains Salt"
+      filterSummary: "salty"
+    - *theobromine
+  sortingIdRewrites: *baseRewrites
+
+moff:
+  name: "Moff Station"
+  description: "MRP station-based fork focused on silly antics and custom content."
+  path: "../cookbook-sources/moff"
+  repo: "moff-station/moff-station-14"
+  methodEntities: *baseMethods
+  mixFillState: beakerlarge4
+  specialDiets:
+    - *reptilianDiet
+    - *mothDiet
+  specialReagents:
+    - *theobromine
+  sortingIdRewrites: *baseRewrites

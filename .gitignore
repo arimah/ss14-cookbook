@@ -1,0 +1,12 @@
+node_modules/
+
+# All of the below are built on demand
+bin/
+public/index.html
+public/assets/*.css
+public/assets/*.js
+public/data/*.json
+public/img/sprites*.webp
+
+sources.yml
+.env
