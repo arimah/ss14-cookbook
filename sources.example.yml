@@ -137,3 +137,13 @@ mystation:
   # Optional. Default value: []
   sortingIdRewrites:
     - "rewrites_base.yml"
+  # Recipes to ignore. The values are recipe prototype IDs.
+  # There are a few more special recipes that are also ignored, which you can
+  # find in `src/gen/constants.ts`.
+  # Optional. Default value: []
+  ignoredRecipes:
+    - NFRecipeBuildABuddyHuman
+    - NFRecipeBuildABuddyGoblin
+    - NFRecipeBuildABuddyReptilian
+    - NFRecipeBuildABuddySlime
+    - NFRecipeBuildABuddyVulpkanin
