@@ -317,21 +317,6 @@ input {
       margin-right: 6px;
     }
 
-textarea {
-  padding: 4px 6px;
-  font: inherit;
-  font-family: monospace;
-  border-radius: 5px;
-  border: 2px solid var(--input-border);
-  background-color: var(--input-bg);
-  color: var(--input-fg);
-}
-
-  textarea:focus {
-    outline: none;
-    border-color: var(--focus-color);
-  }
-
 .checkbox {
   display: flex;
   align-items: center;
@@ -1086,11 +1071,6 @@ select {
     gap: 8px;
   }
 
-    .recipe-search_row--actions > button,
-    .recipe-search_row--actions > .dropdown {
-      min-width: 130px;
-    }
-
   .recipe-search_mode {
     display: flex;
     gap: 4px;
@@ -1146,34 +1126,11 @@ select {
       .recipe-search_mode {
         margin-top: 0;
       }
-
-      .recipe-search_row--actions > button,
-      .recipe-search_row--actions > .dropdown {
-        min-width: 180px;
-      }
   }
 
   @media (min-width: 850px) {
     .recipe-search {
       grid-template-columns: 1fr minmax(150px, auto) auto auto;
-    }
-
-    .recipe-search_row--actions {
-      position: absolute;
-      bottom: 16px;
-      right: 0;
-    }
-
-      .recipe-search_row--actions > button,
-      .recipe-search_row--actions > .dropdown {
-        min-width: 130px;
-      }
-  }
-
-  @media (min-width: 1000px) {
-    .recipe-search_row--actions > button,
-    .recipe-search_row--actions > .dropdown {
-      min-width: 180px;
     }
   }
 
@@ -2281,42 +2238,4 @@ select {
 
   .privacy_text p:not(:first-child) {
     margin-top: 16px;
-  }
-
-.menu-export {
-  width: 600px;
-}
-
-  .menu-export > .dialog_body {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    justify-items: stretch;
-  }
-
-  .menu-export_value-sizer,
-  .menu-export_value {
-    grid-row: 1;
-    grid-column: 1;
-    box-sizing: border-box;
-    max-width: 100%;
-    max-height: 256px;
-    font: inherit;
-    font-family: monospace;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    overflow: hidden;
-  }
-
-  .menu-export_value-sizer {
-    align-self: flex-start;
-    padding: 6px 8px;
-    visibility: hidden;
-    user-select: none;
-    pointer-events: none;
-  }
-
-  .menu-export_value {
-    resize: none;
-    align-self: stretch;
   }
