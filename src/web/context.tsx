@@ -2,6 +2,7 @@ import {ReactNode, createContext, memo, useContext, useMemo} from 'react';
 
 import {GameData, Entity, Reagent, Recipe} from '../types';
 
+import {NeutralCollator} from './helpers';
 import {SearchableRecipeData} from './types';
 
 export interface GameDataProviderProps {
@@ -34,6 +35,7 @@ export const GameDataProvider = memo((
     const recipesBySolidIngredient = new Map<string, string[]>();
     const recipesByReagentIngredient = new Map<string, string[]>();
     const searchableRecipeNames = new Map<string, string>();
+    const recipeGroups = new Set<string>();
     for (const recipe of raw.recipes) {
       recipeMap.set(recipe.id, recipe);
       let name: string | null = null;
@@ -54,6 +56,8 @@ export const GameDataProvider = memo((
       for (const id of Object.keys(recipe.reagents)) {
         appendAtKey(recipesByReagentIngredient, id, recipe.id);
       }
+
+      recipeGroups.add(recipe.group);
     }
 
     return {
@@ -71,6 +75,9 @@ export const GameDataProvider = memo((
       recipesBySolidIngredient,
       recipesByReagentIngredient,
       searchableRecipeNames,
+      recipeGroups: Array.from(recipeGroups).sort((a, b) =>
+        NeutralCollator.compare(a, b)
+      ),
       ingredients: raw.ingredients,
 
       methodSprites: raw.methodSprites,

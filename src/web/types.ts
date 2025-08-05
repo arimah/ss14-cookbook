@@ -41,6 +41,8 @@ export interface SearchableRecipeData {
   readonly recipesByReagentIngredient: ReadonlyMap<string, readonly string[]>;
   /** Lowercase recipe names indexed by recipe ID. */
   readonly searchableRecipeNames: ReadonlyMap<string, string>;
+  /** All available recipe groups, sorted alphabetically. */
+  readonly recipeGroups: readonly string[];
 
   readonly methodSprites: Readonly<Partial<Record<Recipe['method'], SpritePoint>>>;
   readonly beakerFill: SpritePoint;

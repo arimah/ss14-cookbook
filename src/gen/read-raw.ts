@@ -12,7 +12,7 @@ import {
   StackPrototype,
   ConstructionGraphPrototype,
   isRelevantPrototype,
-} from './types';
+} from './prototypes';
 
 export interface RawGameData {
   readonly entities: ReadonlyMap<string, EntityPrototype>;

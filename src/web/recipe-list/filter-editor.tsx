@@ -35,6 +35,9 @@ import {
   filterReagentsByName,
 } from './filter';
 
+const HideRarelyUsedTooltip = 'Hides ingredients that are only used in a single recipe. You can still find all ingredients by name.';
+const GroupFilterTooltip = 'These groups are taken from the game data and are not always correct or intuitive. Each recipe belongs to exactly one group.';
+
 export interface Props {
   open: boolean;
   filter: RecipeFilter;
@@ -79,20 +82,15 @@ export const FilterEditor = memo((props: Props): JSX.Element => {
         >
           Hide rarely used ingredients
         </Checkbox>
-        <Tooltip
-          text='Hides ingredients that are only used in a single recipe. You can still find all ingredients by name.'
-          provideLabel
-        >
+        <Tooltip text={HideRarelyUsedTooltip} provideLabel>
           <span className='recipe-search_help'>
             <InformationIcon/>
           </span>
         </Tooltip>
       </div>
       <ModeOption filter={filter} update={updateFilter}/>
-      <TraitFilter
-        filter={filter}
-        update={updateFilter}
-      />
+      <GroupFilter filter={filter} update={updateFilter}/>
+      <TraitFilter filter={filter} update={updateFilter}/>
     </div>
   </>;
 });
@@ -366,7 +364,7 @@ const ReagentFilter = (props: FilterProps & IngredientProps): JSX.Element => {
         draft.reagents.delete(reagent);
       }
     });
-  }, []);
+  }, [update]);
 
   const reset = useCallback(() => {
     update(draft => {
@@ -418,7 +416,7 @@ const ModeOption = (props: FilterProps): JSX.Element => {
     update(draft => {
       draft.ingredientMode = e.target.value as IngredientMode;
     });
-  }, []);
+  }, [update]);
 
   return <>
     <label
@@ -441,6 +439,53 @@ const ModeOption = (props: FilterProps): JSX.Element => {
   </>;
 };
 
+const GroupFilter = (props: FilterProps): JSX.Element | null => {
+  const {filter, update} = props;
+
+  const {recipeGroups} = useGameData();
+
+  const toggle = useCallback((group: string, newSelected: boolean) => {
+    update(draft => {
+      if (newSelected) {
+        draft.groups.add(group);
+      } else {
+        draft.groups.delete(group);
+      }
+    });
+  }, [update]);
+
+  if (recipeGroups.length <= 1) {
+    // If literally every recipe is in the same group, don't even offer
+    // a filter. It's pointless.
+    return null;
+  }
+
+  return <>
+    <span className='recipe-search_label'>
+      Group:
+    </span>
+    <ul className='recipe-search_options recipe-search_options--compact'>
+      {recipeGroups.map(group =>
+        <FilterOption
+          key={group}
+          selected={filter.groups.has(group)}
+          value={group}
+          onClick={toggle}
+        >
+          {group}
+        </FilterOption>
+      )}
+      <li style={{ alignSelf: 'center' }}>
+        <Tooltip text={GroupFilterTooltip} provideLabel>
+          <span className='recipe-search_help'>
+            <InformationIcon/>
+          </span>
+        </Tooltip>
+      </li>
+    </ul>
+  </>;
+};
+
 const TraitFilter = (props: FilterProps): JSX.Element => {
   const {filter, update} = props;
 
@@ -450,7 +495,7 @@ const TraitFilter = (props: FilterProps): JSX.Element => {
     update(draft => {
       draft.specials ^= trait;
     });
-  }, []);
+  }, [update]);
 
   return <>
     <span className='recipe-search_label'>

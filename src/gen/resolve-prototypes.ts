@@ -7,7 +7,7 @@ import {globSync} from 'glob';
 import {Recipe} from '../types';
 
 import {PrunedGameData} from './filter-relevant';
-import {ColorWhite, DefaultCookTime} from './constants';
+import {ColorWhite, DefaultCookTime, DefaultRecipeGroup} from './constants';
 import {getReagentResult, getSolidResult} from './reaction-helpers';
 import {
   SolutionContainerManagerComponent,
@@ -15,13 +15,11 @@ import {
   StomachComponent,
   TagComponent,
 } from './components';
+import {EntityPrototype, MicrowaveMealRecipe, Reactant} from './prototypes';
 import {entityAndAncestors, readFileTextWithoutTheStupidBOM} from './helpers';
 import {
-  EntityPrototype,
   MethodEntities,
-  MicrowaveMealRecipe,
   MicrowaveRecipeTypes,
-  Reactant,
   ResolvedEntity,
   ResolvedReagent,
   ResolvedRecipe,
@@ -89,6 +87,7 @@ export const resolvePrototypes = (
         ? convertMicrowaveReagents(recipe.reagents)
         : {},
       subtype: resolveRecipeSubtype(recipe, defaultMicrowaveRecipeType),
+      group: recipe.group ?? DefaultRecipeGroup,
     });
   }
 
@@ -111,6 +110,7 @@ export const resolvePrototypes = (
         : null,
       reagents: reaction.reactants,
       solids: {},
+      group: DefaultRecipeGroup,
     });
   }
 

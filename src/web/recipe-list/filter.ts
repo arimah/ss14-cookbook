@@ -30,6 +30,8 @@ export interface RecipeFilter {
    *   the selected ingredients and reagents.
    */
   readonly ingredientMode: IngredientMode;
+  /** Empty set = include all groups. */
+  readonly groups: ReadonlySet<string>;
   /**
    * A bit mask that matches against special traits.
    * 0 = match all.
@@ -49,6 +51,7 @@ export const InitialFilter: RecipeFilter = {
   ingredients: new Set(),
   reagents: new Set(),
   ingredientMode: 'all',
+  groups: new Set(),
   specials: 0,
 };
 
@@ -69,6 +72,7 @@ export const isFilterActive = (filter: RecipeFilter): boolean =>
   filter.subtypes.length > 0 ||
   filter.ingredients.size > 0 ||
   filter.reagents.size > 0 ||
+  filter.groups.size > 0 ||
   filter.specials !== 0;
 
 export const applyFilter = (
@@ -104,6 +108,8 @@ const applyNonIngredientFilter = (
   filter: RecipeFilter,
   entityMap: ReadonlyMap<string, Entity>
 ): readonly Recipe[] => {
+  // "Wow, this code is so inefficient!"
+  // You're damned right it is.
   if (filter.methods.length > 0) {
     recipes = recipes.filter(recipe =>
       filter.methods.includes(recipe.method)
@@ -117,6 +123,11 @@ const applyNonIngredientFilter = (
           ? filter.subtypes.includes(recipe.subtype)
           : recipe.subtype.some(t => filter.subtypes.includes(t))
       )
+    );
+  }
+  if (filter.groups.size > 0) {
+    recipes = recipes.filter(recipe =>
+      filter.groups.has(recipe.group)
     );
   }
   if (filter.specials !== 0) {

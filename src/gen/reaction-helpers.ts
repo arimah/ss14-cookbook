@@ -1,4 +1,4 @@
-import {ReactionPrototype, isCreateEntityEffect} from './types';
+import {ReactionPrototype, isCreateEntityEffect} from './prototypes';
 
 export const getReagentResult = (
   reaction: ReactionPrototype

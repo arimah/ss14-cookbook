@@ -3,20 +3,20 @@ import {
   IgnoredSpecialRecipes,
   IgnoreSourcesOf,
   ForceIncludeReagentSources,
+  DefaultRecipeGroup,
 } from './constants';
 import {RawGameData} from './read-raw';
 import {getReagentResult, getSolidResult} from './reaction-helpers';
 import {Solution, SolutionContainerManagerComponent} from './components';
-import {entityAndAncestors} from './helpers';
 import {
-  SpecialDiet,
   EntityPrototype,
   ReagentPrototype,
   MicrowaveMealRecipe,
   ReactionPrototype,
-  ResolvedSpecialRecipe,
   ConstructionGraphPrototype,
-} from './types';
+} from './prototypes';
+import {entityAndAncestors} from './helpers';
+import {SpecialDiet, ResolvedSpecialRecipe} from './types';
 
 export interface PrunedGameData {
   readonly entities: ReadonlyMap<string, EntityPrototype>;
@@ -244,6 +244,7 @@ const tryAddSpecialRecipe = (
         },
         reagentResult: null,
         reagents: {},
+        group: DefaultRecipeGroup,
       });
       addedAnything = true;
     }
@@ -252,12 +253,11 @@ const tryAddSpecialRecipe = (
   // If this entity can be constructed into something relevant, then add a
   // special recipe *and* mark the entity as used so we can find recipes
   // for it.
-  const constructed = traverseConstructionGraph(
+  for (const constructed of traverseConstructionGraph(
     entity.id,
     constructionState,
     allConstructionGraphs
-  );
-  if (constructed) {
+  )) {
     const {method, solidResult} = constructed;
     const recipeId = `${method}!${entity.id}`;
     const shouldAddRecipe =
@@ -292,6 +292,7 @@ const tryAddSpecialRecipe = (
         },
         reagentResult: null,
         reagents: {},
+        group: DefaultRecipeGroup,
       });
     }
   }
@@ -369,11 +370,11 @@ const isFoodRelatedReagent = (reagent: ReagentPrototype): boolean =>
   reagent.group !== 'Narcotics' &&
   reagent.group !== 'Toxins';
 
-const traverseConstructionGraph = (
+function* traverseConstructionGraph(
   entityId: string,
   state: ConstructionState,
   allConstructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>
-): ResolvedSpecialRecipe | undefined => {
+): Generator<ResolvedSpecialRecipe> {
   if (
     state.graph == null || state.node == null ||
     // We can't handle entities in the middle of construction
@@ -387,7 +388,7 @@ const traverseConstructionGraph = (
     console.warn(
       `Entity '${entityId}': Unknown construction graph: ${state.graph}`
     );
-    return undefined;
+    return;
   }
 
   // This construction graph traversal is *extremely* simplified compared to
@@ -400,7 +401,7 @@ const traverseConstructionGraph = (
   const startNode = graph.graph.find(n => n.node === state.node);
   if (!startNode || !startNode.edges) {
     // Broken construction graph or we're at an end node with no edges
-    return undefined;
+    return;
   }
 
   for (const edge of startNode.edges) {
@@ -416,39 +417,41 @@ const traverseConstructionGraph = (
 
     const {steps} = edge;
     if (
-      steps.length === 1 &&
-      target.entity != null &&
-      target.entity !== entityId
+      steps.length !== 1 || // No support for multi-step construction
+      target.entity == null ||
+      target.entity === entityId
     ) {
-      const step = steps[0];
-      if (step.tool === 'Rolling') {
-        return {
-          method: 'roll',
-          solidResult: target.entity,
-          solids: {
-            [entityId]: 1,
-          },
-          reagentResult: null,
-          reagents: {},
-        };
-      }
-      if (step.minTemperature != null && step.maxTemperature == null) {
-        return {
-          method: 'heat',
-          minTemp: step.minTemperature,
-          solidResult: target.entity,
-          solids: {
-            [entityId]: 1,
-          },
-          reagentResult: null,
-          reagents: {},
-        };
-      }
+      continue;
+    }
+
+    const step = steps[0];
+    if (step.tool === 'Rolling') {
+      yield {
+        method: 'roll',
+        solidResult: target.entity,
+        solids: {
+          [entityId]: 1,
+        },
+        reagentResult: null,
+        reagents: {},
+        group: DefaultRecipeGroup,
+      };
+    }
+    if (step.minTemperature != null && step.maxTemperature == null) {
+      yield {
+        method: 'heat',
+        minTemp: step.minTemperature,
+        solidResult: target.entity,
+        solids: {
+          [entityId]: 1,
+        },
+        reagentResult: null,
+        reagents: {},
+        group: DefaultRecipeGroup,
+      };
     }
   }
-
-  return undefined;
-};
+}
 
 const findGrindableProduceReagents = (
   entity: EntityPrototype,

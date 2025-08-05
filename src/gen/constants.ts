@@ -9,6 +9,12 @@ export const DefaultCookTime = 5;
 
 /**
  * MUST MIRROR C#! This matches the default value of the field
+ * `MicrowaveMealRecipePrototype.Group`.
+ */
+export const DefaultRecipeGroup = 'Other';
+
+/**
+ * MUST MIRROR C#! This matches the default value of the field
  * `SliceableFoodComponent.TotalCount`.
  */
 export const DefaultTotalSliceCount = 5;

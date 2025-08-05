@@ -1141,7 +1141,7 @@ select {
   }
 
   .recipe-search_help {
-    display: inline-block;
+    display: block;
     margin: -4px;
     padding: 4px;
     border-radius: 3px;

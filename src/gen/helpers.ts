@@ -1,6 +1,6 @@
 import {readFileSync} from 'fs';
 
-import {EntityPrototype} from './types';
+import {EntityPrototype} from './prototypes';
 
 /**
  * Synchronously reads a file as a string, assuming its contents are UTF-8,

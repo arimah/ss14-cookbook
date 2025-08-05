@@ -69,6 +69,7 @@ interface RecipeBase {
   readonly reagentResult: string | null;
   readonly solids: Readonly<Record<string, number>>;
   readonly reagents: Readonly<Record<string, ReagentIngredient>>;
+  readonly group: string;
 }
 
 export interface MicrowaveRecipe extends RecipeBase {
