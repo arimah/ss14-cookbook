@@ -4,6 +4,7 @@ import {isPlainObject, PlainObject} from './types';
 export type RelevantPrototype =
   | ConstructionGraphPrototype
   | EntityPrototype
+  | MetamorphRecipePrototype
   | MicrowaveMealRecipe
   | ReactionPrototype
   | ReagentPrototype
@@ -92,24 +93,93 @@ export interface ConstructionGraphStep {
   readonly maxTemperature?: number;
 }
 
+export interface MetamorphRecipePrototype {
+  readonly type: 'metamorphRecipe';
+  readonly id: string;
+  readonly key: string;
+  readonly result: string;
+  // Annoyingly, the DataField is not marked as required, so we have to assume
+  // this can be omitted. In that case, we just ignore it; what are we even
+  // supposed to do with an empty rule set?
+  readonly rules?: readonly FoodMetamorphRule[];
+}
+
+export type FoodMetamorphRule =
+  | FmrSequenceLength
+  | FmrLastElementHasTags
+  | FmrElementHasTags
+  | FmrFoodHasReagent
+  | FmrIngredientsWithTags
+  ;
+
+export interface FmrSequenceLength {
+  readonly '!type': 'SequenceLength';
+  readonly range: MinMax;
+}
+
+export interface FmrLastElementHasTags {
+  readonly '!type': 'LastElementHasTags';
+  readonly tags: readonly string[];
+  /** default: true */
+  readonly needAll?: boolean;
+}
+
+export interface FmrElementHasTags {
+  readonly '!type': 'ElementHasTags';
+  readonly elementNumber: number;
+  readonly tags: readonly string[];
+  /** default: true */
+  readonly needAll?: boolean;
+}
+
+export interface FmrFoodHasReagent {
+  readonly '!type': 'FoodHasReagent';
+  readonly reagent: string;
+  readonly count: MinMax;
+  // Not relevant
+  // readonly solution?: string;
+}
+
+export interface FmrIngredientsWithTags {
+  readonly '!type': 'IngredientsWithTags';
+  readonly tags: readonly string[];
+  readonly count: MinMax;
+  /** default: true */
+  readonly needAll?: boolean;
+}
+
+export interface MinMax {
+  // Neither field is marked as required, defaulting to 0.
+  readonly min?: number;
+  readonly max?: number;
+}
+
+const RelevantPrototypeTypes: ReadonlySet<string> = new Set([
+  'constructionGraph',
+  'entity',
+  'metamorphRecipe',
+  'microwaveMealRecipe',
+  'reaction',
+  'reagent',
+  'stack',
+]);
+
+/**
+ * A regular expression that matches `type:` followed by any of the prototypes
+ * we actually care about. This allows us to cut down on YAML parsing time by
+ * ignoring files without relevant prototype definitions.
+ */
+export const RelevantPrototypeRegex = new RegExp(
+  `\\btype:\\s+(?:${Array.from(RelevantPrototypeTypes).join('|')})\\b`
+);
+
 export const isRelevantPrototype = (
   node: unknown
-): node is RelevantPrototype => {
-  if (!isPlainObject(node) || typeof node.id !== 'string') {
-    return false;
-  }
-  switch (node.type) {
-    case 'constructionGraph':
-    case 'entity':
-    case 'microwaveMealRecipe':
-    case 'reaction':
-    case 'reagent':
-    case 'stack':
-      return true;
-    default:
-      return false;
-  }
-};
+): node is RelevantPrototype =>
+  isPlainObject(node) &&
+  typeof node.id === 'string' &&
+  typeof node.type === 'string' &&
+  RelevantPrototypeTypes.has(node.type);
 
 export const isCreateEntityEffect = (
   node: unknown

@@ -15,7 +15,10 @@ export type Component =
   | ConstructionComponent
   | TagComponent
   | StomachComponent
-  | DeepFrySpawnComponent;
+  | DeepFrySpawnComponent
+  | FoodSequenceStartPointComponent
+  | FoodSequenceElementComponent
+  ;
 
 export interface SpriteComponent {
   readonly type: 'Sprite';
@@ -72,6 +75,17 @@ export interface ConstructionComponent {
 export interface TagComponent {
   readonly type: 'Tag';
   readonly tags?: readonly string[];
+}
+
+export interface FoodSequenceStartPointComponent {
+  readonly type: 'FoodSequenceStartPoint';
+  readonly key?: string;
+  readonly maxLayers?: number;
+}
+
+export interface FoodSequenceElementComponent {
+  readonly type: 'FoodSequenceElement';
+  readonly entries?: Readonly<Record<string, string>>;
 }
 
 export interface StomachComponent {

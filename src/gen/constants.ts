@@ -19,6 +19,19 @@ export const DefaultRecipeGroup = 'Other';
  */
 export const DefaultTotalSliceCount = 5;
 
+/**
+ * MUST MIRROR C#! This matches the default value of the field
+ * `FoodSequenceStartPointComponent.MaxLayers`.
+ */
+export const DefaultFoodSequenceMaxLayers = 10;
+
+/**
+ * The name of the solution that contains all food reagents.
+ * We could extract this from the `FoodComponent`, but in practice literally
+ * every single food uses `food`.
+ */
+export const FoodSolutionName = 'food';
+
 export const GameDataPath = (id: string, hash: string) =>
   `public/data/data_${id}.${hash}.json`;
 

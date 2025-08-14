@@ -1,4 +1,5 @@
 import {ReagentIngredient, Recipe} from '../types';
+import { Solution } from './components';
 
 export type MethodEntities = Readonly<Record<Recipe['method'], string | null>>;
 
@@ -44,33 +45,80 @@ export interface SpecialReagent extends SpecialCommon {
   readonly id: string;
 }
 
+/**
+ * A *resolved* entity contains all the data from an entity prototype that
+ * the cookbook makes use of. It's essentially processed component data.
+ * Component resolution happens early, so we can manipulate entity prototypes
+ * without having to traverse the prototype and its parents repeatedly.
+ *
+ * Note: Some component data present in this type may still require additional
+ * post-processing. E.g., sprite colours have to be parsed prior to rendering.
+ */
 export interface ResolvedEntity {
   readonly id: string;
   readonly name: string;
-  readonly color: ParsedColor;
-  readonly spriteLayers: readonly ResolvedSpriteLayerState[];
-  /** Set of all tags attached to this prototype. */
-  readonly tags: ReadonlySet<string>;
-  /** Set of reagent prototype IDs that the food contains. */
-  readonly reagents: ReadonlySet<string>;
+  /** True if the entity is produce, i.e. grown in a hydroponics tray. */
+  readonly isProduce: boolean;
+  /** The entity's sprite. */
+  readonly sprite: ResolvedSprite;
+  /** All of the entity's solution. */
+  readonly solution: ResolvedSolution | null;
   /**
-   * If this entity is a stomach, contains the tags that the stomach
-   * can digest.
+   * The entity's food reagent IDs, extracted from `solution.food`. If the
+   * entity has no food solution, this set is empty.
    */
-  readonly specialDigestibleTags?: readonly string[];
+  readonly reagents: Set<string>;
   /**
-   * If this entity is a stomach, contains the components that the
+   * If the entity can be put in a grinder, contains the resolved extractable
+   * solutions.
+   */
+  readonly extractable: ResolvedExtractable | null;
+  /**
+   * If the entity can start a food sequence, contains the food sequence key
+   * and maximum layer count.
+   */
+  readonly foodSequenceStart: ResolvedFoodSequenceStart | null;
+  /**
+   * Contains the keys of the food sequences that the entity can participate
+   * in. Basically, determines where the food can be inserted. If the entity
+   * is not a food sequence element, the array is empty.
+   */
+  readonly foodSequenceElement: readonly string[];
+  /**
+   * If the entity is a sliceable food, contains the resulting slice entity
+   * and count.
+   */
+  readonly sliceableFood: ResolvedSlice | null;
+  /** The entity's construction component data, if it has one. */
+  readonly construction: ResolvedConstruction | null;
+  /**
+   * If the entity can be deep-fried, contains the resulting entity.
+   * Frontier.
+   */
+  readonly deepFryOutput: string | null;
+  /**
+   * If this entity is a stomach, contains the tags and components that the
    * stomach can digest.
    */
-  readonly specialDigestibleComponents?: readonly string[];
+  readonly stomach: ResolvedStomach | null;
+  /** Set of all tags attached to this prototype. */
+  readonly tags: ReadonlySet<string>;
   /** Set of component names present on this prototype. */
   readonly components: ReadonlySet<string>;
 }
 
-export interface ResolvedSpriteLayerState {
-  readonly path: string;
-  readonly state: string;
-  readonly color: ParsedColor;
+export interface ResolvedSprite {
+  readonly path: string | null;
+  readonly state: string | null;
+  readonly color: string | null;
+  readonly layers: readonly ResolvedSpriteLayer[];
+}
+
+export interface ResolvedSpriteLayer {
+  readonly path: string | null;
+  readonly state: string | null;
+  readonly color: string | null;
+  readonly visible: boolean;
 }
 
 /**
@@ -79,6 +127,39 @@ export interface ResolvedSpriteLayerState {
  * Note that this means red is the *high* byte.
  */
 export type ParsedColor = number;
+
+export type ResolvedSolution = Readonly<Record<string, Solution>>;
+
+export interface ResolvedExtractable {
+  readonly grindSolutionName: string | null;
+  /**
+   * For silly reasons, the juice solution is always inlined and never read
+   * from the `SolutionContainerManagerComponent`.
+   */
+  readonly juiceSolution: Solution | null;
+}
+
+export interface ResolvedSlice {
+  readonly slice: string | null;
+  readonly count: number;
+}
+
+export interface ResolvedConstruction {
+  readonly graph: string | null;
+  readonly node: string | null;
+  readonly edge: number | null;
+  readonly step: number | null;
+}
+
+export interface ResolvedStomach {
+  readonly tags: readonly string[] | null;
+  readonly components: readonly string[] | null;
+}
+
+export interface ResolvedFoodSequenceStart {
+  readonly key: string | null;
+  readonly maxLayers: number;
+}
 
 export interface ResolvedReagent {
   // The ID is in the owning collection.

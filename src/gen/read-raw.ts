@@ -5,12 +5,14 @@ import {globSync} from 'glob';
 
 import {readFileTextWithoutTheStupidBOM} from './helpers';
 import {
+  ConstructionGraphPrototype,
   EntityPrototype,
+  MetamorphRecipePrototype,
   MicrowaveMealRecipe,
   ReactionPrototype,
   ReagentPrototype,
   StackPrototype,
-  ConstructionGraphPrototype,
+  RelevantPrototypeRegex,
   isRelevantPrototype,
 } from './prototypes';
 
@@ -19,13 +21,10 @@ export interface RawGameData {
   readonly reagents: ReadonlyMap<string, ReagentPrototype>;
   readonly stacks: ReadonlyMap<string, StackPrototype>;
   readonly constructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>;
+  readonly metamorphRecipes: ReadonlyMap<string, MetamorphRecipePrototype>;
   readonly recipes: readonly MicrowaveMealRecipe[];
   readonly reactions: readonly ReactionPrototype[];
 }
-
-// To cut down on YAML parsing time, we filter explicitly for files with
-// the sort of prototypes we're interested in.
-const RelevantFileRegex = /\btype:\s+(?:constructionGraph|entity|microwaveMealRecipe|reaction|reagent|stack)\b/;
 
 // SS14 uses `!type:T` tags to create values of type `T`.
 // The yaml library we're using provides no way to create tags dynamically,
@@ -50,6 +49,11 @@ const typeTag = (name: string): CollectionTag => ({
 const customTags: CollectionTag[] = [
   // Add more tags here as necessary
   typeTag('CreateEntityReactionEffect'),
+  typeTag('SequenceLength'),
+  typeTag('LastElementHasTags'),
+  typeTag('ElementHasTags'),
+  typeTag('FoodHasReagent'),
+  typeTag('IngredientsWithTags'),
 ];
 
 export const findResourceFiles = (prototypeDir: string): string[] =>
@@ -61,13 +65,14 @@ export const readRawGameData = (yamlPaths: string[]): RawGameData => {
   const reagents = new Map<string, ReagentPrototype>();
   const stacks = new Map<string, StackPrototype>();
   const constructionGraphs = new Map<string, ConstructionGraphPrototype>();
+  const metamorphRecipes = new Map<string, MetamorphRecipePrototype>();
   const recipes: MicrowaveMealRecipe[] = [];
   const reactions: ReactionPrototype[] = [];
 
   for (const path of yamlPaths) {
     const source = readFileTextWithoutTheStupidBOM(path);
 
-    if (!RelevantFileRegex.test(source)) {
+    if (!RelevantPrototypeRegex.test(source)) {
       // The file does not seem to contain anything relevant, skip it
       continue;
     }
@@ -101,6 +106,9 @@ export const readRawGameData = (yamlPaths: string[]): RawGameData => {
         case 'constructionGraph':
           constructionGraphs.set(node.id, node);
           break;
+        case 'metamorphRecipe':
+          metamorphRecipes.set(node.id, node);
+          break;
         case 'microwaveMealRecipe':
           recipes.push(node);
           break;
@@ -115,6 +123,7 @@ export const readRawGameData = (yamlPaths: string[]): RawGameData => {
     reagents,
     stacks,
     constructionGraphs,
+    metamorphRecipes,
     recipes,
     reactions,
   };

@@ -1,19 +1,21 @@
-import {DefaultTotalSliceCount, DefaultRecipeGroup} from './constants';
+import {DefaultRecipeGroup} from './constants';
 import {RawGameData} from './read-raw';
 import {getReagentResult, getSolidResult} from './reaction-helpers';
-import {Solution, SolutionContainerManagerComponent} from './components';
+import {Solution} from './components';
 import {
-  EntityPrototype,
   ReagentPrototype,
   MicrowaveMealRecipe,
   ReactionPrototype,
   ConstructionGraphPrototype,
 } from './prototypes';
-import {entityAndAncestors} from './helpers';
-import {SpecialDiet, ResolvedSpecialRecipe} from './types';
+import {
+  ResolvedSpecialRecipe,
+  ResolvedEntity,
+  ResolvedConstruction,
+} from './types';
 
 export interface PrunedGameData {
-  readonly entities: ReadonlyMap<string, EntityPrototype>;
+  readonly entities: ReadonlyMap<string, ResolvedEntity>;
   readonly reagents: ReadonlyMap<string, ReagentPrototype>;
   readonly recipes: readonly MicrowaveMealRecipe[];
   readonly reactions: readonly ReactionPrototype[];
@@ -29,8 +31,8 @@ export interface FilterParams {
 }
 
 export const filterRelevantPrototypes = (
-  raw: RawGameData,
-  specialDiets: SpecialDiet[],
+  raw: Omit<RawGameData, 'entities'>,
+  allEntities: ReadonlyMap<string, ResolvedEntity>,
   params: FilterParams
 ): PrunedGameData => {
   const usedEntities = new Set<string>();
@@ -72,12 +74,11 @@ export const filterRelevantPrototypes = (
   let hasAnythingNew: boolean;
   do {
     hasAnythingNew = false;
-    for (const entity of raw.entities.values()) {
+    for (const entity of allEntities.values()) {
       if (tryAddSpecialRecipe(
         entity,
         specialRecipes,
         usedEntities,
-        raw.entities,
         raw.constructionGraphs,
         params.ignoredSpecialRecipes
       )) {
@@ -103,12 +104,8 @@ export const filterRelevantPrototypes = (
 
   const reagentSources = new Map<string, string[]>();
 
-  for (const entity of raw.entities.values()) {
-    const sourceOf = findGrindableProduceReagents(
-      entity,
-      raw.entities,
-      usedReagents
-    );
+  for (const entity of allEntities.values()) {
+    const sourceOf = findGrindableProduceReagents(entity, usedReagents);
     if (sourceOf && sourceOf.length > 0) {
       usedEntities.add(entity.id);
       for (const reagentId of sourceOf) {
@@ -142,13 +139,9 @@ export const filterRelevantPrototypes = (
     }
   }
 
-  for (const diet of specialDiets) {
-    usedEntities.add(diet.organ);
-  }
-
-  const entities = new Map<string, EntityPrototype>();
+  const entities = new Map<string, ResolvedEntity>();
   for (const id of usedEntities) {
-    const entity = raw.entities.get(id);
+    const entity = allEntities.get(id);
     if (!entity) {
       throw new Error(`Could not resolve entity: ${id}`);
     }
@@ -174,56 +167,18 @@ export const filterRelevantPrototypes = (
   };
 };
 
-interface SliceableState {
-  slice?: string;
-  count?: number;
-}
-
-interface ConstructionState {
-  graph?: string;
-  node?: string;
-  edge?: number;
-  step?: number;
-}
-
-/** Frontier */
-interface DeepFryState {
-  output?: string;
-}
-
 const tryAddSpecialRecipe = (
-  entity: EntityPrototype,
+  entity: ResolvedEntity,
   specialRecipes: Map<string, ResolvedSpecialRecipe>,
   usedEntities: Set<string>,
-  allEntities: ReadonlyMap<string, EntityPrototype>,
   allConstructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>,
   ignoredSpecialRecipes: ReadonlySet<string>
 ): boolean => {
-  const sliceableState: SliceableState = {};
-  const constructionState: ConstructionState = {};
-  const deepFryState: DeepFryState = {}; // Frontier
-
-  for (const ent of entityAndAncestors(entity, allEntities)) {
-    if (ent.components) {
-      for (const comp of ent.components) {
-        switch (comp.type) {
-          case 'SliceableFood':
-            Object.assign(sliceableState, comp);
-            break;
-          case 'Construction':
-            Object.assign(constructionState, comp);
-            break;
-          case 'DeepFrySpawn':
-            Object.assign(deepFryState, comp);
-            break;
-        }
-      }
-    }
-  }
-
   // NOTE: We CANNOT treat slicing and constructing as mutually exclusive!
   // FoodDough can be cut into FoodDoughSlice *or* rolled into FoodDoughFlat.
   let addedAnything = false;
+
+  const {sliceableFood, construction, deepFryOutput} = entity;
 
   // If this entity can be sliced to something that's used as an ingredient
   // (e.g. cheese wheel to cheese slice), then add a special recipe for it
@@ -232,14 +187,17 @@ const tryAddSpecialRecipe = (
   // Note: We ignore things that can be sliced into non-ingredients, or we'd
   // end up with totally pointless cut recipes for every single type of cake
   // and pie, etc.
-  if (sliceableState.slice && usedEntities.has(sliceableState.slice)) {
+  if (
+    sliceableFood?.slice != null &&
+    usedEntities.has(sliceableFood.slice)
+  ) {
     const recipeId = `cut!${entity.id}`;
     if (!specialRecipes.has(recipeId)) {
       usedEntities.add(entity.id);
       specialRecipes.set(recipeId, {
         method: 'cut',
-        solidResult: sliceableState.slice,
-        maxCount: sliceableState.count ?? DefaultTotalSliceCount,
+        solidResult: sliceableFood.slice,
+        maxCount: sliceableFood.count,
         solids: {
           [entity.id]: 1,
         },
@@ -256,7 +214,7 @@ const tryAddSpecialRecipe = (
   // for it.
   for (const constructed of traverseConstructionGraph(
     entity.id,
-    constructionState,
+    construction,
     allConstructionGraphs
   )) {
     const {method, solidResult} = constructed;
@@ -280,14 +238,14 @@ const tryAddSpecialRecipe = (
   }
 
   // Frontier: If the entity has a DeepFrySpawn, we can deep fry it. Crispy.
-  if (deepFryState.output) {
+  if (deepFryOutput) {
     const recipeId = `deepFry!${entity.id}`;
     if (!specialRecipes.has(recipeId)) {
       usedEntities.add(entity.id);
-      usedEntities.add(deepFryState.output);
+      usedEntities.add(deepFryOutput);
       specialRecipes.set(recipeId, {
         method: 'deepFry',
-        solidResult: deepFryState.output,
+        solidResult: deepFryOutput,
         solids: {
           [entity.id]: 1,
         },
@@ -295,6 +253,7 @@ const tryAddSpecialRecipe = (
         reagents: {},
         group: DefaultRecipeGroup,
       });
+      addedAnything = true;
     }
   }
 
@@ -373,21 +332,22 @@ const isFoodRelatedReagent = (reagent: ReagentPrototype): boolean =>
 
 function* traverseConstructionGraph(
   entityId: string,
-  state: ConstructionState,
+  constr: ResolvedConstruction | null,
   allConstructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>
 ): Generator<ResolvedSpecialRecipe> {
   if (
-    state.graph == null || state.node == null ||
+    !constr ||
+    constr.graph == null || constr.node == null ||
     // We can't handle entities in the middle of construction
-    state.edge != null || state.step != null
+    constr.edge != null || constr.step != null
   ) {
     return;
   }
 
-  const graph = allConstructionGraphs.get(state.graph);
+  const graph = allConstructionGraphs.get(constr.graph);
   if (!graph) {
     console.warn(
-      `Entity '${entityId}': Unknown construction graph: ${state.graph}`
+      `Entity '${entityId}': Unknown construction graph: ${constr.graph}`
     );
     return;
   }
@@ -399,7 +359,7 @@ function* traverseConstructionGraph(
   // with one single step that uses a 'Rolling' tool with no conditions or
   // actions that leads to a target node with a different entity. That's it.
   // Nothing fancy.
-  const startNode = graph.graph.find(n => n.node === state.node);
+  const startNode = graph.graph.find(n => n.node === constr.node);
   if (!startNode || !startNode.edges) {
     // Broken construction graph or we're at an end node with no edges
     return;
@@ -455,53 +415,30 @@ function* traverseConstructionGraph(
 }
 
 const findGrindableProduceReagents = (
-  entity: EntityPrototype,
-  allEntities: ReadonlyMap<string, EntityPrototype>,
+  entity: ResolvedEntity,
   usedReagents: Set<string>
 ): string[] | null => {
-  let produce = false;
-  let grindableSolutionName: string | null = null;
-  let juiceableSolution: Solution | null = null;
-  let solutions: SolutionContainerManagerComponent | null = null;
+  const {isProduce, extractable, solution} = entity;
 
-  for (const ent of entityAndAncestors(entity, allEntities)) {
-    if (ent.components) {
-      for (const comp of ent.components) {
-        switch (comp.type) {
-          case 'SolutionContainerManager':
-            solutions = comp;
-            break;
-          case 'Produce':
-            produce = true;
-            break;
-          case 'Extractable':
-            grindableSolutionName = comp.grindableSolutionName ?? null;
-            if (comp.juiceSolution) {
-              juiceableSolution = comp.juiceSolution;
-            }
-            break;
-        }
-      }
-    }
-  }
-
-  if (!produce) {
+  if (
+    !extractable ||
+    !solution ||
     // Don't show random grindable objects, just plants that can be grown.
+    !isProduce
+  ) {
     return null;
   }
 
   const foundSolutions: Solution[] = [];
 
   const grindSolution =
-    grindableSolutionName &&
-    solutions &&
-    solutions.solutions &&
-    solutions.solutions[grindableSolutionName];
+    extractable.grindSolutionName &&
+    solution[extractable.grindSolutionName];
   if (grindSolution && grindSolution.reagents) {
     foundSolutions.push(grindSolution);
   }
-  if (juiceableSolution && juiceableSolution.reagents) {
-    foundSolutions.push(juiceableSolution);
+  if (extractable.juiceSolution?.reagents) {
+    foundSolutions.push(extractable.juiceSolution);
   }
 
   if (foundSolutions.length === 0) {
