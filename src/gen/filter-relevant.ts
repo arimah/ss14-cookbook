@@ -135,9 +135,7 @@ export const filterRelevantPrototypes = (
     }
 
     for (const entityId of sources) {
-      if (!usedEntities.has(entityId)) {
-        continue;
-      }
+      usedEntities.add(entityId);
       sourceList.push(entityId);
     }
   }
@@ -380,7 +378,7 @@ function* traverseConstructionGraph(
     // We can't handle entities in the middle of construction
     state.edge != null || state.step != null
   ) {
-    return undefined;
+    return;
   }
 
   const graph = allConstructionGraphs.get(state.graph);
