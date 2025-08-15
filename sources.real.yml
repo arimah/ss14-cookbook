@@ -34,6 +34,22 @@ base:
       filterSummary: "theobromine-containing"
   sortingIdRewrites: &baseRewrites
     - "rewrites_base.yml"
+  ignoredSpecialRecipes: &ignoredSpecialRecipes
+    # These eggs look indistinguishable from regular FoodEgg, and the recipes
+    # as a result are also seemingly identical. To avoid confusing people with
+    # three identical egg ingredients and three identical boiled egg recipes,
+    # we ignore these recipes altogether.
+    - heat!FoodEggChickenFertilized
+    - heat!FoodEggDuckFertilized
+  ignoreSourcesOf: &ignoredSources
+    # These reagents bloat the list without providing anything especially useful.
+    - Water
+    - Blood
+    - Nutriment
+    - Vitamin
+  forceIncludeReagentSources: &reagentSources
+    # Eggs can be trivially cracked into raw egg.
+    Egg: [FoodEgg]
 
 frontier:
   name: "Frontier"
@@ -89,6 +105,9 @@ frontier:
     - NFRecipeBuildABuddyReptilian
     - NFRecipeBuildABuddySlime
     - NFRecipeBuildABuddyVulpkanin
+  ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoreSourcesOf: *ignoredSources
+  forceIncludeReagentSources: *reagentSources
 
 delta-v:
   name: "Delta-V"
@@ -108,6 +127,9 @@ delta-v:
   specialReagents:
     - *theobromine
   sortingIdRewrites: *baseRewrites
+  ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoreSourcesOf: *ignoredSources
+  forceIncludeReagentSources: *reagentSources
 
 rmc-14:
   name: "RMC-14"
@@ -122,6 +144,9 @@ rmc-14:
   specialReagents:
     - *theobromine
   sortingIdRewrites: *baseRewrites
+  ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoreSourcesOf: *ignoredSources
+  forceIncludeReagentSources: *reagentSources
 
 floof:
   name: "Floof"
@@ -142,6 +167,9 @@ floof:
   specialReagents:
     - *theobromine
   sortingIdRewrites: *baseRewrites
+  ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoreSourcesOf: *ignoredSources
+  forceIncludeReagentSources: *reagentSources
 
 impstation:
   name: "Impstation"
@@ -170,6 +198,9 @@ impstation:
       filterSummary: "salty"
     - *theobromine
   sortingIdRewrites: *baseRewrites
+  ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoreSourcesOf: *ignoredSources
+  forceIncludeReagentSources: *reagentSources
 
 moff:
   name: "Moff Station"
@@ -184,3 +215,6 @@ moff:
   specialReagents:
     - *theobromine
   sortingIdRewrites: *baseRewrites
+  ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoreSourcesOf: *ignoredSources
+  forceIncludeReagentSources: *reagentSources

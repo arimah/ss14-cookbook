@@ -138,8 +138,6 @@ mystation:
   sortingIdRewrites:
     - "rewrites_base.yml"
   # Recipes to ignore. The values are recipe prototype IDs.
-  # There are a few more special recipes that are also ignored, which you can
-  # find in `src/gen/constants.ts`.
   # Optional. Default value: []
   ignoredRecipes:
     - NFRecipeBuildABuddyHuman
@@ -147,3 +145,34 @@ mystation:
     - NFRecipeBuildABuddyReptilian
     - NFRecipeBuildABuddySlime
     - NFRecipeBuildABuddyVulpkanin
+  # Special (non-microwave) recipes to ignore. The values are the generated
+  # recipe ID, which follows the format `method!EntityID`. The entity ID is
+  # either the singular ingredient, for `heat`, `cut`, `roll` and `deepFry`
+  # recipes, or the ID of the reaction for `r` (reaction).
+  # Note: *not* the reagent ID! To exclude the dough reaction, you would add
+  # `r!CreateDough`, not `r!FoodDough`.
+  # Optional. Default value: []
+  ignoredSpecialRecipes:
+    # These eggs look indistinguishable from regular FoodEgg, and the recipes
+    # as a result are also seemingly identical. To avoid confusing people with
+    # three identical egg ingredients and three identical boiled egg recipes,
+    # we ignore these recipes altogether.
+    - heat!FoodEggChickenFertilized
+    - heat!FoodEggDuckFertilized
+  # Don't generate or show sources of these reagents. They tend to bload the
+  # list without providing anything useful. Almost all produces can be ground
+  # into nutriment, many meats into blood.
+  # Optional. Default value: []
+  ignoreSourcesOf:
+    - Water
+    - Blood
+    - Nutriment
+    - Vitamin
+  # "Harcoded" reagent sources. The key is the reagent ID, the value is a list
+  # of entities that the reagent can be obtained from.
+  # Note: The source entities will *always* be added to the generated file,
+  # even if they are not used as ingredients in any recipe.
+  # Optional: Default value: []
+  forceIncludeReagentSources: &reagentSources
+    # Eggs can be trivially cracked into raw egg.
+    Egg: [FoodEgg]

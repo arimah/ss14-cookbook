@@ -32,6 +32,9 @@ interface ForkInfo {
   readonly microwaveRecipeTypes?: MicrowaveRecipeTypes;
   readonly sortingIdRewrites?: string[];
   readonly ignoredRecipes?: string[];
+  readonly ignoredSpecialRecipes?: string[];
+  readonly ignoreSourcesOf?: string[];
+  readonly forceIncludeReagentSources?: Record<string, string[]>;
 }
 
 const PrototypesSubPath = './Resources/Prototypes';
@@ -65,7 +68,14 @@ const buildFork = async (id: string, fork: ForkInfo): Promise<ProcessedGameData>
   const filtered = filterRelevantPrototypes(
     raw,
     fork.specialDiets ?? [],
-    new Set(fork.ignoredRecipes ?? [])
+    {
+      ignoredRecipes: new Set(fork.ignoredRecipes ?? []),
+      ignoredSpecialRecipes: new Set(fork.ignoredSpecialRecipes ?? []),
+      ignoreSourcesOf: new Set(fork.ignoreSourcesOf ?? []),
+      forceIncludeReagentSources: new Map(
+        Object.entries(fork.forceIncludeReagentSources ?? {})
+      ),
+    }
   );
   console.log(
     `${

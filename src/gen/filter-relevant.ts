@@ -1,10 +1,4 @@
-import {
-  DefaultTotalSliceCount,
-  IgnoredSpecialRecipes,
-  IgnoreSourcesOf,
-  ForceIncludeReagentSources,
-  DefaultRecipeGroup,
-} from './constants';
+import {DefaultTotalSliceCount, DefaultRecipeGroup} from './constants';
 import {RawGameData} from './read-raw';
 import {getReagentResult, getSolidResult} from './reaction-helpers';
 import {Solution, SolutionContainerManagerComponent} from './components';
@@ -27,10 +21,17 @@ export interface PrunedGameData {
   readonly reagentSources: ReadonlyMap<string, readonly string[]>;
 }
 
+export interface FilterParams {
+  ignoredRecipes: ReadonlySet<string>;
+  ignoredSpecialRecipes: ReadonlySet<string>;
+  ignoreSourcesOf: ReadonlySet<string>;
+  forceIncludeReagentSources: ReadonlyMap<string, readonly string[]>;
+}
+
 export const filterRelevantPrototypes = (
   raw: RawGameData,
   specialDiets: SpecialDiet[],
-  ignoredRecipes: ReadonlySet<string>
+  params: FilterParams
 ): PrunedGameData => {
   const usedEntities = new Set<string>();
   const usedReagents = new Set<string>();
@@ -38,7 +39,7 @@ export const filterRelevantPrototypes = (
   const specialRecipes = new Map<string, ResolvedSpecialRecipe>();
 
   for (const recipe of raw.recipes) {
-    if (ignoredRecipes.has(recipe.id)) {
+    if (params.ignoredRecipes.has(recipe.id)) {
       continue;
     }
 
@@ -74,10 +75,11 @@ export const filterRelevantPrototypes = (
     for (const entity of raw.entities.values()) {
       if (tryAddSpecialRecipe(
         entity,
+        specialRecipes,
+        usedEntities,
         raw.entities,
         raw.constructionGraphs,
-        specialRecipes,
-        usedEntities
+        params.ignoredSpecialRecipes
       )) {
         hasAnythingNew = true;
       }
@@ -110,7 +112,7 @@ export const filterRelevantPrototypes = (
     if (sourceOf && sourceOf.length > 0) {
       usedEntities.add(entity.id);
       for (const reagentId of sourceOf) {
-        if (IgnoreSourcesOf.has(reagentId)) {
+        if (params.ignoreSourcesOf.has(reagentId)) {
           continue;
         }
 
@@ -124,7 +126,7 @@ export const filterRelevantPrototypes = (
     }
   }
 
-  for (const [reagentId, sources] of ForceIncludeReagentSources) {
+  for (const [reagentId, sources] of params.forceIncludeReagentSources) {
     if (!usedReagents.has(reagentId)) {
       continue;
     }
@@ -191,10 +193,11 @@ interface DeepFryState {
 
 const tryAddSpecialRecipe = (
   entity: EntityPrototype,
+  specialRecipes: Map<string, ResolvedSpecialRecipe>,
+  usedEntities: Set<string>,
   allEntities: ReadonlyMap<string, EntityPrototype>,
   allConstructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>,
-  specialRecipes: Map<string, ResolvedSpecialRecipe>,
-  usedEntities: Set<string>
+  ignoredSpecialRecipes: ReadonlySet<string>
 ): boolean => {
   const sliceableState: SliceableState = {};
   const constructionState: ConstructionState = {};
@@ -260,7 +263,7 @@ const tryAddSpecialRecipe = (
     const recipeId = `${method}!${entity.id}`;
     const shouldAddRecipe =
       !specialRecipes.has(recipeId) &&
-      !IgnoredSpecialRecipes.has(recipeId) &&
+      !ignoredSpecialRecipes.has(recipeId) &&
       (
         // Rolling must produce an ingredient, e.g. dough to flat dough
         method === 'roll' && usedEntities.has(solidResult) ||

@@ -19,33 +19,6 @@ export const DefaultRecipeGroup = 'Other';
  */
 export const DefaultTotalSliceCount = 5;
 
-/** Special recipes to ignore. */
-export const IgnoredSpecialRecipes: ReadonlySet<string> = new Set([
-  // These eggs look indistinguishable from regular FoodEgg, and the recipes
-  // as a result are also seemingly identical. To avoid confusing people with
-  // three identical egg ingredients and three identical boiled egg recipes,
-  // we ignore these recipes altogether.
-  'heat!FoodEggChickenFertilized',
-  'heat!FoodEggDuckFertilized',
-]);
-
-/**
- * Ignore sources of these reagents. It bloats the list without providing
- * anything especially useful.
- */
-export const IgnoreSourcesOf: ReadonlySet<string> = new Set([
-  'Water',
-  'Blood',
-  'Nutriment',
-  'Vitamin',
-]);
-
-/** Hardcoded reagent sources. */
-export const ForceIncludeReagentSources: ReadonlyMap<string, readonly string[]> = new Map([
-  // Eggs can be trivially cracked into raw egg.
-  ['Egg', ['FoodEgg']],
-]);
-
 export const GameDataPath = (id: string, hash: string) =>
   `public/data/data_${id}.${hash}.json`;
 
