@@ -53,7 +53,7 @@ const customTags: CollectionTag[] = [
 ];
 
 export const findResourceFiles = (prototypeDir: string): string[] =>
-  globSync('*/**/*.yml', {cwd: prototypeDir})
+  globSync('**/*.yml', {cwd: prototypeDir})
     .map(filePath => resolve(prototypeDir, filePath))
 
 export const readRawGameData = (yamlPaths: string[]): RawGameData => {
