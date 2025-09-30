@@ -3,15 +3,17 @@ import {resolve} from 'path';
 import {FluentBundle, FluentResource} from '@fluent/bundle';
 import {globSync} from 'glob';
 
-import {Recipe} from '../types';
+import {CookingMethod} from '../types';
 
 import {PrunedGameData} from './filter-relevant';
 import {
   DefaultCookTime,
   DefaultRecipeGroup,
+  MixerCategoryToStepType,
 } from './constants';
+import {ConstructRecipeBuilder} from './construct-recipe-builder';
 import {getReagentResult, getSolidResult} from './reaction-helpers';
-import {MicrowaveMealRecipe, Reactant} from './prototypes';
+import {MicrowaveMealRecipe, Reactant, ReactionPrototype} from './prototypes';
 import {readFileTextWithoutTheStupidBOM} from './helpers';
 import {
   MethodEntities,
@@ -26,7 +28,7 @@ export interface ResolvedGameData {
   readonly reagents: ReadonlyMap<string, ResolvedReagent>;
   readonly recipes: ReadonlyMap<string, ResolvedRecipe>;
   readonly reagentSources: ReadonlyMap<string, readonly string[]>;
-  readonly methodEntities: ReadonlyMap<Recipe['method'], ResolvedEntity>;
+  readonly methodEntities: ReadonlyMap<CookingMethod, ResolvedEntity>;
   /** Frontier */
   readonly microwaveRecipeTypeEntities: ReadonlyMap<string, ResolvedEntity> | undefined;
 }
@@ -54,6 +56,7 @@ export const resolvePrototypes = (
       time: recipe.time ?? DefaultCookTime,
       solidResult: recipe.result,
       reagentResult: null,
+      resultQty: recipe.resultCount, // Frontier
       solids: recipe.solids ?? {},
       reagents: recipe.reagents
         ? convertMicrowaveReagents(recipe.reagents)
@@ -67,23 +70,8 @@ export const resolvePrototypes = (
     recipes.set(id, recipe);
   }
 
-  for (const reaction of filtered.reactions) {
-    const reagentResult = getReagentResult(reaction);
-    // Add an arbitrary prefix to prevent collisions.
-    const id = `r!${reaction.id}`;
-    recipes.set(id, {
-      method: 'mix',
-      reagentResult: reagentResult?.[0] ?? null,
-      resultAmount: reagentResult?.[1] ?? 0,
-      solidResult: getSolidResult(reaction),
-      minTemp: reaction.minTemp ?? 0,
-      maxTemp: reaction.maxTemp && isFinite(reaction.maxTemp)
-        ? reaction.maxTemp
-        : null,
-      reagents: reaction.reactants,
-      solids: {},
-      group: DefaultRecipeGroup,
-    });
+  for (const [id, recipe] of reactionRecipes(filtered.reactions)) {
+    recipes.set(id, recipe);
   }
 
   for (const reagent of filtered.reagents.values()) {
@@ -97,14 +85,14 @@ export const resolvePrototypes = (
     });
   }
 
-  const resolvedMethodEntities = new Map<Recipe['method'], ResolvedEntity>();
+  const resolvedMethodEntities = new Map<CookingMethod, ResolvedEntity>();
   for (const [method, id] of Object.entries(methodEntities)) {
     if (id === null) {
       // Unsupported cooking method on this fork, skip it.
       continue;
     }
     resolvedMethodEntities.set(
-      method as Recipe['method'],
+      method as CookingMethod,
       allEntities.get(id)!
     );
   }
@@ -175,3 +163,57 @@ const convertMicrowaveReagents = (
   }
   return result;
 };
+
+function* reactionRecipes(
+  reactions: readonly ReactionPrototype[]
+): Generator<[string, ResolvedRecipe]> {
+  for (const reaction of reactions) {
+    const reagentResult = getReagentResult(reaction);
+    const solidResult = getSolidResult(reaction);
+    // Add an arbitrary prefix to prevent collisions.
+    const id = `r!${reaction.id}`;
+
+    if (
+      reaction.requiredMixerCategories &&
+      reaction.requiredMixerCategories.length > 0
+    ) {
+      for (const category of reaction.requiredMixerCategories) {
+        const type = MixerCategoryToStepType.get(category);
+        if (!type) {
+          continue;
+        }
+
+        const recipe = new ConstructRecipeBuilder();
+        if (reagentResult) {
+          recipe
+            .withReagentResult(reagentResult[0])
+            .withResultQty(reagentResult[1]);
+        } else {
+          recipe.withSolidResult(solidResult!);
+        }
+
+        recipe.mix(reaction.reactants);
+        if (reaction.minTemp) {
+          recipe.heatMixture(reaction.minTemp, reaction.maxTemp);
+        }
+        recipe.pushStep({type});
+
+        yield [`${id}:${type}`, recipe.toRecipe()];
+      }
+    } else {
+      yield [id, {
+        method: 'mix',
+        solidResult,
+        reagentResult: reagentResult?.[0] ?? null,
+        resultQty: reagentResult?.[1] ?? 1,
+        minTemp: reaction.minTemp ?? 0,
+        maxTemp: reaction.maxTemp && isFinite(reaction.maxTemp)
+          ? reaction.maxTemp
+          : null,
+        reagents: reaction.reactants,
+        solids: {},
+        group: DefaultRecipeGroup,
+      }];
+    }
+  }
+}

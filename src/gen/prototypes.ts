@@ -39,6 +39,8 @@ export interface MicrowaveMealRecipe extends PlainObject {
   readonly group?: string;
   /** Frontier */
   readonly recipeType?: string | readonly string[];
+  /** Frontier */
+  readonly resultCount?: number;
 }
 
 export interface ReactionPrototype extends PlainObject {

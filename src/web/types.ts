@@ -1,4 +1,5 @@
 import {
+  CookingMethod,
   Entity,
   MicrowaveRecipeType,
   Reagent,
@@ -6,6 +7,15 @@ import {
   SpritePoint,
   Trait,
 } from '../types';
+
+/**
+ * The cooking method that's shown on the right-hand side of the recipe.
+ * Also used by the recipe filter options.
+ */
+export type DisplayMethod =
+  | Exclude<CookingMethod, 'shake' | 'stir' | 'heatMixture'>
+  | 'construct'
+  ;
 
 export interface SearchableRecipeData {
   /** The fork ID that this game data is for. */
@@ -44,7 +54,7 @@ export interface SearchableRecipeData {
   /** All available recipe groups, sorted alphabetically. */
   readonly recipeGroups: readonly string[];
 
-  readonly methodSprites: Readonly<Partial<Record<Recipe['method'], SpritePoint>>>;
+  readonly methodSprites: Readonly<Partial<Record<CookingMethod, SpritePoint>>>;
   readonly beakerFill: SpritePoint;
   /** Frontier */
   readonly microwaveRecipeTypes:

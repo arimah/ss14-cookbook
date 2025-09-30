@@ -1,5 +1,10 @@
-import {ReagentIngredient, Recipe} from '../types';
-import { Solution } from './components';
+import {
+  ConstructionStep,
+  ConstructVerb,
+  ReagentIngredient,
+  Recipe,
+} from '../types';
+import {Solution} from './components';
 
 export type MethodEntities = Readonly<Record<Recipe['method'], string | null>>;
 
@@ -177,6 +182,7 @@ interface ResolvedRecipeBase {
   // The ID is in the owning collection.
   readonly solidResult: string | null;
   readonly reagentResult: string | null;
+  readonly resultQty?: number;
   readonly solids: Record<string, number>;
   readonly reagents: Record<string, ReagentIngredient>;
   readonly group: string;
@@ -192,7 +198,7 @@ export interface ResolvedMicrowaveRecipe extends ResolvedRecipeBase {
 
 export interface ResolvedReactionRecipe extends ResolvedRecipeBase {
   readonly method: 'mix';
-  readonly resultAmount: number;
+  readonly resultQty: number;
   readonly minTemp: number;
   readonly maxTemp: number | null;
 }
@@ -205,37 +211,21 @@ export interface ResolvedReactionRecipe extends ResolvedRecipeBase {
  * with various unique features. The term "special recipe" just kinda stuck.
  */
 export type ResolvedSpecialRecipe =
-  | ResolvedCutRecipe
-  | ResolvedRollRecipe
-  | ResolvedHeatRecipe
   | ResolvedDeepFryRecipe
+  | ResolvedConstructionRecipe
   ;
-
-export interface ResolvedCutRecipe extends ResolvedRecipeBase {
-  readonly method: 'cut';
-  readonly solidResult: string;
-  readonly maxCount: number;
-  readonly reagentResult: null;
-}
-
-export interface ResolvedRollRecipe extends ResolvedRecipeBase {
-  readonly method: 'roll';
-  readonly solidResult: string;
-  readonly reagentResult: null;
-}
-
-export interface ResolvedHeatRecipe extends ResolvedRecipeBase {
-  readonly method: 'heat';
-  readonly minTemp: number;
-  readonly solidResult: string;
-  readonly reagentResult: null;
-}
 
 /** Frontier: Deep-frying recipes */
 export interface ResolvedDeepFryRecipe extends ResolvedRecipeBase {
   readonly method: 'deepFry';
   readonly solidResult: string;
   readonly reagentResult: null;
+}
+
+export interface ResolvedConstructionRecipe extends ResolvedRecipeBase {
+  readonly method: 'construct';
+  readonly mainVerb: ConstructVerb | null;
+  readonly steps: ConstructionStep[];
 }
 
 export interface PlainObject {

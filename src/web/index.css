@@ -29,6 +29,7 @@
 .theme-dark {
   --fg: #ffffff;
   --fg-fav: #ffee66;
+  --fg-subtle: #ffffffaa;
   --bg-level-0: #1a1a1a;
   --bg-level-1: #282828;
   --bg-level-2: #393939;
@@ -112,6 +113,7 @@
 .theme-light {
   --fg: #000000;
   --fg-fav: #826c00;
+  --fg-subtle: #000000aa;
   --bg-level-0: #e2e2e2;
   --bg-level-1: #f3f3f3;
   --bg-level-2: #ffffff;
@@ -912,6 +914,31 @@ select {
 
       .recipe_ingredient-help > .icon {
         display: block;
+      }
+
+  .recipe_instructions {
+    list-style-type: decimal;
+  }
+
+    .recipe_step {
+      margin-left: 22px;
+      padding-left: 6px;
+    }
+
+      .recipe_step::marker {
+        color: var(--fg-subtle);
+      }
+
+      :is(.recipe_step--start, .recipe_step--end) > .recipe_ingredient {
+        display: contents;
+      }
+
+        :is(.recipe_step--start, .recipe_step--end) > .recipe_ingredient > :is(.sprite, .reagent) {
+          margin-right: 4px;
+        }
+
+      .recipe_step--simple > .sprite {
+        margin-right: 4px;
       }
 
   .recipe_method {

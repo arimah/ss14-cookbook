@@ -1,4 +1,4 @@
-import {DefaultRecipeGroup} from './constants';
+import {DefaultRecipeGroup, MixerCategoryToStepType} from './constants';
 import {RawGameData} from './read-raw';
 import {getReagentResult, getSolidResult} from './reaction-helpers';
 import {Solution} from './components';
@@ -12,7 +12,9 @@ import {
   ResolvedSpecialRecipe,
   ResolvedEntity,
   ResolvedConstruction,
+  ResolvedConstructionRecipe,
 } from './types';
+import {ConstructRecipeBuilder} from './construct-recipe-builder';
 
 export interface PrunedGameData {
   readonly entities: ReadonlyMap<string, ResolvedEntity>;
@@ -193,18 +195,14 @@ const tryAddSpecialRecipe = (
   ) {
     const recipeId = `cut!${entity.id}`;
     if (!specialRecipes.has(recipeId)) {
-      usedEntities.add(entity.id);
-      specialRecipes.set(recipeId, {
-        method: 'cut',
-        solidResult: sliceableFood.slice,
-        maxCount: sliceableFood.count,
-        solids: {
-          [entity.id]: 1,
-        },
-        reagentResult: null,
-        reagents: {},
-        group: DefaultRecipeGroup,
-      });
+      const recipe = new ConstructRecipeBuilder()
+        .withSolidResult(sliceableFood.slice)
+        .withResultQty(sliceableFood.count)
+        .startWith(entity.id)
+        .cut()
+        .toRecipe();
+      collectUsedEntities(usedEntities, recipe);
+      specialRecipes.set(recipeId, recipe);
       addedAnything = true;
     }
   }
@@ -212,27 +210,26 @@ const tryAddSpecialRecipe = (
   // If this entity can be constructed into something relevant, then add a
   // special recipe *and* mark the entity as used so we can find recipes
   // for it.
-  for (const constructed of traverseConstructionGraph(
+  for (const recipe of traverseConstructionGraph(
     entity.id,
     construction,
     allConstructionGraphs
   )) {
-    const {method, solidResult} = constructed;
-    const recipeId = `${method}!${entity.id}`;
+    const {mainVerb} = recipe;
+    const recipeId = `${mainVerb}!${entity.id}`;
     const shouldAddRecipe =
       !specialRecipes.has(recipeId) &&
       !ignoredSpecialRecipes.has(recipeId) &&
       (
-        // Rolling must produce an ingredient, e.g. dough to flat dough
-        method === 'roll' && usedEntities.has(solidResult) ||
+        // Most methods must produce an ingredient, e.g. dough to flat dough.
+        mainVerb !== 'heat' && usedEntities.has(recipe.solidResult!) ||
         // Heating produces things that don't have to be ingredients, e.g.
         // steak or boiled egg.
-        method === 'heat'
+        mainVerb === 'heat'
       );
     if (shouldAddRecipe) {
-      usedEntities.add(solidResult);
-      usedEntities.add(entity.id);
-      specialRecipes.set(recipeId, constructed);
+      collectUsedEntities(usedEntities, recipe);
+      specialRecipes.set(recipeId, recipe);
       addedAnything = true;
     }
   }
@@ -246,10 +243,10 @@ const tryAddSpecialRecipe = (
       specialRecipes.set(recipeId, {
         method: 'deepFry',
         solidResult: deepFryOutput,
+        reagentResult: null,
         solids: {
           [entity.id]: 1,
         },
-        reagentResult: null,
         reagents: {},
         group: DefaultRecipeGroup,
       });
@@ -258,6 +255,18 @@ const tryAddSpecialRecipe = (
   }
 
   return addedAnything;
+};
+
+const collectUsedEntities = (
+  usedEntities: Set<string>,
+  recipe: ResolvedSpecialRecipe
+): void => {
+  if (recipe.solidResult) {
+    usedEntities.add(recipe.solidResult);
+  }
+  for (const id of Object.keys(recipe.solids)) {
+    usedEntities.add(id);
+  }
 };
 
 const tryAddReaction = (
@@ -274,10 +283,11 @@ const tryAddReaction = (
 
   // Some reactions can only occur in centrifuges, electrolysers and, for
   // whatever reason, by being bashed with a bible. We ignore any reaction
-  // that has such prerequisites.
+  // without a supported mixer category.
   if (
     reaction.requiredMixerCategories != null &&
-    reaction.requiredMixerCategories.length !== 0
+    reaction.requiredMixerCategories.length !== 0 &&
+    !reaction.requiredMixerCategories.some(c => MixerCategoryToStepType.has(c))
   ) {
     return false;
   }
@@ -326,15 +336,14 @@ const tryAddReaction = (
 };
 
 const isFoodRelatedReagent = (reagent: ReagentPrototype): boolean =>
-  reagent.group !== 'Medicine' &&
-  reagent.group !== 'Narcotics' &&
-  reagent.group !== 'Toxins';
+  reagent.group === 'Foods' ||
+  reagent.group === 'Drinks';
 
 function* traverseConstructionGraph(
   entityId: string,
   constr: ResolvedConstruction | null,
   allConstructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>
-): Generator<ResolvedSpecialRecipe> {
+): Generator<ResolvedConstructionRecipe> {
   if (
     !constr ||
     constr.graph == null || constr.node == null ||
@@ -387,29 +396,18 @@ function* traverseConstructionGraph(
 
     const step = steps[0];
     if (step.tool === 'Rolling') {
-      yield {
-        method: 'roll',
-        solidResult: target.entity,
-        solids: {
-          [entityId]: 1,
-        },
-        reagentResult: null,
-        reagents: {},
-        group: DefaultRecipeGroup,
-      };
+      yield new ConstructRecipeBuilder()
+        .withSolidResult(target.entity)
+        .startWith(entityId)
+        .roll()
+        .toRecipe();
     }
     if (step.minTemperature != null && step.maxTemperature == null) {
-      yield {
-        method: 'heat',
-        minTemp: step.minTemperature,
-        solidResult: target.entity,
-        solids: {
-          [entityId]: 1,
-        },
-        reagentResult: null,
-        reagents: {},
-        group: DefaultRecipeGroup,
-      };
+      yield new ConstructRecipeBuilder()
+        .withSolidResult(target.entity)
+        .startWith(entityId)
+        .heat(step.minTemperature)
+        .toRecipe();
     }
   }
 }

@@ -10,6 +10,10 @@ base:
     cut: KitchenKnife
     roll: RollingPin
     heat: KitchenElectricGrill
+    heatMixture: ChemistryHotplate
+    stir: Spoon
+    shake: DrinkShaker
+    construct: ClothingHeadHatChef # general recipes
     deepFry: null
   mixFillState: beakerlarge4
   specialDiets:
@@ -43,10 +47,17 @@ base:
     - heat!FoodEggDuckFertilized
   ignoreSourcesOf: &ignoredSources
     # These reagents bloat the list without providing anything especially useful.
-    - Water
     - Blood
     - Nutriment
     - Vitamin
+    - Water
+    # These have sources that are too rare or weird to be meaningful.
+    - Chlorine # blue pumpkin, rare botany mutation
+    - Gold # golden apple, rare botany mutation; trivially obtained from gold
+    - Nothing # borderline meme reagent
+    - Saline # pickle (Frontier); trivially made with salt + water
+    - UncookedAnimalProteins # meatwheat, rare botany mutation; trivially obtained from meat
+    - Wine # holymelon, rare botany mutation; trivially obtained from bar
   forceIncludeReagentSources: &reagentSources
     # Eggs can be trivially cracked into raw egg.
     Egg: [FoodEgg]
@@ -62,6 +73,10 @@ frontier:
     cut: KitchenKnife
     roll: RollingPin
     heat: KitchenElectricGrill
+    heatMixture: ChemistryHotplate
+    stir: Spoon
+    shake: DrinkShaker
+    construct: ClothingHeadHatChef # general recipes
     deepFry: KitchenDeepFryer
   mixFillState: beakerlarge4
   microwaveRecipeTypes: &microwaveRecipeTypes

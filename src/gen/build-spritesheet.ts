@@ -3,7 +3,7 @@ import {resolve, join as joinPath} from 'path';
 
 import {Jimp, JimpInstance, cssColorToHex} from 'jimp';
 
-import {SpritePoint, SpriteAttribution, Recipe} from '../types';
+import {SpritePoint, SpriteAttribution, Recipe, CookingMethod} from '../types';
 
 import {ResolvedGameData} from './resolve-prototypes';
 import {ColorWhite, SpriteOffsets} from './constants';
@@ -15,7 +15,7 @@ export interface SpriteSheetData {
   readonly spriteCount: number;
   readonly sheet: JimpInstance;
   readonly points: ReadonlyMap<string, SpritePoint>;
-  readonly methods: ReadonlyMap<Recipe['method'], SpritePoint>;
+  readonly methods: ReadonlyMap<CookingMethod, SpritePoint>;
   readonly beakerFillPoint: SpritePoint;
   /** Frontier */
   readonly microwaveRecipeTypes?: ReadonlyMap<string, SpritePoint>;
@@ -85,7 +85,7 @@ export const buildSpriteSheet = async (
     )
   );
 
-  const methods = new Map<Recipe['method'], SpritePoint>(
+  const methods = new Map<CookingMethod, SpritePoint>(
     Array.from(resolved.methodEntities, ([method, {id}]) =>
       [method, spritePoints.get(entityToSpriteKey.get(id)!)!] as const
     )

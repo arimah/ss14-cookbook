@@ -11,7 +11,7 @@ import {
 } from 'react';
 import {Draft, produce} from 'immer';
 
-import {Reagent, Recipe} from '../../types';
+import {Reagent} from '../../types';
 
 import {useGameData} from '../context';
 import {EntitySprite, RawSprite, ReagentSprite} from '../sprites';
@@ -26,10 +26,10 @@ import {InputGroup} from '../input-group';
 import {Checkbox} from '../checkbox';
 import {Tooltip} from '../tooltip';
 import {NeutralCollator} from '../helpers';
+import {DisplayMethod} from '../types';
 
 import {
   RecipeFilter,
-  Method,
   IngredientMode,
   filterIngredientsByName,
   filterReagentsByName,
@@ -122,9 +122,9 @@ const MethodFilter = (props: FilterProps): JSX.Element => {
 
   const toggle = useCallback((method: string) => {
     update(draft => {
-      const index = draft.methods.indexOf(method as Method);
+      const index = draft.methods.indexOf(method as DisplayMethod);
       if (index === -1) {
-        draft.methods.push(method as Method);
+        draft.methods.push(method as DisplayMethod);
       } else {
         draft.methods.splice(index, 1);
       }
@@ -198,7 +198,7 @@ const MethodFilter = (props: FilterProps): JSX.Element => {
 };
 
 interface SecondaryMethod {
-  readonly method: Exclude<Recipe['method'], 'microwave'>;
+  readonly method: Exclude<DisplayMethod, 'microwave'>;
   readonly label: string;
   readonly alt: string;
 }
@@ -209,6 +209,7 @@ const SecondaryMethods: readonly SecondaryMethod[] = [
   {method: 'mix', label: 'Mix', alt: 'beaker'},
   {method: 'cut', label: 'Cut', alt: 'knife'},
   {method: 'roll', label: 'Roll', alt: 'rolling pin'},
+  {method: 'construct', label: 'General', alt: ''},
 ];
 
 interface IngredientProps {

@@ -40,6 +40,10 @@ mystation:
     cut: KitchenKnife
     roll: RollingPin
     heat: KitchenElectricGrill
+    heatMixture: ChemistryHotplate
+    stir: Spoon
+    shake: DrinkShaker
+    construct: ClothingHeadHatChef # general recipes
     # FRONTIER-SPECIFIC.
     # This cooking method is unique to Frontier and should be `null` unless
     # the fork has explicitly and specifically ported Frontier's deep frying.
@@ -134,11 +138,11 @@ mystation:
   # These files rewrite entity prototype IDs to get a better default order in
   # the recipe listing. The repository comes with two files for this purpose:
   # "rewrites_base.yml" and "rewrites_frontier.yml". Feel free to add your own!
-  # Optional. Default value: []
+  # Optional. Default value: []    (no sorting rewrites)
   sortingIdRewrites:
     - "rewrites_base.yml"
   # Recipes to ignore. The values are recipe prototype IDs.
-  # Optional. Default value: []
+  # Optional. Default value: []    (include all recipes)
   ignoredRecipes:
     - NFRecipeBuildABuddyHuman
     - NFRecipeBuildABuddyGoblin
@@ -151,7 +155,7 @@ mystation:
   # recipes, or the ID of the reaction for `r` (reaction).
   # Note: *not* the reagent ID! To exclude the dough reaction, you would add
   # `r!CreateDough`, not `r!FoodDough`.
-  # Optional. Default value: []
+  # Optional. Default value: []    (include all recipes)
   ignoredSpecialRecipes:
     # These eggs look indistinguishable from regular FoodEgg, and the recipes
     # as a result are also seemingly identical. To avoid confusing people with
@@ -162,7 +166,7 @@ mystation:
   # Don't generate or show sources of these reagents. They tend to bload the
   # list without providing anything useful. Almost all produces can be ground
   # into nutriment, many meats into blood.
-  # Optional. Default value: []
+  # Optional. Default value: []    (include all sources)
   ignoreSourcesOf:
     - Water
     - Blood
@@ -173,6 +177,6 @@ mystation:
   # Note: The source entities will *always* be added to the generated file,
   # even if they are not used as ingredients in any recipe.
   # Optional: Default value: []
-  forceIncludeReagentSources: &reagentSources
+  forceIncludeReagentSources:
     # Eggs can be trivially cracked into raw egg.
     Egg: [FoodEgg]
