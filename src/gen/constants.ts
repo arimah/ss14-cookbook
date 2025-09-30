@@ -26,6 +26,12 @@ export const DefaultTotalSliceCount = 5;
 export const DefaultFoodSequenceMaxLayers = 10;
 
 /**
+ * MUST MIRROR C#! This matches the default value of the field
+ * `Butcherable.Type`.`
+ */
+export const DefaultButcheringType = 'Knife';
+
+/**
  * The name of the solution that contains all food reagents.
  * We could extract this from the `FoodComponent`, but in practice literally
  * every single food uses `food`.

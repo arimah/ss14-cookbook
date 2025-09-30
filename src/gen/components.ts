@@ -7,30 +7,73 @@
  * components we care about".
  */
 export type Component =
-  | SpriteComponent
-  | SolutionContainerManagerComponent
-  | SliceableFoodComponent
-  | ExtractableComponent
-  | ProduceComponent
+  | ButcherableComponent
   | ConstructionComponent
-  | TagComponent
-  | StomachComponent
   | DeepFrySpawnComponent
-  | FoodSequenceStartPointComponent
+  | ExtractableComponent
   | FoodSequenceElementComponent
+  | FoodSequenceStartPointComponent
+  | ProduceComponent
+  | SliceableFoodComponent
+  | SolutionContainerManagerComponent
+  | SpriteComponent
+  | StomachComponent
+  | TagComponent
   ;
 
-export interface SpriteComponent {
-  readonly type: 'Sprite';
-  readonly state?: string;
-  readonly sprite?: string;
-  readonly color?: string;
-  readonly layers?: readonly {
-    readonly sprite?: string;
-    readonly state: string;
-    readonly visible?: boolean;
-    readonly color?: string;
-  }[];
+export interface ButcherableComponent {
+  readonly type: 'Butcherable';
+  readonly butcheringType: string;
+  readonly spawned: readonly EntitySpawnEntry[];
+}
+
+export interface EntitySpawnEntry {
+  readonly id?: string;
+  readonly prob?: number;
+  readonly amount?: number;
+  readonly maxAmount?: number;
+  readonly orGroup?: string;
+}
+
+export interface ConstructionComponent {
+  readonly type: 'Construction';
+  readonly graph?: string;
+  readonly node?: string;
+  readonly edge?: number;
+  readonly step?: number;
+}
+
+/** Frontier: Deep frying */
+export interface DeepFrySpawnComponent {
+  readonly type: 'DeepFrySpawn';
+  readonly output: string;
+}
+
+export interface ExtractableComponent {
+  readonly type: 'Extractable';
+  readonly grindableSolutionName?: string;
+  readonly juiceSolution?: Solution;
+}
+
+export interface FoodSequenceElementComponent {
+  readonly type: 'FoodSequenceElement';
+  readonly entries?: Readonly<Record<string, string>>;
+}
+
+export interface FoodSequenceStartPointComponent {
+  readonly type: 'FoodSequenceStartPoint';
+  readonly key?: string;
+  readonly maxLayers?: number;
+}
+
+export interface ProduceComponent {
+  readonly type: 'Produce';
+}
+
+export interface SliceableFoodComponent {
+  readonly type: 'SliceableFood';
+  readonly slice?: string;
+  readonly count?: number;
 }
 
 export interface SolutionContainerManagerComponent {
@@ -48,44 +91,17 @@ export interface SolutionReagent {
   readonly Quantity: number;
 }
 
-export interface SliceableFoodComponent {
-  readonly type: 'SliceableFood';
-  readonly slice?: string;
-  readonly count?: number;
-}
-
-export interface ExtractableComponent {
-  readonly type: 'Extractable';
-  readonly grindableSolutionName?: string;
-  readonly juiceSolution?: Solution;
-}
-
-export interface ProduceComponent {
-  readonly type: 'Produce';
-}
-
-export interface ConstructionComponent {
-  readonly type: 'Construction';
-  readonly graph?: string;
-  readonly node?: string;
-  readonly edge?: number;
-  readonly step?: number;
-}
-
-export interface TagComponent {
-  readonly type: 'Tag';
-  readonly tags?: readonly string[];
-}
-
-export interface FoodSequenceStartPointComponent {
-  readonly type: 'FoodSequenceStartPoint';
-  readonly key?: string;
-  readonly maxLayers?: number;
-}
-
-export interface FoodSequenceElementComponent {
-  readonly type: 'FoodSequenceElement';
-  readonly entries?: Readonly<Record<string, string>>;
+export interface SpriteComponent {
+  readonly type: 'Sprite';
+  readonly state?: string;
+  readonly sprite?: string;
+  readonly color?: string;
+  readonly layers?: readonly {
+    readonly sprite?: string;
+    readonly state: string;
+    readonly visible?: boolean;
+    readonly color?: string;
+  }[];
 }
 
 export interface StomachComponent {
@@ -106,8 +122,7 @@ export interface EntityWhitelist {
   readonly sizes?: readonly string[];
 }
 
-/** Frontier: Deep frying */
-export interface DeepFrySpawnComponent {
-  readonly type: 'DeepFrySpawn';
-  readonly output: string;
+export interface TagComponent {
+  readonly type: 'Tag';
+  readonly tags?: readonly string[];
 }

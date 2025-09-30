@@ -53,7 +53,7 @@ export const RecipeIngredients = memo((
 
 export interface SolidIngredientProps {
   id: string;
-  qty: number;
+  qty?: number;
 }
 
 export const SolidIngredient = (props: SolidIngredientProps): JSX.Element => {
@@ -67,8 +67,7 @@ export const SolidIngredient = (props: SolidIngredientProps): JSX.Element => {
     <span className='recipe_ingredient'>
       <EntitySprite id={id}/>
       <span>
-        {qty}
-        {' '}
+        {qty != null ? `${qty} ` : null}
         {relatedRecipes ? (
           <RecipePopup id={relatedRecipes}>
             <span className='more-info'>

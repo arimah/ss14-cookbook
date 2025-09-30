@@ -2,8 +2,10 @@ import {createDraft, Draft, finishDraft} from 'immer';
 import {RawGameData} from './read-raw';
 import {EntityPrototype} from './prototypes';
 import {
+  ButcherableComponent,
   Component,
   ConstructionComponent,
+  EntitySpawnEntry,
   ExtractableComponent,
   FoodSequenceElementComponent,
   FoodSequenceStartPointComponent,
@@ -12,7 +14,12 @@ import {
   SpriteComponent,
   StomachComponent,
 } from './components';
-import {DefaultFoodSequenceMaxLayers, DefaultTotalSliceCount, FoodSolutionName} from './constants';
+import {
+    DefaultButcheringType,
+  DefaultFoodSequenceMaxLayers,
+  DefaultTotalSliceCount,
+  FoodSolutionName,
+} from './constants';
 import {entityAndAncestors} from './helpers';
 import {ResolvedEntity, ResolvedSolution, ResolvedSpriteLayer} from './types';
 
@@ -45,6 +52,7 @@ const InitialState: ResolvedEntity = {
   foodSequenceStart: null,
   foodSequenceElement: [],
   sliceableFood: null,
+  butcherable: null,
   construction: null,
   deepFryOutput: null,
   stomach: null,
@@ -70,6 +78,9 @@ const resolveEntity = (
     for (const comp of ent.components ?? EmptyComponents) {
       draft.components.add(comp.type);
       switch (comp.type) {
+        case 'Butcherable':
+          resolveButcherable(draft, comp);
+          break;
         case 'Construction':
           resolveConstruction(draft, comp);
           break;
@@ -117,6 +128,25 @@ const resolveEntity = (
   }
 
   return finishDraft(draft);
+};
+
+const resolveButcherable = (
+  draft: Draft<ResolvedEntity>,
+  comp: ButcherableComponent
+): void => {
+  if (!draft.butcherable) {
+    draft.butcherable = {
+      tool: DefaultButcheringType,
+      spawned: null,
+    };
+  }
+
+  if (comp.butcheringType) {
+    draft.butcherable.tool = comp.butcheringType;
+  }
+  if (comp.spawned) {
+    draft.butcherable.spawned = comp.spawned as Draft<EntitySpawnEntry[]>;
+  }
 };
 
 const resolveConstruction = (

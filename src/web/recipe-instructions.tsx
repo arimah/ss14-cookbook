@@ -1,6 +1,8 @@
 import {memo} from 'react';
 
 import {
+    AddStep,
+  AlsoMakesStep,
   ConstructionStep,
   EndStep,
   HeatMixtureStep,
@@ -48,7 +50,7 @@ const Step = (props: StepProps): JSX.Element => {
     case 'mix':
       return <MixStep step={step} visible={visible}/>;
     case 'add':
-      return <li className='recipe_step'>TODO</li>;
+      return <AddStep step={step}/>;
     case 'heat':
       return <HeatStep step={step}/>;
     case 'heatMixture':
@@ -58,6 +60,8 @@ const Step = (props: StepProps): JSX.Element => {
     case 'stir':
     case 'shake':
       return <SimpleStep step={step}/>;
+    case 'alsoMakes':
+      return <AlsoMakesStep step={step}/>;
   }
 };
 
@@ -69,7 +73,7 @@ const StartStep = (props: StartStepProps): JSX.Element => {
   const {step} = props;
   return (
     <li className='recipe_step recipe_step--start'>
-      Take <SolidIngredient id={step.entity} qty={1}/>
+      Take <SolidIngredient id={step.entity}/>
     </li>
   );
 };
@@ -82,7 +86,7 @@ const EndStep = (props: EndStepProps): JSX.Element => {
   const {step} = props;
   return (
     <li className='recipe_step recipe_step--end'>
-      Finish with <SolidIngredient id={step.entity} qty={1}/>
+      Finish with <SolidIngredient id={step.entity}/>
     </li>
   );
 };
@@ -120,6 +124,48 @@ const MixStep = (props: MixStepProps): JSX.Element => {
           reagents={step.reagents}
           solids={{}}
         />
+      </li>
+    );
+  }
+};
+
+interface AddStepProps {
+  step: AddStep;
+}
+
+const AddStep = (props: AddStepProps): JSX.Element => {
+  const {step} = props;
+
+  let text: string;
+  if (step.minCount && step.minCount > 1) {
+    if (step.maxCount) {
+      text = `Add ${step.minCount} to ${step.maxCount} `;
+    } else {
+      text = `Add at least ${step.minCount} `;
+    }
+  } else if (step.maxCount) {
+    text = `Add up to ${step.maxCount} `;
+  } else {
+    text = `Add `;
+  }
+
+  // More compact appearance if only one entity matches
+  if (typeof step.entity === 'string') {
+    return (
+      <li className='recipe_step recipe_step--start'>
+        {text} <SolidIngredient id={step.entity}/>
+      </li>
+    );
+  } else {
+    if (step.minCount || step.maxCount) {
+      text += ' of any of:';
+    } else {
+      text += ' any of:';
+    }
+    return (
+      <li className='recipe_step recipe_step--add'>
+        <span>{text}</span>
+        {step.entity.map(id => <SolidIngredient key={id} id={id}/>)}
       </li>
     );
   }
@@ -186,4 +232,28 @@ const SimpleStepText: Readonly<Record<SimpleInteractionStep['type'], string>> = 
   roll: 'Roll it',
   shake: 'Shake it',
   stir: 'Stir it',
+};
+
+interface AlsoMakesStepProps {
+  step: AlsoMakesStep;
+}
+
+const AlsoMakesStep = (props: AlsoMakesStepProps): JSX.Element => {
+  const {step} = props;
+
+  // More compact appearance if there's only one other entity
+  if (typeof step.entity === 'string') {
+    return (
+      <li className='recipe_step recipe_step--start'>
+        Also makes <SolidIngredient id={step.entity}/>
+      </li>
+    );
+  } else {
+    return (
+      <li className='recipe_step recipe_step--add'>
+        <span>Also makes:</span>
+        {step.entity.map(id => <SolidIngredient key={id} id={id}/>)}
+      </li>
+    );
+  }
 };

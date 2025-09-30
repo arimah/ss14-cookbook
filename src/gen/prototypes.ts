@@ -93,6 +93,7 @@ export interface ConstructionGraphStep {
   readonly tool?: string;
   readonly minTemperature?: number;
   readonly maxTemperature?: number;
+  readonly tag?: string;
 }
 
 export interface MetamorphRecipePrototype {

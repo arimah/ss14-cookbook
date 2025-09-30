@@ -154,6 +154,7 @@ export type ConstructionStep =
   | HeatMixtureStep
   | AddStep
   | SimpleInteractionStep
+  | AlsoMakesStep
   ;
 
 /** "Start with ..." */
@@ -201,6 +202,12 @@ export interface HeatMixtureStep {
 /** Simple, single-verb interaction that doesn't need any extra data. */
 export interface SimpleInteractionStep {
   readonly type: 'cut' | 'roll' | 'stir' | 'shake';
+}
+
+/** A pseudo-step that informs the user that the recipe makes other things. */
+export interface AlsoMakesStep {
+  readonly type: 'alsoMakes';
+  readonly entity: OneOrMoreEntities;
 }
 
 export type OneOrMoreEntities = string | readonly string[];

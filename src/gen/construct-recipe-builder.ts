@@ -151,6 +151,10 @@ export class ConstructRecipeBuilder {
     return this.pushStep(ShakeStep);
   }
 
+  public alsoMakes(entity: OneOrMoreEntities): this {
+    return this.pushStep({type: 'alsoMakes', entity});
+  }
+
   private collectIngredients(step: ConstructionStep): void {
     switch (step.type) {
       case 'start':

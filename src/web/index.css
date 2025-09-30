@@ -934,7 +934,7 @@ select {
       }
 
         :is(.recipe_step--start, .recipe_step--end) > .recipe_ingredient > :is(.sprite, .reagent) {
-          margin-right: 4px;
+          margin-right: 2px;
         }
 
       .recipe_step--simple > .sprite {

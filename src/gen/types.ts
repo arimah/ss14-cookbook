@@ -4,7 +4,7 @@ import {
   ReagentIngredient,
   Recipe,
 } from '../types';
-import {Solution} from './components';
+import {EntitySpawnEntry, Solution} from './components';
 
 export type MethodEntities = Readonly<Record<Recipe['method'], string | null>>;
 
@@ -94,6 +94,11 @@ export interface ResolvedEntity {
    * and count.
    */
   readonly sliceableFood: ResolvedSlice | null;
+  /**
+   * If the entity can be butchered, contains the tool required and the
+   * entities it will spawn.
+   */
+  readonly butcherable: ResolvedButcherable | null;
   /** The entity's construction component data, if it has one. */
   readonly construction: ResolvedConstruction | null;
   /**
@@ -147,6 +152,11 @@ export interface ResolvedExtractable {
 export interface ResolvedSlice {
   readonly slice: string | null;
   readonly count: number;
+}
+
+export interface ResolvedButcherable {
+  readonly tool: string;
+  readonly spawned: readonly EntitySpawnEntry[] | null;
 }
 
 export interface ResolvedConstruction {

@@ -1,7 +1,7 @@
 import {DefaultRecipeGroup, MixerCategoryToStepType} from './constants';
 import {RawGameData} from './read-raw';
 import {getReagentResult, getSolidResult} from './reaction-helpers';
-import {Solution} from './components';
+import {EntitySpawnEntry, Solution} from './components';
 import {
   ReagentPrototype,
   MicrowaveMealRecipe,
@@ -15,6 +15,7 @@ import {
   ResolvedConstructionRecipe,
 } from './types';
 import {ConstructRecipeBuilder} from './construct-recipe-builder';
+import { OneOrMoreEntities } from '../types';
 
 export interface PrunedGameData {
   readonly entities: ReadonlyMap<string, ResolvedEntity>;
@@ -77,10 +78,11 @@ export const filterRelevantPrototypes = (
   do {
     hasAnythingNew = false;
     for (const entity of allEntities.values()) {
-      if (tryAddSpecialRecipe(
+      if (tryAddSpecialRecipes(
         entity,
         specialRecipes,
         usedEntities,
+        allEntities,
         raw.constructionGraphs,
         params.ignoredSpecialRecipes
       )) {
@@ -169,10 +171,11 @@ export const filterRelevantPrototypes = (
   };
 };
 
-const tryAddSpecialRecipe = (
+const tryAddSpecialRecipes = (
   entity: ResolvedEntity,
   specialRecipes: Map<string, ResolvedSpecialRecipe>,
   usedEntities: Set<string>,
+  allEntities: ReadonlyMap<string, ResolvedEntity>,
   allConstructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>,
   ignoredSpecialRecipes: ReadonlySet<string>
 ): boolean => {
@@ -207,16 +210,84 @@ const tryAddSpecialRecipe = (
     }
   }
 
-  // If this entity can be constructed into something relevant, then add a
-  // special recipe *and* mark the entity as used so we can find recipes
+  // If the entity can be butchered by knife, we might be able to add a
+  // recipe. The *input entity* must already be used, either as an ingredient
+  // or as the result of some other recipe.
+  if (
+    entity.butcherable &&
+    entity.butcherable.tool === 'Knife' &&
+    entity.butcherable.spawned &&
+    usedEntities.has(entity.id)
+  ) {
+    const spawns = getAllGuaranteedUsableSpawns(entity.butcherable.spawned);
+
+    const canUseAtLeastOneSpawnedEntity = spawns.some(([id]) => {
+      // We can use the entity if it is a food and a non-material that is
+      // either an ingredient in some other recipe or is the start of a
+      // food sequence.
+      //
+      // Basically, we want to catch burger buns and essentially no other
+      // butcherables without hardcoding burger buns. There are SO MANY
+      // arbitrary entities that can be butchered.
+      const entity = allEntities.get(id)!;
+      return (
+        isEdible(entity) &&
+        !entity.components.has('Material') &&
+        (
+          usedEntities.has(entity.id) ||
+          entity.foodSequenceStart
+        )
+      );
+    });
+
+    if (entity.id === 'FoodBreadBun') {
+      console.log(entity.id, spawns, canUseAtLeastOneSpawnedEntity, entity.components);
+    }
+
+    // If we can use at least one, add them all.
+    if (canUseAtLeastOneSpawnedEntity) {
+      for (const [spawnedId, amount] of spawns) {
+        const recipeId = `butcher!${entity.id}:${spawnedId}`;
+        if (specialRecipes.has(recipeId)) {
+          continue;
+        }
+
+        const builder = new ConstructRecipeBuilder()
+          .withSolidResult(spawnedId)
+          .withResultQty(amount)
+          .startWith(entity.id)
+          .cut();
+        const otherSpawns = spawns
+          .filter(e => e[0] !== spawnedId)
+          .map(e => e[0]);
+        if (otherSpawns.length > 0) {
+          builder.alsoMakes(
+            otherSpawns.length === 1
+              ? otherSpawns[0]
+              : otherSpawns
+          );
+        }
+        const recipe = builder.toRecipe();
+        collectUsedEntities(usedEntities, recipe);
+        specialRecipes.set(recipeId, recipe);
+        addedAnything = true;
+      }
+    }
+  }
+
+  // If this entity can be constructed into something relevant, then add
+  // special recipes *and* mark the entity as used so we can find recipes
   // for it.
   for (const recipe of traverseConstructionGraph(
     entity.id,
     construction,
+    allEntities,
     allConstructionGraphs
   )) {
     const {mainVerb} = recipe;
-    const recipeId = `${mainVerb}!${entity.id}`;
+    const recipeId = mainVerb
+      ? `${mainVerb}!${entity.id}`
+      : `construct!${entity.id}:${recipe.solidResult}`;
     const shouldAddRecipe =
       !specialRecipes.has(recipeId) &&
       !ignoredSpecialRecipes.has(recipeId) &&
@@ -256,6 +327,23 @@ const tryAddSpecialRecipe = (
 
   return addedAnything;
 };
+
+const getAllGuaranteedUsableSpawns = (
+  spawned: readonly EntitySpawnEntry[]
+): [string, number][] => {
+  return spawned
+    .filter(entry =>
+      entry.id != null || // We need an entity ID
+      !entry.orGroup || // We can't handle OR groups
+      (entry.amount ?? 1) > 0 || // We need at least one
+      (entry.prob ?? 1) !== 1 // And the probability has to be 1
+    )
+    .map(entry => [entry.id!, entry.amount ?? 1] as const);
+};
+
+const isEdible = (entity: ResolvedEntity): boolean =>
+  entity.components.has('Food') || // Legacy component
+  entity.components.has('Edible'); // New thing
 
 const collectUsedEntities = (
   usedEntities: Set<string>,
@@ -342,6 +430,7 @@ const isFoodRelatedReagent = (reagent: ReagentPrototype): boolean =>
 function* traverseConstructionGraph(
   entityId: string,
   constr: ResolvedConstruction | null,
+  allEntities: ReadonlyMap<string, ResolvedEntity>,
   allConstructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>
 ): Generator<ResolvedConstructionRecipe> {
   if (
@@ -409,8 +498,40 @@ function* traverseConstructionGraph(
         .heat(step.minTemperature)
         .toRecipe();
     }
+    if (step.tag) {
+      const usableEntities = findTargetEntityByTag(step.tag, allEntities);
+      if (usableEntities) {
+        yield new ConstructRecipeBuilder()
+          .withSolidResult(target.entity)
+          .startWith(entityId)
+          .add(usableEntities)
+          .toRecipe();
+      }
+    }
   }
 }
+
+const findTargetEntityByTag = (
+  tag: string,
+  allEntities: ReadonlyMap<string, ResolvedEntity>
+): OneOrMoreEntities | null => {
+  const result: string[] = [];
+
+  for (const entity of allEntities.values()) {
+    if (entity.tags.has(tag)) {
+      result.push(entity.id);
+    }
+  }
+
+  switch (result.length) {
+    case 0:
+      return null;
+    case 1:
+      return result[0];
+    default:
+      return result;
+  }
+};
 
 const findGrindableProduceReagents = (
   entity: ResolvedEntity,
