@@ -90,45 +90,45 @@ export const App = (props: Props): JSX.Element => {
   const commitLink = GitHubCommitUrl(meta.repo, meta.commit);
 
   return (
-    <NoticesProvider all={notices}>
-      <GameDataProvider forkId={fork} raw={data}>
-        <ForkProvider fork={fork} allForks={forks} setFork={handleSetFork}>
-          <FavoritesProvider>
-            <RecipeExplorerProvider>
-              <UrlProvider>
+    <UrlProvider>
+      <NoticesProvider all={notices}>
+        <GameDataProvider forkId={fork} raw={data}>
+          <ForkProvider fork={fork} allForks={forks} setFork={handleSetFork}>
+            <FavoritesProvider>
+              <RecipeExplorerProvider>
                 <Outlet/>
-              </UrlProvider>
-            </RecipeExplorerProvider>
-          </FavoritesProvider>
-        </ForkProvider>
-        <footer>
-          <p>
-            {'Recipes generated from commit '}
-            <a href={commitLink} target='_blank' rel='noopener'>
-              {meta.commit.slice(0, 9)}
-            </a>
-            {` on ${formatDate(meta.date)}.`}
-          </p>
-          <p>
-            Made by Alice Heurlin / Arimah, 2024.
-            {' '}
-            Discord: @arimah.
-            {' '}
-            GitHub: <a href='https://github.com/arimah' target='_blank' rel='noopener'>arimah</a>.
-          </p>
-          <p>
-            {'Sprites were made by many contributors: '}
-            <AttributionsLink value={data.attributions} meta={meta}/>
-            {'.'}
-          </p>
-          <p>
-            <PrivacyPolicyLink/>
-            {' • '}
-            <a href={REPO_URL} target='_blank' rel='noopener'>Source code</a>
-          </p>
-        </footer>
-      </GameDataProvider>
-    </NoticesProvider>
+              </RecipeExplorerProvider>
+            </FavoritesProvider>
+          </ForkProvider>
+          <footer>
+            <p>
+              {'Recipes generated from commit '}
+              <a href={commitLink} target='_blank' rel='noopener'>
+                {meta.commit.slice(0, 9)}
+              </a>
+              {` on ${formatDate(meta.date)}.`}
+            </p>
+            <p>
+              Made by Alice Heurlin / Arimah, 2024.
+              {' '}
+              Discord: @arimah.
+              {' '}
+              GitHub: <a href='https://github.com/arimah' target='_blank' rel='noopener'>arimah</a>.
+            </p>
+            <p>
+              {'Sprites were made by many contributors: '}
+              <AttributionsLink value={data.attributions} meta={meta}/>
+              {'.'}
+            </p>
+            <p>
+              <PrivacyPolicyLink/>
+              {' • '}
+              <a href={REPO_URL} target='_blank' rel='noopener'>Source code</a>
+            </p>
+          </footer>
+        </GameDataProvider>
+      </NoticesProvider>
+    </UrlProvider>
   );
 };
 

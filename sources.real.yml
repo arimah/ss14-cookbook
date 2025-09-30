@@ -45,6 +45,23 @@ base:
     # we ignore these recipes altogether.
     - heat!FoodEggChickenFertilized
     - heat!FoodEggDuckFertilized
+  ignoredFoodSequenceElements: &ignoredFoodSequenceElements
+    # Ultra-rare botany mutation.
+    - FoodExtradimensionalOrange
+    # MobMouse is included, don't need all the other mice.
+    - MobMouseDead
+    - MobMouse1
+    - MobMouse2
+    - MobMouseCancer
+    - MobMouseAdmeme
+    # Looks identical to FoodRealCapfruit (the one that shoots blanks).
+    - FoodFakeCapfruit
+    # Ew. You can discover these on your own!
+    - OrganDionaBrain
+    - OrganDionaBrainNymph
+    - OrganHumanBrain
+    - SentientSlimeCore
+    - SentientSlimesCore
   ignoreSourcesOf: &ignoredSources
     # These reagents bloat the list without providing anything especially useful.
     - Blood
@@ -121,6 +138,26 @@ frontier:
     - NFRecipeBuildABuddySlime
     - NFRecipeBuildABuddyVulpkanin
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements:
+    # Ultra-rare botany mutation.
+    - FoodExtradimensionalOrange
+    # MobMouse is included, don't need all the other mice.
+    - MobMouseDead
+    - MobMouse1
+    - MobMouse2
+    - MobMouseCancer
+    - MobMouseAdmeme
+    # Looks identical to FoodRealCapfruit (the one that shoots blanks).
+    - FoodFakeCapfruit
+    # Ew. You can discover these on your own!
+    - Hairball
+    - OrganDionaBrain
+    - OrganDionaBrainNymph
+    - OrganGoblinBrain
+    - OrganShelegBrain
+    - OrganHumanBrain
+    - SentientSlimeCore
+    - SentientSlimesCore
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
 
@@ -143,6 +180,7 @@ delta-v:
     - *theobromine
   sortingIdRewrites: *baseRewrites
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
 
@@ -160,6 +198,7 @@ rmc-14:
     - *theobromine
   sortingIdRewrites: *baseRewrites
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
 
@@ -183,6 +222,7 @@ floof:
     - *theobromine
   sortingIdRewrites: *baseRewrites
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
 
@@ -214,6 +254,7 @@ impstation:
     - *theobromine
   sortingIdRewrites: *baseRewrites
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
 
@@ -231,5 +272,6 @@ moff:
     - *theobromine
   sortingIdRewrites: *baseRewrites
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources

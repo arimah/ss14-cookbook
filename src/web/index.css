@@ -716,16 +716,29 @@ select {
     box-shadow: var(--shadow-basic);
   }
 
-  @media (min-width: 600px) {
+  @media (min-width: 650px) {
     .tabs_tab {
       padding: 10px 16px;
-      min-width: 250px;
+      min-width: 100px;
     }
   }
 
-  @media (min-width: 850px) {
+  @media (min-width: 800px) {
     .tabs_tab {
-      min-width: 300px;
+      padding: 10px 16px;
+      min-width: 150px;
+    }
+  }
+
+  @media (min-width: 950px) {
+    .tabs_tab {
+      min-width: 200px;
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .tabs_tab {
+      min-width: 250px;
     }
   }
 
@@ -836,7 +849,8 @@ select {
     --button-border: var(--recipe-bg-title);
   }
 
-    .recipe_title > button {
+    .recipe_title > button,
+    .recipe_title > .btn {
       padding-inline: 6px;
     }
 
@@ -1602,6 +1616,51 @@ select {
       }
   }
 
+.foodseq {
+  margin-inline: -16px;
+  padding: 16px;
+  background-color: var(--bg-level-1);
+  box-shadow: var(--shadow-basic);
+}
+
+  @media (min-width: 650px) {
+    .foodseq {
+      margin-inline: 0;
+      border-radius: 7px;
+    }
+  }
+
+  .foodseq_list {
+    list-style-type: none;
+  }
+
+    .foodseq_list > li {
+      margin-top: 16px;
+    }
+
+    .foodseq_start .sprite {
+      margin-right: 4px;
+    }
+
+  .foodseq_elements {
+    list-style-type: none;
+    display: grid;
+    margin-top: 4px;
+    margin-inline: -4px;
+    padding: 4px;
+    gap: 4px 8px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    border-radius: 7px;
+    background-color: var(--bg-level-2);
+  }
+
+    .foodseq_element {
+      display: flex;
+      flex-direction: row;
+      gap: 4px;
+      align-items: center;
+    }
+
 .planner {
   /* TODO */
 }
@@ -2088,6 +2147,23 @@ select {
     .popup--recipe > .popup--tooltip {
       align-self: center;
       max-width: none;
+    }
+
+  .popup--foodseq {
+    padding: 8px 12px;
+    max-width: 300px;
+    white-space: pre-wrap;
+    border-radius: 7px;
+    background-color: var(--tooltip-bg);
+    color: var(--tooltip-fg);
+    box-shadow: 0 3px 7px var(--shadow-color);
+  }
+
+    .popup_entity {
+      display: flex;
+      flex-direction: row;
+      gap: 4px;
+      align-items: center;
     }
 
   @keyframes popup-enter {

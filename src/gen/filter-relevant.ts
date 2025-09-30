@@ -24,11 +24,14 @@ export interface PrunedGameData {
   readonly reactions: readonly ReactionPrototype[];
   readonly specialRecipes: ReadonlyMap<string, ResolvedSpecialRecipe>;
   readonly reagentSources: ReadonlyMap<string, readonly string[]>;
+  readonly foodSequenceStartPoints: ReadonlyMap<string, readonly string[]>;
+  readonly foodSequenceElements: ReadonlyMap<string, readonly string[]>;
 }
 
 export interface FilterParams {
   ignoredRecipes: ReadonlySet<string>;
   ignoredSpecialRecipes: ReadonlySet<string>;
+  ignoredFoodSequenceElements: ReadonlySet<string>;
   ignoreSourcesOf: ReadonlySet<string>;
   forceIncludeReagentSources: ReadonlyMap<string, readonly string[]>;
 }
@@ -143,6 +146,12 @@ export const filterRelevantPrototypes = (
     }
   }
 
+  const foodSequences = collectFoodSequences(
+    usedEntities,
+    allEntities,
+    params.ignoredFoodSequenceElements
+  );
+
   const entities = new Map<string, ResolvedEntity>();
   for (const id of usedEntities) {
     const entity = allEntities.get(id);
@@ -168,6 +177,8 @@ export const filterRelevantPrototypes = (
     reactions: Array.from(reactions.values()),
     specialRecipes,
     reagentSources,
+    foodSequenceStartPoints: foodSequences.startPoints,
+    foodSequenceElements: foodSequences.elements,
   };
 };
 
@@ -239,10 +250,6 @@ const tryAddSpecialRecipes = (
         )
       );
     });
-
-    if (entity.id === 'FoodBreadBun') {
-      console.log(entity.id, spawns, canUseAtLeastOneSpawnedEntity, entity.components);
-    }
 
     // If we can use at least one, add them all.
     if (canUseAtLeastOneSpawnedEntity) {
@@ -569,4 +576,52 @@ const findGrindableProduceReagents = (
       .map(reagent => reagent.ReagentId)
       .filter(id => usedReagents.has(id))
   );
+};
+
+interface FoodSequences {
+  startPoints: Map<string, string[]>;
+  elements: Map<string, string[]>;
+}
+
+const collectFoodSequences = (
+  usedEntities: Set<string>,
+  allEntities: ReadonlyMap<string, ResolvedEntity>,
+  ignoredFoodSequenceElements: ReadonlySet<string>
+): FoodSequences => {
+  const startPoints = new Map<string, string[]>();
+  for (const id of usedEntities.values()) {
+    const {foodSequenceStart} = allEntities.get(id)!;
+    if (foodSequenceStart?.key) {
+      appendAtKey(startPoints, foodSequenceStart.key, id);
+    }
+  }
+
+  const elements = new Map<string, string[]>();
+  for (const entity of allEntities.values()) {
+    if (
+      entity.foodSequenceElement.length === 0 ||
+      ignoredFoodSequenceElements.has(entity.id)
+    ) {
+      continue;
+    }
+
+    usedEntities.add(entity.id);
+
+    for (const key of entity.foodSequenceElement) {
+      if (!startPoints.has(key)) {
+        continue;
+      }
+      appendAtKey(elements, key, entity.id);
+    }
+  }
+  return {startPoints, elements};
+};
+
+const appendAtKey = <K, V>(map: Map<K, V[]>, key: K, value: V): void => {
+  let values = map.get(key);
+  if (!values) {
+    values = [];
+    map.set(key, values);
+  }
+  values.push(value);
 };

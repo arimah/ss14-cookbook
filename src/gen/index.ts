@@ -74,6 +74,9 @@ const buildFork = async (id: string, fork: ForkInfo): Promise<ProcessedGameData>
       forceIncludeReagentSources: new Map(
         Object.entries(fork.forceIncludeReagentSources ?? {})
       ),
+      ignoredFoodSequenceElements: new Set(
+        fork.ignoredFoodSequenceElements ?? []
+      ),
     }
   );
   console.log(
@@ -135,6 +138,8 @@ const buildFork = async (id: string, fork: ForkInfo): Promise<ProcessedGameData>
     default: fork.default ?? false,
     hidden: fork.hidden,
     resolved,
+    foodSequenceStartPoints: filtered.foodSequenceStartPoints,
+    foodSequenceElements: filtered.foodSequenceElements,
     specials,
     sprites: spriteSheet,
     microwaveRecipeTypes: fork.microwaveRecipeTypes,

@@ -4,6 +4,8 @@ import {useSearchParams} from 'react-router-dom';
 export interface UrlGenerator {
   readonly recipes: string;
 
+  readonly foodSequence: string;
+
   readonly menuList: string;
   readonly menuNew: string;
   menuView(id: string): string;
@@ -21,11 +23,12 @@ export const UrlProvider = (props: UrlProviderProps): JSX.Element => {
 
   const [query] = useSearchParams();
   const urlGenerator = useMemo<UrlGenerator>(() => ({
-    recipes: withQuery('/', query),
-    menuList: withQuery('/menu', query),
-    menuNew: withQuery('/menu/new', query),
-    menuView: (id: string) => withQuery(`/menu/${id}`, query),
-    menuEdit: (id: string) => withQuery(`/menu/${id}/edit`, query),
+    recipes: withFork('/', query),
+    foodSequence: withFork('/combinations', query),
+    menuList: withFork('/menu', query),
+    menuNew: withFork('/menu/new', query),
+    menuView: (id: string) => withFork(`/menu/${id}`, query),
+    menuEdit: (id: string) => withFork(`/menu/${id}/edit`, query),
   }), [query]);
 
   return (
@@ -35,11 +38,12 @@ export const UrlProvider = (props: UrlProviderProps): JSX.Element => {
   );
 };
 
-const withQuery = (url: string, query: URLSearchParams): string => {
-  if (query.size === 0) {
+const withFork = (url: string, query: URLSearchParams): string => {
+  const fork = query.get('fork');
+  if (!fork) {
     return url;
   }
-  return `${url}?${query.toString()}`;
+  return `${url}?fork=${encodeURIComponent(fork)}`;
 };
 
 export const useUrl = (): UrlGenerator => {

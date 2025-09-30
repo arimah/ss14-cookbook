@@ -23,6 +23,8 @@ export interface GameData {
    */
   readonly ingredients: readonly string[];
   readonly recipes: readonly Recipe[];
+  readonly foodSequenceStartPoints: Readonly<Record<string, readonly string[]>>;
+  readonly foodSequenceElements: Readonly<Record<string, readonly string[]>>;
   readonly methodSprites: Readonly<Record<CookingMethod, SpritePoint>>;
   readonly beakerFill: SpritePoint;
   /** Frontier */
@@ -45,6 +47,19 @@ export interface Entity {
   readonly name: string;
   readonly sprite: SpritePoint;
   readonly traits: number;
+  /**
+   * If present, contains the food sequence this entity is the start point of.
+   */
+  readonly seqStart?: FoodSeqStart;
+  /**
+   * If present, contains the food sequences this entity can be put in.
+   */
+  readonly seqElem?: readonly string[];
+}
+
+export interface FoodSeqStart {
+  readonly key: string;
+  readonly maxCount: number;
 }
 
 export interface Reagent {

@@ -1,16 +1,23 @@
 import {RefObject, memo, useMemo, useRef} from 'react';
+import {createPortal} from 'react-dom';
+import {Link} from 'react-router-dom';
+
+import {Entity, Recipe as RecipeData} from '../types';
 
 import {useGameData} from './context';
-import {CloseIcon, NodeTreeIcon} from './icons';
+import {CloseIcon, FoodSequenceIcon, NodeTreeIcon} from './icons';
 import {FavoriteButton, useIsFavorite} from './favorites';
 import {useExploreRecipe, useCurrentExploredRecipe} from './recipe-explorer';
 import {useRecipeVisibility} from './recipe-visibility-context';
 import {RecipeTraits} from './recipe-traits';
 import {RecipeMethod} from './recipe-method';
 import {RecipeIngredients} from './recipe-ingredients';
+import {EntitySprite} from './sprites';
 import {Tooltip} from './tooltip';
+import {getPopupRoot, usePopupTrigger} from './popup-impl';
 import {RecipeResult} from './recipe-result';
 import {RecipeInstructions} from './recipe-instructions';
+import {useUrl} from './url';
 
 export interface Props {
   className?: string;
@@ -18,6 +25,7 @@ export interface Props {
   canFavorite?: boolean;
   canExplore?: boolean;
   headerAction?: JSX.Element;
+  skipDefaultHeaderAction?: boolean;
 }
 
 export const Recipe = memo((props: Props): JSX.Element => {
@@ -27,9 +35,10 @@ export const Recipe = memo((props: Props): JSX.Element => {
     canFavorite = true,
     canExplore = true,
     headerAction,
+    skipDefaultHeaderAction,
   } = props;
 
-  const {recipeMap} = useGameData();
+  const {recipeMap, entityMap} = useGameData();
   const recipe = recipeMap.get(id)!;
 
   const isFav = useIsFavorite()(id);
@@ -39,6 +48,10 @@ export const Recipe = memo((props: Props): JSX.Element => {
 
   const ref = useRef<HTMLElement>(null);
   const visible = useRecipeVisibility(ref);
+
+  const effectiveHeaderAction =
+    headerAction ??
+    (!skipDefaultHeaderAction && defaultHeaderAction(recipe, entityMap));
 
   // This is a bit ugly. In order to keep the title *text* visually centered,
   // we insert a spacer as necessary. By design, the recipe icon is exactly
@@ -51,7 +64,7 @@ export const Recipe = memo((props: Props): JSX.Element => {
   // if >0, spacer on the right.
   const balanceBias =
     // left
-    (1 + +!!headerAction)
+    (1 + +!!effectiveHeaderAction)
     -
     // right
     (+!!canFavorite + +!!canExplore);
@@ -59,7 +72,7 @@ export const Recipe = memo((props: Props): JSX.Element => {
   const title = useMemo(() => {
     return <>
       <RecipeTraits recipe={recipe}/>
-      {headerAction}
+      {effectiveHeaderAction}
       {balanceBias < 0 && <span className='recipe_spacer'/>}
       <RecipeResult recipe={recipe}/>
       {balanceBias > 0 && <span className='recipe_spacer'/>}
@@ -102,6 +115,93 @@ export const Recipe = memo((props: Props): JSX.Element => {
       </div>
     </div>
   );
+});
+
+const FoodSequenceStartTooltip =
+  'You can put other foods inside this one.\n' +
+  'Click to see what can be put inside it.';
+
+const defaultHeaderAction = (
+  recipe: RecipeData,
+  entities: ReadonlyMap<string, Entity>
+): JSX.Element | null => {
+  if (recipe.solidResult) {
+    const entity = entities.get(recipe.solidResult)!;
+    if (entity.seqStart) {
+      return <SeqStartButton entityId={entity.id}/>;
+    }
+    if (entity.seqElem) {
+      return <SeqElemIcon entityId={entity.id}/>;
+    }
+  }
+  return null;
+};
+
+interface SeqStartButtonProps {
+  entityId: string;
+}
+
+const SeqStartButton = memo((props: SeqStartButtonProps): JSX.Element => {
+  const {entityId} = props;
+
+  const url = useUrl();
+
+  // TODO: Maybe use different icons for starts and elements
+  return (
+    <Tooltip text={FoodSequenceStartTooltip} provideLabel>
+      <Link
+        className='btn'
+        to={url.foodSequence}
+        state={{forEntity: entityId}}
+      >
+        <FoodSequenceIcon/>
+      </Link>
+    </Tooltip>
+  );
+});
+
+interface SeqElemIconProps {
+  entityId: string;
+}
+
+const SeqElemIcon = memo((props: SeqElemIconProps): JSX.Element => {
+  const {entityId} = props;
+
+  const {foodSequenceStartPoints, entityMap} = useGameData();
+
+  const entity = entityMap.get(entityId)!;
+  const tooltipContent = useMemo(() => <>
+    <p>You can put this food inside:</p>
+    {entity.seqElem!
+      .flatMap(k => foodSequenceStartPoints.get(k)!)
+      .map(id => {
+        const startEnt = entityMap.get(id)!;
+        return (
+          <p key={id} className='popup_entity'>
+            <EntitySprite id={startEnt.id}/>
+            {startEnt.name}
+          </p>
+        );
+      })}
+  </>, [entity, foodSequenceStartPoints, entityMap]);
+
+  const {visible, popupRef, parentRef} = usePopupTrigger<HTMLDivElement>(
+    'above',
+    tooltipContent
+  );
+
+  // TODO: Maybe use different icons for starts and elements
+  return <>
+    <span className='btn' ref={parentRef}>
+      <FoodSequenceIcon/>
+    </span>
+    {visible && createPortal(
+      <div className='popup popup--foodseq' ref={popupRef}>
+        {tooltipContent}
+      </div>,
+      getPopupRoot()
+    )}
+  </>;
 });
 
 interface ExploreButtonProps {

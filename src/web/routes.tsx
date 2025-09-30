@@ -1,5 +1,6 @@
 import {Cookbook} from './main';
 import {RecipeList} from './recipe-list';
+import {FoodSequences} from './food-sequence';
 import {MenuPlanner, MenuPlannerRoutes} from './menu-planner';
 
 export interface RouteHandle {
@@ -14,6 +15,11 @@ export const AppRoutes = [
         path: '/',
         element: <RecipeList/>,
         handle: {name: 'recipe-list'} satisfies RouteHandle,
+      },
+      {
+        path: '/combinations',
+        element: <FoodSequences/>,
+        handle: {name: 'food-sequence'} satisfies RouteHandle,
       },
       {
         path: '/menu',

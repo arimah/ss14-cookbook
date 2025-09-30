@@ -163,6 +163,19 @@ mystation:
     # we ignore these recipes altogether.
     - heat!FoodEggChickenFertilized
     - heat!FoodEggDuckFertilized
+  # Entities to ignore as food sequence elements. The value is a list of entity
+  # prototype IDs. These entities will not be present in *any* list of food
+  # sequence elements. Use this to exclude weird or extremely rare items, or
+  # to de-duplicate otherwise identical-looking items (e.g. real and fake
+  # capfruit).
+  #
+  # The values below are examples; see `sources.real.yml` for the real values.
+  # Optiona. Default value: []    (include everything)
+  ignoredFoodSequenceElements:
+    - FoodFakeCapfruit
+    - MobMouseDead
+    - MobMouse1
+    - MobMouse2
   # Don't generate or show sources of these reagents. They tend to bload the
   # list without providing anything useful. Almost all produces can be ground
   # into nutriment, many meats into blood.
