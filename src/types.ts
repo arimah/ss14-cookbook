@@ -168,6 +168,7 @@ export type ConstructionStep =
   | HeatStep
   | HeatMixtureStep
   | AddStep
+  | AddReagentStep
   | SimpleInteractionStep
   | AlsoMakesStep
   ;
@@ -181,7 +182,7 @@ export interface StartStep {
 /** "Finish with ..." */
 export interface EndStep {
   readonly type: 'end';
-  readonly entity: string;
+  readonly entity: OneOrMoreEntities;
 }
 
 /** "Add (ingredient)" */
@@ -190,6 +191,14 @@ export interface AddStep {
   readonly entity: OneOrMoreEntities;
   readonly minCount?: number;
   readonly maxCount?: number;
+}
+
+/** "Add (reagent)" */
+export interface AddReagentStep {
+  readonly type: 'addReagent';
+  readonly reagent: string;
+  readonly minCount: number;
+  readonly maxCount: number;
 }
 
 /** Combine in a beaker (or similar). */

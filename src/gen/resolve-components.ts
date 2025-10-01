@@ -1,6 +1,6 @@
 import {createDraft, Draft, finishDraft} from 'immer';
 import {RawGameData} from './read-raw';
-import {EntityPrototype} from './prototypes';
+import {EntityId, EntityMap, EntityPrototype, TagId} from './prototypes';
 import {
   ButcherableComponent,
   Component,
@@ -21,12 +21,17 @@ import {
   FoodSolutionName,
 } from './constants';
 import {entityAndAncestors} from './helpers';
-import {ResolvedEntity, ResolvedSolution, ResolvedSpriteLayer} from './types';
+import {
+  ResolvedEntity,
+  ResolvedEntityMap,
+  ResolvedSolution,
+  ResolvedSpriteLayer,
+} from './types';
 
 export const resolveComponents = (
   raw: RawGameData
-): ReadonlyMap<string, ResolvedEntity> => {
-  const result = new Map<string, ResolvedEntity>();
+): ResolvedEntityMap => {
+  const result = new Map<EntityId, ResolvedEntity>();
 
   for (const entity of raw.entities.values()) {
     const resolved = resolveEntity(entity, raw.entities);
@@ -37,7 +42,7 @@ export const resolveComponents = (
 }
 
 const InitialState: ResolvedEntity = {
-  id: '',
+  id: '' as EntityId,
   name: '(unknown name)',
   isProduce: false,
   sprite: {
@@ -50,7 +55,7 @@ const InitialState: ResolvedEntity = {
   reagents: new Set(),
   extractable: null,
   foodSequenceStart: null,
-  foodSequenceElement: [],
+  foodSequenceElement: null,
   sliceableFood: null,
   butcherable: null,
   construction: null,
@@ -64,7 +69,7 @@ const EmptyComponents: Component[] = [];
 
 const resolveEntity = (
   entity: EntityPrototype,
-  allEntities: ReadonlyMap<string, EntityPrototype>
+  allEntities: EntityMap
 ): ResolvedEntity => {
   const draft = createDraft(InitialState);
   draft.id = entity.id;
@@ -199,8 +204,15 @@ const resolveFoodSequenceElement = (
   draft: Draft<ResolvedEntity>,
   comp: FoodSequenceElementComponent
 ): void => {
+  if (!draft.foodSequenceElement) {
+    draft.foodSequenceElement = {
+      keys: [],
+      elements: [],
+    };
+  }
   if (comp.entries != null) {
-    draft.foodSequenceElement = Object.keys(comp.entries);
+    draft.foodSequenceElement.keys = Object.keys(comp.entries) as TagId[];
+    draft.foodSequenceElement.elements = Object.values(comp.entries);
   }
 };
 
@@ -316,7 +328,7 @@ const resolveStomach = (
     }
 
     if (whitelist.tags) {
-      draft.stomach.tags = whitelist.tags as string[];
+      draft.stomach.tags = whitelist.tags as TagId[];
     }
     if (whitelist.components) {
       draft.stomach.components = whitelist.components as string[];

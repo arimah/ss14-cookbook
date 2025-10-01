@@ -13,21 +13,29 @@ import {
 } from './constants';
 import {ConstructRecipeBuilder} from './construct-recipe-builder';
 import {getReagentResult, getSolidResult} from './reaction-helpers';
-import {MicrowaveMealRecipe, Reactant, ReactionPrototype} from './prototypes';
+import {
+  EntityId,
+  MicrowaveMealRecipe,
+  Reactant,
+  ReactionPrototype,
+  ReagentId,
+} from './prototypes';
 import {readFileTextWithoutTheStupidBOM} from './helpers';
 import {
   MethodEntities,
   MicrowaveRecipeTypes,
   ResolvedEntity,
+  ResolvedEntityMap,
   ResolvedReagent,
+  ResolvedReagentMap,
   ResolvedRecipe,
 } from './types';
 
 export interface ResolvedGameData {
-  readonly entities: ReadonlyMap<string, ResolvedEntity>;
-  readonly reagents: ReadonlyMap<string, ResolvedReagent>;
+  readonly entities: ResolvedEntityMap;
+  readonly reagents: ResolvedReagentMap;
   readonly recipes: ReadonlyMap<string, ResolvedRecipe>;
-  readonly reagentSources: ReadonlyMap<string, readonly string[]>;
+  readonly reagentSources: ReadonlyMap<ReagentId, readonly EntityId[]>;
   readonly methodEntities: ReadonlyMap<CookingMethod, ResolvedEntity>;
   /** Frontier */
   readonly microwaveRecipeTypeEntities: ReadonlyMap<string, ResolvedEntity> | undefined;
@@ -35,12 +43,12 @@ export interface ResolvedGameData {
 
 export const resolvePrototypes = (
   filtered: PrunedGameData,
-  allEntities: ReadonlyMap<string, ResolvedEntity>,
+  allEntities: ResolvedEntityMap,
   localeDir: string,
   methodEntities: MethodEntities,
   microwaveRecipeTypes: MicrowaveRecipeTypes | undefined
 ): ResolvedGameData => {
-  const reagents = new Map<string, ResolvedReagent>();
+  const reagents = new Map<ReagentId, ResolvedReagent>();
   const recipes = new Map<string, ResolvedRecipe>();
 
   const fluentBundle = createFluentBundle(localeDir);

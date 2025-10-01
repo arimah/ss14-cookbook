@@ -3,7 +3,7 @@ import {resolve, join as joinPath} from 'path';
 
 import {Jimp, JimpInstance, cssColorToHex} from 'jimp';
 
-import {SpritePoint, SpriteAttribution, Recipe, CookingMethod} from '../types';
+import {SpritePoint, SpriteAttribution, CookingMethod} from '../types';
 
 import {ResolvedGameData} from './resolve-prototypes';
 import {ColorWhite, SpriteOffsets} from './constants';

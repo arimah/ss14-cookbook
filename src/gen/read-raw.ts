@@ -5,23 +5,37 @@ import {globSync} from 'glob';
 
 import {readFileTextWithoutTheStupidBOM} from './helpers';
 import {
+  ConstructionGraphId,
+  ConstructionGraphMap,
   ConstructionGraphPrototype,
+  EntityId,
+  EntityMap,
   EntityPrototype,
+  FoodSequenceElementId,
+  FoodSequenceElementMap,
+  FoodSequenceElementPrototype,
+  MetamorphRecipeId,
+  MetamorphRecipeMap,
   MetamorphRecipePrototype,
   MicrowaveMealRecipe,
   ReactionPrototype,
+  ReagentId,
+  ReagentMap,
   ReagentPrototype,
-  StackPrototype,
   RelevantPrototypeRegex,
+  StackId,
+  StackMap,
+  StackPrototype,
   isRelevantPrototype,
 } from './prototypes';
 
 export interface RawGameData {
-  readonly entities: ReadonlyMap<string, EntityPrototype>;
-  readonly reagents: ReadonlyMap<string, ReagentPrototype>;
-  readonly stacks: ReadonlyMap<string, StackPrototype>;
-  readonly constructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>;
-  readonly metamorphRecipes: ReadonlyMap<string, MetamorphRecipePrototype>;
+  readonly entities: EntityMap;
+  readonly reagents: ReagentMap;
+  readonly stacks: StackMap;
+  readonly constructionGraphs: ConstructionGraphMap;
+  readonly metamorphRecipes: MetamorphRecipeMap;
+  readonly foodSequenceElements: FoodSequenceElementMap;
   readonly recipes: readonly MicrowaveMealRecipe[];
   readonly reactions: readonly ReactionPrototype[];
 }
@@ -61,11 +75,12 @@ export const findResourceFiles = (prototypeDir: string): string[] =>
     .map(filePath => resolve(prototypeDir, filePath))
 
 export const readRawGameData = (yamlPaths: string[]): RawGameData => {
-  const entities = new Map<string, EntityPrototype>();
-  const reagents = new Map<string, ReagentPrototype>();
-  const stacks = new Map<string, StackPrototype>();
-  const constructionGraphs = new Map<string, ConstructionGraphPrototype>();
-  const metamorphRecipes = new Map<string, MetamorphRecipePrototype>();
+  const entities = new Map<EntityId, EntityPrototype>();
+  const reagents = new Map<ReagentId, ReagentPrototype>();
+  const stacks = new Map<StackId, StackPrototype>();
+  const constructionGraphs = new Map<ConstructionGraphId, ConstructionGraphPrototype>();
+  const metamorphRecipes = new Map<MetamorphRecipeId, MetamorphRecipePrototype>();
+  const foodSequenceElements = new Map<FoodSequenceElementId, FoodSequenceElementPrototype>();
   const recipes: MicrowaveMealRecipe[] = [];
   const reactions: ReactionPrototype[] = [];
 
@@ -97,6 +112,9 @@ export const readRawGameData = (yamlPaths: string[]): RawGameData => {
         case 'entity':
           entities.set(node.id, node);
           break;
+        case 'foodSequenceElement':
+          foodSequenceElements.set(node.id, node);
+          break;
         case 'reagent':
           reagents.set(node.id, node);
           break;
@@ -124,6 +142,7 @@ export const readRawGameData = (yamlPaths: string[]): RawGameData => {
     stacks,
     constructionGraphs,
     metamorphRecipes,
+    foodSequenceElements,
     recipes,
     reactions,
   };

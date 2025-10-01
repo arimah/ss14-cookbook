@@ -1,8 +1,8 @@
-import {ReactionPrototype, isCreateEntityEffect} from './prototypes';
+import {EntityId, ReactionPrototype, ReagentId, isCreateEntityEffect} from './prototypes';
 
 export const getReagentResult = (
   reaction: ReactionPrototype
-): [string, number] | null => {
+): [ReagentId, number] | null => {
   if (!reaction.products) {
     return null;
   }
@@ -11,19 +11,17 @@ export const getReagentResult = (
   if (products.length !== 1) {
     return null;
   }
-
-  // products[0] is a tuple of [ReagentId, amount]
-  return products[0];
+  return products[0] as [ReagentId, number];
 };
 
 export const getSolidResult = (
   reaction: ReactionPrototype
-): string | null => {
+): EntityId | null => {
   if (!reaction.effects || reaction.effects.length === 0) {
     return null;
   }
 
-  let result: string | null = null;
+  let result: EntityId | null = null;
 
   for (const effect of reaction.effects) {
     if (isCreateEntityEffect(effect)) {

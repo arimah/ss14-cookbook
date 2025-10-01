@@ -1,7 +1,8 @@
 import {memo} from 'react';
 
 import {
-    AddStep,
+  AddReagentStep,
+  AddStep,
   AlsoMakesStep,
   ConstructionStep,
   EndStep,
@@ -14,7 +15,11 @@ import {
 
 import {useGameData} from './context';
 import {RawSprite} from './sprites';
-import {ReagentIngredient, RecipeIngredients, SolidIngredient} from './recipe-ingredients';
+import {
+  ReagentIngredient,
+  RecipeIngredients,
+  SolidIngredient,
+} from './recipe-ingredients';
 import {Temperature} from './temperature';
 
 export interface RecipeInstructionsProps {
@@ -51,6 +56,8 @@ const Step = (props: StepProps): JSX.Element => {
       return <MixStep step={step} visible={visible}/>;
     case 'add':
       return <AddStep step={step}/>;
+    case 'addReagent':
+      return <AddReagentStep step={step}/>;
     case 'heat':
       return <HeatStep step={step}/>;
     case 'heatMixture':
@@ -84,11 +91,20 @@ interface EndStepProps {
 
 const EndStep = (props: EndStepProps): JSX.Element => {
   const {step} = props;
-  return (
-    <li className='recipe_step recipe_step--end'>
-      Finish with <SolidIngredient id={step.entity}/>
-    </li>
-  );
+  if (typeof step.entity === 'string') {
+    return (
+      <li className='recipe_step recipe_step--end'>
+        Finish with <SolidIngredient id={step.entity}/>
+      </li>
+    );
+  } else {
+    return (
+      <li className='recipe_step recipe_step--add'>
+        <span>Finish with one of:</span>
+        {step.entity.map(id => <SolidIngredient key={id} id={id}/>)}
+      </li>
+    );
+  }
 };
 
 interface MixStepProps {
@@ -137,11 +153,11 @@ const AddStep = (props: AddStepProps): JSX.Element => {
   const {step} = props;
 
   let text: string;
-  if (step.minCount && step.minCount > 1) {
+  if (step.minCount) {
     if (step.maxCount) {
       text = `Add ${step.minCount} to ${step.maxCount} `;
     } else {
-      text = `Add at least ${step.minCount} `;
+      text = `Add ${step.minCount} or more`;
     }
   } else if (step.maxCount) {
     text = `Add up to ${step.maxCount} `;
@@ -169,6 +185,24 @@ const AddStep = (props: AddStepProps): JSX.Element => {
       </li>
     );
   }
+};
+
+interface AddReagentStepProps {
+  step: AddReagentStep;
+}
+
+const AddReagentStep = (props: AddReagentStepProps): JSX.Element => {
+  const {step} = props;
+
+  const amount = step.minCount !== step.maxCount
+    ? [step.minCount, step.maxCount] as const
+    : step.minCount;
+
+  return (
+    <li className='recipe_step recipe_step--start'>
+      Add <ReagentIngredient id={step.reagent} amount={amount}/>
+    </li>
+  );
 };
 
 interface HeatStepProps {

@@ -4,9 +4,17 @@ import {
   ReagentIngredient,
   Recipe,
 } from '../types';
-import {EntitySpawnEntry, Solution} from './components';
 
-export type MethodEntities = Readonly<Record<Recipe['method'], string | null>>;
+import {EntitySpawnEntry, Solution} from './components';
+import {
+  ConstructionGraphId,
+  EntityId,
+  FoodSequenceElementId,
+  ReagentId,
+  TagId,
+} from './prototypes';
+
+export type MethodEntities = Readonly<Record<Recipe['method'], EntityId | null>>;
 
 /** Frontier */
 export type MicrowaveRecipeTypes = Readonly<Record<string, MicrowaveRecipeTypeData>>;
@@ -14,7 +22,7 @@ export type MicrowaveRecipeTypes = Readonly<Record<string, MicrowaveRecipeTypeDa
 /** Frontier */
 export interface MicrowaveRecipeTypeData {
   readonly default?: boolean;
-  readonly machine: string;
+  readonly machine: EntityId;
   readonly verb: string;
   readonly filterSummary: string;
 }
@@ -36,19 +44,21 @@ export interface SpecialDiet extends SpecialCommon {
    * must have a `Stomach` component that filters by at least one tag or
    * component.
    */
-  readonly organ: string;
+  readonly organ: EntityId;
   /**
    * Exclude foods containing any of the reagents in this array.
    *
    * Impstation.
    */
-  readonly excludeFoodsWith?: readonly string[];
+  readonly excludeFoodsWith?: readonly ReagentId[];
 }
 
 export interface SpecialReagent extends SpecialCommon {
   /** The reagent ID to highlight. */
-  readonly id: string;
+  readonly id: ReagentId;
 }
+
+export type ResolvedEntityMap = ReadonlyMap<EntityId, ResolvedEntity>;
 
 /**
  * A *resolved* entity contains all the data from an entity prototype that
@@ -60,7 +70,7 @@ export interface SpecialReagent extends SpecialCommon {
  * post-processing. E.g., sprite colours have to be parsed prior to rendering.
  */
 export interface ResolvedEntity {
-  readonly id: string;
+  readonly id: EntityId;
   readonly name: string;
   /** True if the entity is produce, i.e. grown in a hydroponics tray. */
   readonly isProduce: boolean;
@@ -72,7 +82,7 @@ export interface ResolvedEntity {
    * The entity's food reagent IDs, extracted from `solution.food`. If the
    * entity has no food solution, this set is empty.
    */
-  readonly reagents: Set<string>;
+  readonly reagents: Set<ReagentId>;
   /**
    * If the entity can be put in a grinder, contains the resolved extractable
    * solutions.
@@ -84,11 +94,10 @@ export interface ResolvedEntity {
    */
   readonly foodSequenceStart: ResolvedFoodSequenceStart | null;
   /**
-   * Contains the keys of the food sequences that the entity can participate
-   * in. Basically, determines where the food can be inserted. If the entity
-   * is not a food sequence element, the array is empty.
+   * If the entity is a food sequence element, contains the food sequences it
+   * can participate in as well as its corresponding elements.
    */
-  readonly foodSequenceElement: readonly string[];
+  readonly foodSequenceElement: ResolvedFoodSequenceElement | null;
   /**
    * If the entity is a sliceable food, contains the resulting slice entity
    * and count.
@@ -105,14 +114,14 @@ export interface ResolvedEntity {
    * If the entity can be deep-fried, contains the resulting entity.
    * Frontier.
    */
-  readonly deepFryOutput: string | null;
+  readonly deepFryOutput: EntityId | null;
   /**
    * If this entity is a stomach, contains the tags and components that the
    * stomach can digest.
    */
   readonly stomach: ResolvedStomach | null;
   /** Set of all tags attached to this prototype. */
-  readonly tags: ReadonlySet<string>;
+  readonly tags: ReadonlySet<TagId>;
   /** Set of component names present on this prototype. */
   readonly components: ReadonlySet<string>;
 }
@@ -150,7 +159,7 @@ export interface ResolvedExtractable {
 }
 
 export interface ResolvedSlice {
-  readonly slice: string | null;
+  readonly slice: EntityId | null;
   readonly count: number;
 }
 
@@ -160,21 +169,28 @@ export interface ResolvedButcherable {
 }
 
 export interface ResolvedConstruction {
-  readonly graph: string | null;
+  readonly graph: ConstructionGraphId | null;
   readonly node: string | null;
   readonly edge: number | null;
   readonly step: number | null;
 }
 
 export interface ResolvedStomach {
-  readonly tags: readonly string[] | null;
+  readonly tags: readonly TagId[] | null;
   readonly components: readonly string[] | null;
 }
 
 export interface ResolvedFoodSequenceStart {
-  readonly key: string | null;
+  readonly key: TagId | null;
   readonly maxLayers: number;
 }
+
+export interface ResolvedFoodSequenceElement {
+  readonly keys: readonly TagId[];
+  readonly elements: readonly FoodSequenceElementId[];
+}
+
+export type ResolvedReagentMap = ReadonlyMap<ReagentId, ResolvedReagent>;
 
 export interface ResolvedReagent {
   // The ID is in the owning collection.
@@ -190,18 +206,18 @@ export type ResolvedRecipe =
 
 interface ResolvedRecipeBase {
   // The ID is in the owning collection.
-  readonly solidResult: string | null;
-  readonly reagentResult: string | null;
+  readonly solidResult: EntityId | null;
+  readonly reagentResult: ReagentId | null;
   readonly resultQty?: number;
-  readonly solids: Record<string, number>;
-  readonly reagents: Record<string, ReagentIngredient>;
+  readonly solids: Record<EntityId, number>;
+  readonly reagents: Record<ReagentId, ReagentIngredient>;
   readonly group: string;
 }
 
 export interface ResolvedMicrowaveRecipe extends ResolvedRecipeBase {
   readonly method: 'microwave';
   readonly time: number;
-  readonly solidResult: string;
+  readonly solidResult: EntityId;
   readonly reagentResult: null;
   readonly subtype?: string | readonly string[];
 }
@@ -228,7 +244,7 @@ export type ResolvedSpecialRecipe =
 /** Frontier: Deep-frying recipes */
 export interface ResolvedDeepFryRecipe extends ResolvedRecipeBase {
   readonly method: 'deepFry';
-  readonly solidResult: string;
+  readonly solidResult: EntityId;
   readonly reagentResult: null;
 }
 

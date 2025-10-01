@@ -1,82 +1,90 @@
+import {OneOrMoreEntities} from '../types';
+
 import {DefaultRecipeGroup, MixerCategoryToStepType} from './constants';
 import {RawGameData} from './read-raw';
 import {getReagentResult, getSolidResult} from './reaction-helpers';
 import {EntitySpawnEntry, Solution} from './components';
+import {ConstructRecipeBuilder} from './construct-recipe-builder';
 import {
-  ReagentPrototype,
+  ConstructionGraphMap,
+  EntityId,
+  FoodSequenceElementId,
+  FoodSequenceElementMap,
+  FoodSequenceElementPrototype,
+  MetamorphRecipeMap,
   MicrowaveMealRecipe,
+  MicrowaveMealRecipeId,
+  ReactionId,
   ReactionPrototype,
-  ConstructionGraphPrototype,
+  ReagentId,
+  ReagentMap,
+  ReagentPrototype,
+  StackId,
+  StackMap,
+  TagId,
 } from './prototypes';
 import {
   ResolvedSpecialRecipe,
   ResolvedEntity,
   ResolvedConstruction,
   ResolvedConstructionRecipe,
+  ResolvedEntityMap,
 } from './types';
-import {ConstructRecipeBuilder} from './construct-recipe-builder';
-import { OneOrMoreEntities } from '../types';
 
 export interface PrunedGameData {
-  readonly entities: ReadonlyMap<string, ResolvedEntity>;
-  readonly reagents: ReadonlyMap<string, ReagentPrototype>;
+  readonly entities: ResolvedEntityMap;
+  readonly reagents: ReagentMap;
   readonly recipes: readonly MicrowaveMealRecipe[];
   readonly reactions: readonly ReactionPrototype[];
   readonly specialRecipes: ReadonlyMap<string, ResolvedSpecialRecipe>;
-  readonly reagentSources: ReadonlyMap<string, readonly string[]>;
-  readonly foodSequenceStartPoints: ReadonlyMap<string, readonly string[]>;
-  readonly foodSequenceElements: ReadonlyMap<string, readonly string[]>;
+  readonly reagentSources: ReadonlyMap<ReagentId, readonly EntityId[]>;
+  readonly foodSequenceStartPoints: ReadonlyMap<TagId, readonly EntityId[]>;
+  readonly foodSequenceElements: ReadonlyMap<TagId, readonly EntityId[]>;
 }
 
 export interface FilterParams {
-  ignoredRecipes: ReadonlySet<string>;
+  ignoredRecipes: ReadonlySet<MicrowaveMealRecipeId>;
   ignoredSpecialRecipes: ReadonlySet<string>;
-  ignoredFoodSequenceElements: ReadonlySet<string>;
-  ignoreSourcesOf: ReadonlySet<string>;
-  forceIncludeReagentSources: ReadonlyMap<string, readonly string[]>;
+  ignoredFoodSequenceElements: ReadonlySet<EntityId>;
+  ignoreSourcesOf: ReadonlySet<ReagentId>;
+  forceIncludeReagentSources: ReadonlyMap<ReagentId, readonly EntityId[]>;
 }
 
 export const filterRelevantPrototypes = (
   raw: Omit<RawGameData, 'entities'>,
-  allEntities: ReadonlyMap<string, ResolvedEntity>,
+  allEntities: ResolvedEntityMap,
   params: FilterParams
 ): PrunedGameData => {
-  const usedEntities = new Set<string>();
-  const usedReagents = new Set<string>();
-  const recipes: MicrowaveMealRecipe[] = [];
+  const usedEntities = new Set<EntityId>();
+  const usedReagents = new Set<ReagentId>();
   const specialRecipes = new Map<string, ResolvedSpecialRecipe>();
 
-  for (const recipe of raw.recipes) {
-    if (params.ignoredRecipes.has(recipe.id)) {
-      continue;
-    }
+  // First, collect microwave recipes. These are part of the "root set":
+  // from these, we get an initial set of entities and reagents that are
+  // relevant to the cookbook.
+  const recipes = collectMicrowaveRecipes(
+    raw.recipes,
+    usedEntities,
+    usedReagents,
+    raw.stacks,
+    params.ignoredRecipes
+  );
 
-    usedEntities.add(recipe.result);
+  // Next, we'll add metamorph recipes. These are the second part of the
+  // root set of relevant entities and reagents.
+  addMetamorphRecipes(
+    raw.metamorphRecipes,
+    specialRecipes,
+    usedEntities,
+    usedReagents,
+    allEntities,
+    raw.foodSequenceElements
+  );
 
-    if (recipe.solids) {
-      for (const id of Object.keys(recipe.solids)) {
-        const stack = raw.stacks.get(id);
-        if (stack) {
-          usedEntities.add(stack.spawn);
-        } else {
-          usedEntities.add(id);
-        }
-      }
-    }
+  const reactions = new Map<ReactionId, ReactionPrototype>();
 
-    if (recipe.reagents) {
-      for (const id of Object.keys(recipe.reagents)) {
-        usedReagents.add(id);
-      }
-    }
-
-    recipes.push(recipe);
-  }
-
-  const reactions = new Map<string, ReactionPrototype>();
-
-  // And now we have to go through *every* entity to find sliceable foods
-  // and other special recipes, as well as every reaction.
+  // And now we have to go through *every* entity to find special recipes:
+  // cutting, rolling, heating, construction, and more.
   let hasAnythingNew: boolean;
   do {
     hasAnythingNew = false;
@@ -85,6 +93,7 @@ export const filterRelevantPrototypes = (
         entity,
         specialRecipes,
         usedEntities,
+        usedReagents,
         allEntities,
         raw.constructionGraphs,
         params.ignoredSpecialRecipes
@@ -94,6 +103,7 @@ export const filterRelevantPrototypes = (
     }
   } while (hasAnythingNew);
 
+  // Now let's find reactions for all the reagents we've collected.
   do {
     hasAnythingNew = false;
     for (const reaction of raw.reactions) {
@@ -109,50 +119,27 @@ export const filterRelevantPrototypes = (
     }
   } while (hasAnythingNew);
 
-  const reagentSources = new Map<string, string[]>();
+  // And now we collect *sources* of reagents.
+  const reagentSources = collectReagentSources(
+    allEntities,
+    usedEntities,
+    usedReagents,
+    params.ignoreSourcesOf,
+    params.forceIncludeReagentSources
+  );
 
-  for (const entity of allEntities.values()) {
-    const sourceOf = findGrindableProduceReagents(entity, usedReagents);
-    if (sourceOf && sourceOf.length > 0) {
-      usedEntities.add(entity.id);
-      for (const reagentId of sourceOf) {
-        if (params.ignoreSourcesOf.has(reagentId)) {
-          continue;
-        }
-
-        let sources = reagentSources.get(reagentId);
-        if (!sources) {
-          sources = [];
-          reagentSources.set(reagentId, sources);
-        }
-        sources.push(entity.id);
-      }
-    }
-  }
-
-  for (const [reagentId, sources] of params.forceIncludeReagentSources) {
-    if (!usedReagents.has(reagentId)) {
-      continue;
-    }
-    let sourceList = reagentSources.get(reagentId);
-    if (!sourceList) {
-      sourceList = [];
-      reagentSources.set(reagentId, sourceList);
-    }
-
-    for (const entityId of sources) {
-      usedEntities.add(entityId);
-      sourceList.push(entityId);
-    }
-  }
-
+  // We know the total set of relevant entities now, so we'll use that
+  // to collect food sequence information, i.e. what can be put inside
+  // which food sequence start point.
   const foodSequences = collectFoodSequences(
     usedEntities,
     allEntities,
     params.ignoredFoodSequenceElements
   );
 
-  const entities = new Map<string, ResolvedEntity>();
+  // Lastly, we'll resolve the entity and reagent IDs to actual entities
+  // and reagents, respectively.
+  const entities = new Map<EntityId, ResolvedEntity>();
   for (const id of usedEntities) {
     const entity = allEntities.get(id);
     if (!entity) {
@@ -161,7 +148,7 @@ export const filterRelevantPrototypes = (
     entities.set(id, entity);
   }
 
-  const reagents = new Map<string, ReagentPrototype>();
+  const reagents = new Map<ReagentId, ReagentPrototype>();
   for (const id of usedReagents) {
     const reagent = raw.reagents.get(id);
     if (!reagent) {
@@ -182,12 +169,227 @@ export const filterRelevantPrototypes = (
   };
 };
 
+const collectMicrowaveRecipes = (
+  allRecipes: readonly MicrowaveMealRecipe[],
+  usedEntities: Set<EntityId>,
+  usedReagents: Set<ReagentId>,
+  stacks: StackMap,
+  ignoredRecipes: ReadonlySet<string>
+): MicrowaveMealRecipe[] => {
+  const relevantRecipes = allRecipes.filter(r => !ignoredRecipes.has(r.id));
+  for (const recipe of relevantRecipes) {
+    if (ignoredRecipes.has(recipe.id)) {
+      continue;
+    }
+    usedEntities.add(recipe.result);
+
+    if (recipe.solids) {
+      for (const id of Object.keys(recipe.solids)) {
+        const stack = stacks.get(id as StackId);
+        if (stack) {
+          usedEntities.add(stack.spawn);
+        } else {
+          usedEntities.add(id as EntityId);
+        }
+      }
+    }
+
+    if (recipe.reagents) {
+      for (const id of Object.keys(recipe.reagents)) {
+        usedReagents.add(id as ReagentId);
+      }
+    }
+  }
+  return relevantRecipes;
+};
+
+const addMetamorphRecipes = (
+  metamorphRecipes: MetamorphRecipeMap,
+  specialRecipes: Map<string, ResolvedSpecialRecipe>,
+  usedEntities: Set<EntityId>,
+  usedReagents: Set<ReagentId>,
+  allEntities: ResolvedEntityMap,
+  foodSequenceElements: FoodSequenceElementMap
+): void => {
+  outer: for (const recipe of metamorphRecipes.values()) {
+    if (!recipe.rules || recipe.rules.length === 0) {
+      console.warn(`Metamorph recipe ${recipe.id} has no rules`);
+      continue;
+    }
+
+    // Metamorph recipes are built on food sequences. We need to find the start
+    // point of the indicated food sequence.
+    const startPoints = allEntities.values()
+      .filter(ent => ent.foodSequenceStart?.key === recipe.key)
+      .toArray();
+
+    // At present, each food sequence key has exactly one start point. If we
+    // can't find a single matching entity, skip the recipe.
+    if (startPoints.length !== 1) {
+      if (startPoints.length > 1) {
+        console.warn(
+          `Metamorph recipe ${
+            recipe.id
+          }: Multiple start points for food sequence '${
+            recipe.key
+          }'`
+        );
+      }
+      continue;
+    }
+
+    const builder = new ConstructRecipeBuilder()
+      .withSolidResult(recipe.result)
+      .startWith(startPoints[0].id);
+
+    // Now let's translate the rules into concrete steps.
+    // Here we *could* reorder the rules so LastElementHasTags always
+    // comes last, because it's weird to have a "Finish with" in the
+    // middle of the instruction list, but luckily the data is already
+    // ordered in a sane fashion. If this changes, well, fuck me.
+    for (const rule of recipe.rules) {
+      switch (rule['!type']) {
+        case 'SequenceLength':
+          // Can't really do anything meaningful with this - too weird and
+          // complex to show in the UI.
+          // TODO: Figure this out, somehow.
+          break;
+        case 'IngredientsWithTags': {
+          const ingredients = findMetamorphIngredients(
+            allEntities,
+            foodSequenceElements,
+            rule.tags,
+            rule.needAll
+          );
+          if (ingredients === null) {
+            console.warn(
+              `Metamorph recipe ${
+                recipe.id
+              }: no matching ingredients: ${rule.tags.join(', ')}`
+            );
+            continue outer;
+          }
+
+          builder.addSolid(ingredients, rule.count.min, rule.count.max);
+          break;
+        }
+        case 'LastElementHasTags': {
+          const ingredients = findMetamorphIngredients(
+            allEntities,
+            foodSequenceElements,
+            rule.tags,
+            rule.needAll
+          );
+          if (ingredients === null) {
+            console.warn(
+              `Metamorph recipe ${
+                recipe.id
+              }: no matching ingredients: ${rule.tags.join(', ')}`
+            );
+            continue outer;
+          }
+
+          builder.endWith(ingredients);
+          break;
+        }
+        case 'FoodHasReagent':
+          builder.addReagent(rule.reagent, rule.count.min!, rule.count.max!);
+          break;
+        case 'ElementHasTags':
+          // Not yet supported, not yet used - ignore it for now
+          console.warn(
+            `Metamorph recipe ${
+              recipe.id
+            }: unsupported rule: ${rule['!type']}`
+          );
+          continue outer;
+        default:
+          throw new Error(
+            `${recipe.id}: Unknown metamorph recipe rule: ${(rule as any)['!type']}`
+          );
+      }
+    }
+
+    const finalRecipe = builder.toRecipe();
+    collectRefs(usedEntities, usedReagents, finalRecipe);
+
+    const recipeId = `m!${recipe.id}`;
+    specialRecipes.set(recipeId, finalRecipe);
+  }
+};
+
+const findMetamorphIngredients = (
+  allEntities: ResolvedEntityMap,
+  foodSequenceElements: FoodSequenceElementMap,
+  tags: readonly TagId[],
+  needAll = true
+): OneOrMoreEntities | null => {
+  let tagPred: (fse: FoodSequenceElementPrototype) => boolean;
+  if (needAll) {
+    tagPred = fse => {
+      if (!fse.tags || fse.tags.length === 0) {
+        return false;
+      }
+      for (const tag of tags) {
+        if (!fse.tags.includes(tag)) {
+          return false;
+        }
+      }
+      return true;
+    };
+  } else {
+    tagPred = fse => {
+      if (!fse.tags || fse.tags.length === 0) {
+        return false;
+      }
+      for (const tag of tags) {
+        if (fse.tags?.includes(tag)) {
+          return true;
+        }
+      }
+      return false;
+    };
+  }
+
+  // First, let's find all food sequence elements with matching tags.
+  const elements = new Set(
+    foodSequenceElements.values()
+      .filter(tagPred)
+      .map(fse => fse.id)
+  );
+  if (elements.size === 0) {
+    return null;
+  }
+
+  // Second, let's find all entities that use any of the matching food
+  // sequence elements.
+  const isRelevantElem = (elem: FoodSequenceElementId): boolean =>
+    elements.has(elem);
+
+  const entities = allEntities.values()
+    .filter(ent =>
+      ent.foodSequenceElement !== null &&
+      ent.foodSequenceElement.elements.some(isRelevantElem)
+    )
+    .map(ent => ent.id)
+    .toArray();
+  switch (entities.length) {
+    case 0:
+      return null;
+    case 1:
+      return entities[0];
+    default:
+      return entities;
+  }
+};
+
 const tryAddSpecialRecipes = (
   entity: ResolvedEntity,
   specialRecipes: Map<string, ResolvedSpecialRecipe>,
-  usedEntities: Set<string>,
-  allEntities: ReadonlyMap<string, ResolvedEntity>,
-  allConstructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>,
+  usedEntities: Set<EntityId>,
+  usedReagents: Set<ReagentId>,
+  allEntities: ResolvedEntityMap,
+  allConstructionGraphs: ConstructionGraphMap,
   ignoredSpecialRecipes: ReadonlySet<string>
 ): boolean => {
   // NOTE: We CANNOT treat slicing and constructing as mutually exclusive!
@@ -215,7 +417,7 @@ const tryAddSpecialRecipes = (
         .startWith(entity.id)
         .cut()
         .toRecipe();
-      collectUsedEntities(usedEntities, recipe);
+      collectRefs(usedEntities, usedReagents, recipe);
       specialRecipes.set(recipeId, recipe);
       addedAnything = true;
     }
@@ -275,7 +477,7 @@ const tryAddSpecialRecipes = (
           );
         }
         const recipe = builder.toRecipe();
-        collectUsedEntities(usedEntities, recipe);
+        collectRefs(usedEntities, usedReagents, recipe);
         specialRecipes.set(recipeId, recipe);
         addedAnything = true;
       }
@@ -306,7 +508,7 @@ const tryAddSpecialRecipes = (
         mainVerb === 'heat'
       );
     if (shouldAddRecipe) {
-      collectUsedEntities(usedEntities, recipe);
+      collectRefs(usedEntities, usedReagents, recipe);
       specialRecipes.set(recipeId, recipe);
       addedAnything = true;
     }
@@ -337,7 +539,7 @@ const tryAddSpecialRecipes = (
 
 const getAllGuaranteedUsableSpawns = (
   spawned: readonly EntitySpawnEntry[]
-): [string, number][] => {
+): [EntityId, number][] => {
   return spawned
     .filter(entry =>
       entry.id != null || // We need an entity ID
@@ -352,24 +554,31 @@ const isEdible = (entity: ResolvedEntity): boolean =>
   entity.components.has('Food') || // Legacy component
   entity.components.has('Edible'); // New thing
 
-const collectUsedEntities = (
-  usedEntities: Set<string>,
+const collectRefs = (
+  usedEntities: Set<EntityId>,
+  usedReagents: Set<ReagentId>,
   recipe: ResolvedSpecialRecipe
 ): void => {
   if (recipe.solidResult) {
     usedEntities.add(recipe.solidResult);
   }
+  if (recipe.reagentResult) {
+    usedReagents.add(recipe.reagentResult);
+  }
   for (const id of Object.keys(recipe.solids)) {
-    usedEntities.add(id);
+    usedEntities.add(id as EntityId);
+  }
+  for (const id of Object.keys(recipe.reagents)) {
+    usedReagents.add(id as ReagentId);
   }
 };
 
 const tryAddReaction = (
-  reactions: Map<string, ReactionPrototype>,
+  reactions: Map<ReactionId, ReactionPrototype>,
   reaction: ReactionPrototype,
-  usedEntities: Set<string>,
-  usedReagents: Set<string>,
-  allReagents: ReadonlyMap<string, ReagentPrototype>
+  usedEntities: Set<EntityId>,
+  usedReagents: Set<ReagentId>,
+  allReagents: ReagentMap
 ): boolean => {
   if (reactions.has(reaction.id)) {
     // We already have this reaction, don't process it again
@@ -422,8 +631,8 @@ const tryAddReaction = (
   // those reagents, until we run out of reactions or new reagents.
   let hasNewReagents = false;
   for (const id of Object.keys(reaction.reactants)) {
-    if (!usedReagents.has(id)) {
-      usedReagents.add(id);
+    if (!usedReagents.has(id as ReagentId)) {
+      usedReagents.add(id as ReagentId);
       hasNewReagents = true;
     }
   }
@@ -435,10 +644,10 @@ const isFoodRelatedReagent = (reagent: ReagentPrototype): boolean =>
   reagent.group === 'Drinks';
 
 function* traverseConstructionGraph(
-  entityId: string,
+  entityId: EntityId,
   constr: ResolvedConstruction | null,
-  allEntities: ReadonlyMap<string, ResolvedEntity>,
-  allConstructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>
+  allEntities: ResolvedEntityMap,
+  allConstructionGraphs: ConstructionGraphMap
 ): Generator<ResolvedConstructionRecipe> {
   if (
     !constr ||
@@ -511,7 +720,7 @@ function* traverseConstructionGraph(
         yield new ConstructRecipeBuilder()
           .withSolidResult(target.entity)
           .startWith(entityId)
-          .add(usableEntities)
+          .addSolid(usableEntities)
           .toRecipe();
       }
     }
@@ -519,31 +728,64 @@ function* traverseConstructionGraph(
 }
 
 const findTargetEntityByTag = (
-  tag: string,
-  allEntities: ReadonlyMap<string, ResolvedEntity>
+  tag: TagId,
+  allEntities: ResolvedEntityMap
 ): OneOrMoreEntities | null => {
-  const result: string[] = [];
-
-  for (const entity of allEntities.values()) {
-    if (entity.tags.has(tag)) {
-      result.push(entity.id);
-    }
-  }
-
-  switch (result.length) {
+  const matching = allEntities.values()
+    .filter(ent => ent.tags.has(tag))
+    .map(ent => ent.id)
+    .toArray();
+  switch (matching.length) {
     case 0:
       return null;
     case 1:
-      return result[0];
+      return matching[1];
     default:
-      return result;
+      return matching;
   }
+};
+
+const collectReagentSources = (
+  allEntities: ResolvedEntityMap,
+  usedEntities: Set<EntityId>,
+  usedReagents: Set<ReagentId>,
+  ignoreSourcesOf: ReadonlySet<ReagentId>,
+  forceIncludeReagentSources: ReadonlyMap<ReagentId, readonly EntityId[]>
+): Map<ReagentId, EntityId[]> => {
+  const result = new Map<ReagentId, EntityId[]>();
+
+  for (const entity of allEntities.values()) {
+    const sourceOf = findGrindableProduceReagents(entity, usedReagents);
+    if (sourceOf && sourceOf.length > 0) {
+      usedEntities.add(entity.id);
+      for (const reagentId of sourceOf) {
+        if (ignoreSourcesOf.has(reagentId)) {
+          continue;
+        }
+
+        appendAtKey(result, reagentId, entity.id);
+      }
+    }
+  }
+
+  for (const [reagentId, sources] of forceIncludeReagentSources) {
+    if (!usedReagents.has(reagentId)) {
+      continue;
+    }
+
+    for (const entityId of sources) {
+      usedEntities.add(entityId);
+      appendAtKey(result, reagentId, entityId);
+    }
+  }
+
+  return result;
 };
 
 const findGrindableProduceReagents = (
   entity: ResolvedEntity,
-  usedReagents: Set<string>
-): string[] | null => {
+  usedReagents: Set<ReagentId>
+): ReagentId[] | null => {
   const {isProduce, extractable, solution} = entity;
 
   if (
@@ -579,16 +821,16 @@ const findGrindableProduceReagents = (
 };
 
 interface FoodSequences {
-  startPoints: Map<string, string[]>;
-  elements: Map<string, string[]>;
+  startPoints: Map<TagId, EntityId[]>;
+  elements: Map<TagId, EntityId[]>;
 }
 
 const collectFoodSequences = (
-  usedEntities: Set<string>,
-  allEntities: ReadonlyMap<string, ResolvedEntity>,
-  ignoredFoodSequenceElements: ReadonlySet<string>
+  usedEntities: Set<EntityId>,
+  allEntities: ResolvedEntityMap,
+  ignoredFoodSequenceElements: ReadonlySet<EntityId>
 ): FoodSequences => {
-  const startPoints = new Map<string, string[]>();
+  const startPoints = new Map<TagId, EntityId[]>();
   for (const id of usedEntities.values()) {
     const {foodSequenceStart} = allEntities.get(id)!;
     if (foodSequenceStart?.key) {
@@ -596,10 +838,11 @@ const collectFoodSequences = (
     }
   }
 
-  const elements = new Map<string, string[]>();
+  const elements = new Map<TagId, EntityId[]>();
   for (const entity of allEntities.values()) {
     if (
-      entity.foodSequenceElement.length === 0 ||
+      !entity.foodSequenceElement ||
+      entity.foodSequenceElement.keys.length === 0 ||
       ignoredFoodSequenceElements.has(entity.id)
     ) {
       continue;
@@ -607,7 +850,7 @@ const collectFoodSequences = (
 
     usedEntities.add(entity.id);
 
-    for (const key of entity.foodSequenceElement) {
+    for (const key of entity.foodSequenceElement.keys) {
       if (!startPoints.has(key)) {
         continue;
       }

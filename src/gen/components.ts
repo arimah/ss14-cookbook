@@ -1,3 +1,11 @@
+import {
+  ConstructionGraphId,
+  EntityId,
+  FoodSequenceElementId,
+  ReagentId,
+  TagId,
+} from './prototypes';
+
 /**
  * This type is a blatant lie. The game has *hundreds* of components. However,
  * this lie lets us find components *and* narrow them by type with a `switch`
@@ -28,7 +36,7 @@ export interface ButcherableComponent {
 }
 
 export interface EntitySpawnEntry {
-  readonly id?: string;
+  readonly id?: EntityId;
   readonly prob?: number;
   readonly amount?: number;
   readonly maxAmount?: number;
@@ -37,7 +45,7 @@ export interface EntitySpawnEntry {
 
 export interface ConstructionComponent {
   readonly type: 'Construction';
-  readonly graph?: string;
+  readonly graph?: ConstructionGraphId;
   readonly node?: string;
   readonly edge?: number;
   readonly step?: number;
@@ -46,7 +54,7 @@ export interface ConstructionComponent {
 /** Frontier: Deep frying */
 export interface DeepFrySpawnComponent {
   readonly type: 'DeepFrySpawn';
-  readonly output: string;
+  readonly output: EntityId;
 }
 
 export interface ExtractableComponent {
@@ -57,12 +65,12 @@ export interface ExtractableComponent {
 
 export interface FoodSequenceElementComponent {
   readonly type: 'FoodSequenceElement';
-  readonly entries?: Readonly<Record<string, string>>;
+  readonly entries?: Readonly<Record<TagId, FoodSequenceElementId>>;
 }
 
 export interface FoodSequenceStartPointComponent {
   readonly type: 'FoodSequenceStartPoint';
-  readonly key?: string;
+  readonly key?: TagId;
   readonly maxLayers?: number;
 }
 
@@ -72,7 +80,7 @@ export interface ProduceComponent {
 
 export interface SliceableFoodComponent {
   readonly type: 'SliceableFood';
-  readonly slice?: string;
+  readonly slice?: EntityId;
   readonly count?: number;
 }
 
@@ -87,7 +95,7 @@ export interface Solution {
 }
 
 export interface SolutionReagent {
-  readonly ReagentId: string;
+  readonly ReagentId: ReagentId;
   readonly Quantity: number;
 }
 
@@ -117,12 +125,12 @@ export interface EntityWhitelist {
   // The C# class EntityWhitelist can also filter by size, but we don't actually
   // make use of that field. It's part of this interface's definition so we can
   // emit warnings if we encounter it.
-  readonly tags?: readonly string[];
+  readonly tags?: readonly TagId[];
   readonly components?: readonly string[];
   readonly sizes?: readonly string[];
 }
 
 export interface TagComponent {
   readonly type: 'Tag';
-  readonly tags?: readonly string[];
+  readonly tags?: readonly TagId[];
 }

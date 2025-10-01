@@ -82,7 +82,8 @@ export const SolidIngredient = (props: SolidIngredientProps): JSX.Element => {
 
 export interface ReagentIngredientProps {
   id: string;
-  amount: number;
+  /** Single amount (in units), or [min, max]. */
+  amount: number | readonly [number, number];
   catalyst?: boolean;
 }
 
@@ -93,11 +94,15 @@ export const ReagentIngredient = (props: ReagentIngredientProps): JSX.Element =>
   const reagent = reagentMap.get(id)!;
   const relatedRecipes = recipesByReagentResult.get(id);
 
+  const formattedAmount = typeof amount === 'number'
+    ? `${amount}u `
+    : `${amount[0]}–${amount[1]}u `;
+
   return (
     <span className='recipe_ingredient'>
       <ReagentSprite id={id}/>
       <span>
-        {amount}{'u '}
+        {formattedAmount}
         {relatedRecipes ? (
           <RecipePopup id={relatedRecipes}>
             <span className='more-info'>

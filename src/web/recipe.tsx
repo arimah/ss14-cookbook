@@ -192,7 +192,7 @@ const SeqElemIcon = memo((props: SeqElemIconProps): JSX.Element => {
 
   // TODO: Maybe use different icons for starts and elements
   return <>
-    <span className='btn' ref={parentRef}>
+    <span className='recipe_info-icon' ref={parentRef}>
       <FoodSequenceIcon/>
     </span>
     {visible && createPortal(

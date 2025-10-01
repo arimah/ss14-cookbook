@@ -12,6 +12,7 @@ import {resolveSpecials} from './resolve-specials';
 import {buildSpriteSheet} from './build-spritesheet';
 import {getGitCommitHash} from './commit-hash';
 import {ProcessedGameData, saveData} from './save-data';
+import {EntityId, MicrowaveMealRecipeId, ReagentId} from './prototypes';
 import {
   MethodEntities,
   MicrowaveRecipeTypes,
@@ -34,11 +35,11 @@ interface ForkInfo {
   /** Frontier */
   readonly microwaveRecipeTypes?: MicrowaveRecipeTypes;
   readonly sortingIdRewrites?: string[];
-  readonly ignoredRecipes?: string[];
+  readonly ignoredRecipes?: MicrowaveMealRecipeId[];
   readonly ignoredSpecialRecipes?: string[];
-  readonly ignoredFoodSequenceElements?: string[];
-  readonly ignoreSourcesOf?: string[];
-  readonly forceIncludeReagentSources?: Record<string, string[]>;
+  readonly ignoredFoodSequenceElements?: EntityId[];
+  readonly ignoreSourcesOf?: ReagentId[];
+  readonly forceIncludeReagentSources?: Record<ReagentId, readonly EntityId[]>;
 }
 
 const PrototypesSubPath = './Resources/Prototypes';
@@ -72,7 +73,8 @@ const buildFork = async (id: string, fork: ForkInfo): Promise<ProcessedGameData>
       ignoredSpecialRecipes: new Set(fork.ignoredSpecialRecipes ?? []),
       ignoreSourcesOf: new Set(fork.ignoreSourcesOf ?? []),
       forceIncludeReagentSources: new Map(
-        Object.entries(fork.forceIncludeReagentSources ?? {})
+        Object.entries(fork.forceIncludeReagentSources ?? {}) as
+          [ReagentId, readonly EntityId[]][]
       ),
       ignoredFoodSequenceElements: new Set(
         fork.ignoredFoodSequenceElements ?? []

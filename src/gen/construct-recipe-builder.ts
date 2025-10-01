@@ -7,6 +7,7 @@ import {
 } from '../types';
 
 import {DefaultRecipeGroup} from './constants';
+import {EntityId, ReagentId} from './prototypes';
 import {ResolvedConstructionRecipe} from './types';
 
 // The lack of `amount` field is technically invalid, but for construct recipes
@@ -20,11 +21,11 @@ const ShakeStep: SimpleInteractionStep = {type: 'shake'};
 
 export class ConstructRecipeBuilder {
   public readonly group: string;
-  public solidResult: string | null = null;
-  public reagentResult: string | null = null;
+  public solidResult: EntityId | null = null;
+  public reagentResult: ReagentId | null = null;
   public resultQty: number | undefined = undefined;
-  public solidIngredients: Record<string, number> = {};
-  public reagentIngredients: Record<string, ReagentIngredient> = {};
+  public solidIngredients: Record<EntityId, number> = {};
+  public reagentIngredients: Record<ReagentId, ReagentIngredient> = {};
   public steps: ConstructionStep[] = [];
 
   public constructor(group = DefaultRecipeGroup) {
@@ -80,19 +81,19 @@ export class ConstructRecipeBuilder {
     return result;
   }
 
-  public withSolidResult(entityId: string): this {
+  public withSolidResult(id: EntityId): this {
     if (this.reagentResult) {
       throw new Error(`Recipe can't have both solid and reagent result`);
     }
-    this.solidResult = entityId;
+    this.solidResult = id;
     return this;
   }
 
-  public withReagentResult(reagentId: string): this {
+  public withReagentResult(id: ReagentId): this {
     if (this.solidResult) {
       throw new Error(`Recipe can't have both solid and reagent result`);
     }
-    this.reagentResult = reagentId;
+    this.reagentResult = id;
     return this;
   }
 
@@ -107,24 +108,32 @@ export class ConstructRecipeBuilder {
     return this;
   }
 
-  public startWith(entity: string): this {
+  public startWith(entity: EntityId): this {
     return this.pushStep({type: 'start', entity});
   }
 
-  public endWith(entity: string): this {
+  public endWith(entity: OneOrMoreEntities): this {
     return this.pushStep({type: 'end', entity});
   }
 
-  public mix(reagents: Readonly<Record<string, ReagentIngredient>>): this {
+  public mix(reagents: Readonly<Record<ReagentId, ReagentIngredient>>): this {
     return this.pushStep({type: 'mix', reagents});
   }
 
-  public add(
+  public addSolid(
     entity: OneOrMoreEntities,
     minCount?: number,
     maxCount?: number
   ): this {
     return this.pushStep({type: 'add', entity, minCount, maxCount});
+  }
+
+  public addReagent(
+    reagent: string,
+    minCount: number,
+    maxCount: number
+  ): this {
+    return this.pushStep({type: 'addReagent', reagent, minCount, maxCount});
   }
 
   public heat(minTemp: number): this {
@@ -158,26 +167,29 @@ export class ConstructRecipeBuilder {
   private collectIngredients(step: ConstructionStep): void {
     switch (step.type) {
       case 'start':
-        this.solidIngredients[step.entity] = 1;
+        this.solidIngredients[step.entity as EntityId] = 1;
         break;
       case 'end':
-        this.solidIngredients[step.entity] = 1;
+        for (const id of eachEntity(step.entity)) {
+          this.solidIngredients[id] = 1;
+        }
         break;
       case 'mix':
         for (const id of Object.keys(step.reagents)) {
-          this.reagentIngredients[id] = EmptyReagentIngredient;
+          this.reagentIngredients[id as ReagentId] = EmptyReagentIngredient;
         }
         break;
       case 'add':
-        if (typeof step.entity === 'string') {
-          this.solidIngredients[step.entity] = 1;
-        } else {
-          for (const id of step.entity) {
-            this.solidIngredients[id] = 1;
-          }
+        for (const id of eachEntity(step.entity)) {
+          this.solidIngredients[id] = 1;
         }
         break;
+      case 'addReagent':
+        this.reagentIngredients[step.reagent as ReagentId] = EmptyReagentIngredient;
+        break;
+      case 'alsoMakes':
       case 'heat':
+      case 'heatMixture':
       case 'cut':
       case 'roll':
       case 'stir':
@@ -185,5 +197,13 @@ export class ConstructRecipeBuilder {
         // No ingredients
         break;
     }
+  }
+}
+
+function* eachEntity(entity: OneOrMoreEntities): Generator<EntityId> {
+  if (typeof entity === 'string') {
+    yield entity as EntityId;
+  } else {
+    yield* entity as EntityId[];
   }
 }

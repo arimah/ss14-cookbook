@@ -854,6 +854,17 @@ select {
       padding-inline: 6px;
     }
 
+    .recipe_info-icon {
+      padding: 4px;
+      border-radius: 3px;
+      background-color: var(--button-bg);
+      cursor: help;
+    }
+
+      .recipe_info-icon:hover {
+        background-color: var(--button-bg-hover);
+      }
+
   .recipe_trait {
     position: absolute;
     top: 0;

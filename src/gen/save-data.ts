@@ -15,6 +15,7 @@ import {
 import {SpriteSheetData} from './build-spritesheet';
 import {ResolvedGameData} from './resolve-prototypes';
 import {ResolvedSpecials} from './resolve-specials';
+import {EntityId, TagId} from './prototypes';
 import {mapToObject} from './helpers';
 import {
   GameDataPath,
@@ -31,8 +32,8 @@ export interface ProcessedGameData {
   readonly default: boolean;
   readonly hidden?: boolean;
   readonly resolved: ResolvedGameData;
-  readonly foodSequenceStartPoints: ReadonlyMap<string, readonly string[]>;
-  readonly foodSequenceElements: ReadonlyMap<string, readonly string[]>;
+  readonly foodSequenceStartPoints: ReadonlyMap<TagId, readonly EntityId[]>;
+  readonly foodSequenceElements: ReadonlyMap<TagId, readonly EntityId[]>;
   readonly specials: ResolvedSpecials,
   readonly sprites: SpriteSheetData;
   readonly microwaveRecipeTypes?: MicrowaveRecipeTypes;
@@ -67,8 +68,8 @@ export const saveData = async (
           key: entity.foodSequenceStart.key,
           maxCount: entity.foodSequenceStart.maxLayers,
         } : undefined,
-        seqElem: entity.foodSequenceElement.length > 0
-          ? entity.foodSequenceElement
+        seqElem: entity.foodSequenceElement
+          ? entity.foodSequenceElement.keys
           : undefined,
       });
     }
