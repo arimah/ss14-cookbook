@@ -246,7 +246,7 @@ const ExploredRecipe = memo(forwardRef((
 
   return (
     <div className='explorer_main' ref={mainRef}>
-      <Recipe id={id}/>
+      <Recipe id={id} skipDefaultHeaderAction/>
 
       {madeWith.length > 0 && <>
         <div
@@ -268,7 +268,9 @@ const ExploredRecipe = memo(forwardRef((
           ref={madeWithRef}
         >
           <div className='explorer_list-inner'>
-            {madeWith.map(id => <Recipe key={id} id={id}/>)}
+            {madeWith.map(id =>
+              <Recipe key={id} id={id} skipDefaultHeaderAction/>
+            )}
           </div>
         </div>
       </>}
@@ -293,7 +295,9 @@ const ExploredRecipe = memo(forwardRef((
           ref={usedInRef}
         >
           <div className='explorer_list-inner'>
-            {usedIn.map(id => <Recipe key={id} id={id}/>)}
+            {usedIn.map(id =>
+              <Recipe key={id} id={id} skipDefaultHeaderAction/>
+            )}
           </div>
         </div>
       </>}

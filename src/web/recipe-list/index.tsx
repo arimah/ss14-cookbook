@@ -25,11 +25,11 @@ import {
 } from '../sort';
 import {useIsFavorite} from '../favorites';
 import {joinListNatural} from '../helpers';
+import {DisplayMethod} from '../types';
 
 import {
   RecipeFilter,
   InitialFilter,
-  Method,
   isFilterActive,
   applyFilter,
   searchByName,
@@ -306,7 +306,7 @@ const ResultCount = (props: ResultCountProps): JSX.Element => {
 };
 
 const describeMethod = (
-  method: Method,
+  method: DisplayMethod,
   subtypes: readonly string[],
   microwaveSubtypes: Readonly<Record<string, MicrowaveRecipeType>> | null
 ): string => {
@@ -330,6 +330,8 @@ const describeMethod = (
       return 'rolling pin recipes';
     case 'deepFry': // Frontier
       return 'deep-frying recipes';
+    case 'construct':
+      return 'general recipes';
   }
 };
 

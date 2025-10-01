@@ -34,4 +34,10 @@ export const RecipePopup = (props: Props): JSX.Element => {
 };
 
 const renderRecipe = (id: string): JSX.Element =>
-  <Recipe key={id} id={id} canExplore={false} canFavorite={false}/>;
+  <Recipe
+    key={id}
+    id={id}
+    canExplore={false}
+    canFavorite={false}
+    skipDefaultHeaderAction
+  />;

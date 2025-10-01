@@ -5,27 +5,40 @@ import {globSync} from 'glob';
 
 import {readFileTextWithoutTheStupidBOM} from './helpers';
 import {
+  ConstructionGraphId,
+  ConstructionGraphMap,
+  ConstructionGraphPrototype,
+  EntityId,
+  EntityMap,
   EntityPrototype,
+  FoodSequenceElementId,
+  FoodSequenceElementMap,
+  FoodSequenceElementPrototype,
+  MetamorphRecipeId,
+  MetamorphRecipeMap,
+  MetamorphRecipePrototype,
   MicrowaveMealRecipe,
   ReactionPrototype,
+  ReagentId,
+  ReagentMap,
   ReagentPrototype,
+  RelevantPrototypeRegex,
+  StackId,
+  StackMap,
   StackPrototype,
-  ConstructionGraphPrototype,
   isRelevantPrototype,
 } from './prototypes';
 
 export interface RawGameData {
-  readonly entities: ReadonlyMap<string, EntityPrototype>;
-  readonly reagents: ReadonlyMap<string, ReagentPrototype>;
-  readonly stacks: ReadonlyMap<string, StackPrototype>;
-  readonly constructionGraphs: ReadonlyMap<string, ConstructionGraphPrototype>;
+  readonly entities: EntityMap;
+  readonly reagents: ReagentMap;
+  readonly stacks: StackMap;
+  readonly constructionGraphs: ConstructionGraphMap;
+  readonly metamorphRecipes: MetamorphRecipeMap;
+  readonly foodSequenceElements: FoodSequenceElementMap;
   readonly recipes: readonly MicrowaveMealRecipe[];
   readonly reactions: readonly ReactionPrototype[];
 }
-
-// To cut down on YAML parsing time, we filter explicitly for files with
-// the sort of prototypes we're interested in.
-const RelevantFileRegex = /\btype:\s+(?:constructionGraph|entity|microwaveMealRecipe|reaction|reagent|stack)\b/;
 
 // SS14 uses `!type:T` tags to create values of type `T`.
 // The yaml library we're using provides no way to create tags dynamically,
@@ -50,6 +63,11 @@ const typeTag = (name: string): CollectionTag => ({
 const customTags: CollectionTag[] = [
   // Add more tags here as necessary
   typeTag('CreateEntityReactionEffect'),
+  typeTag('SequenceLength'),
+  typeTag('LastElementHasTags'),
+  typeTag('ElementHasTags'),
+  typeTag('FoodHasReagent'),
+  typeTag('IngredientsWithTags'),
 ];
 
 export const findResourceFiles = (prototypeDir: string): string[] =>
@@ -57,17 +75,19 @@ export const findResourceFiles = (prototypeDir: string): string[] =>
     .map(filePath => resolve(prototypeDir, filePath))
 
 export const readRawGameData = (yamlPaths: string[]): RawGameData => {
-  const entities = new Map<string, EntityPrototype>();
-  const reagents = new Map<string, ReagentPrototype>();
-  const stacks = new Map<string, StackPrototype>();
-  const constructionGraphs = new Map<string, ConstructionGraphPrototype>();
+  const entities = new Map<EntityId, EntityPrototype>();
+  const reagents = new Map<ReagentId, ReagentPrototype>();
+  const stacks = new Map<StackId, StackPrototype>();
+  const constructionGraphs = new Map<ConstructionGraphId, ConstructionGraphPrototype>();
+  const metamorphRecipes = new Map<MetamorphRecipeId, MetamorphRecipePrototype>();
+  const foodSequenceElements = new Map<FoodSequenceElementId, FoodSequenceElementPrototype>();
   const recipes: MicrowaveMealRecipe[] = [];
   const reactions: ReactionPrototype[] = [];
 
   for (const path of yamlPaths) {
     const source = readFileTextWithoutTheStupidBOM(path);
 
-    if (!RelevantFileRegex.test(source)) {
+    if (!RelevantPrototypeRegex.test(source)) {
       // The file does not seem to contain anything relevant, skip it
       continue;
     }
@@ -92,6 +112,9 @@ export const readRawGameData = (yamlPaths: string[]): RawGameData => {
         case 'entity':
           entities.set(node.id, node);
           break;
+        case 'foodSequenceElement':
+          foodSequenceElements.set(node.id, node);
+          break;
         case 'reagent':
           reagents.set(node.id, node);
           break;
@@ -100,6 +123,9 @@ export const readRawGameData = (yamlPaths: string[]): RawGameData => {
           break;
         case 'constructionGraph':
           constructionGraphs.set(node.id, node);
+          break;
+        case 'metamorphRecipe':
+          metamorphRecipes.set(node.id, node);
           break;
         case 'microwaveMealRecipe':
           recipes.push(node);
@@ -115,6 +141,8 @@ export const readRawGameData = (yamlPaths: string[]): RawGameData => {
     reagents,
     stacks,
     constructionGraphs,
+    metamorphRecipes,
+    foodSequenceElements,
     recipes,
     reactions,
   };

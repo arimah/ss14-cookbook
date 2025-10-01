@@ -23,7 +23,9 @@ export interface GameData {
    */
   readonly ingredients: readonly string[];
   readonly recipes: readonly Recipe[];
-  readonly methodSprites: Readonly<Record<Recipe['method'], SpritePoint>>;
+  readonly foodSequenceStartPoints: Readonly<Record<string, readonly string[]>>;
+  readonly foodSequenceElements: Readonly<Record<string, readonly string[]>>;
+  readonly methodSprites: Readonly<Record<CookingMethod, SpritePoint>>;
   readonly beakerFill: SpritePoint;
   /** Frontier */
   readonly microwaveRecipeTypes:
@@ -45,6 +47,19 @@ export interface Entity {
   readonly name: string;
   readonly sprite: SpritePoint;
   readonly traits: number;
+  /**
+   * If present, contains the food sequence this entity is the start point of.
+   */
+  readonly seqStart?: FoodSeqStart;
+  /**
+   * If present, contains the food sequences this entity can be put in.
+   */
+  readonly seqElem?: readonly string[];
+}
+
+export interface FoodSeqStart {
+  readonly key: string;
+  readonly maxCount: number;
 }
 
 export interface Reagent {
@@ -54,12 +69,23 @@ export interface Reagent {
   readonly sources: readonly string[];
 }
 
+export type CookingMethod =
+  | 'microwave'
+  | 'mix'
+  | 'construct'
+  | 'cut'
+  | 'roll'
+  | 'heat'
+  | 'heatMixture'
+  | 'stir'
+  | 'shake'
+  | 'deepFry'
+  ;
+
 export type Recipe =
   | MicrowaveRecipe
   | ReagentRecipe
-  | CutRecipe
-  | RollRecipe
-  | HeatRecipe
+  | ConstructRecipe
   | DeepFryRecipe
   ;
 
@@ -67,13 +93,26 @@ interface RecipeBase {
   readonly id: string;
   readonly solidResult: string | null;
   readonly reagentResult: string | null;
+  /**
+   * Contains the result quantity. If the recipe has a `solidResult`, it's the
+   * number of entities it will spawn. If the recipe has `reagentResult`, it's
+   * the number of units the recipe produces.
+   *
+   * If absent, defaults to 1.
+   */
+  readonly resultQty?: number;
   readonly solids: Readonly<Record<string, number>>;
   readonly reagents: Readonly<Record<string, ReagentIngredient>>;
   readonly group: string;
 }
 
+/**
+ * The heart of the cookbook, the microwave recipe combines a number of
+ * entities and/or reagents to produce an entity.
+ */
 export interface MicrowaveRecipe extends RecipeBase {
   readonly method: 'microwave';
+  /** Cook time, in seconds. */
   readonly time: number;
   readonly solidResult: string;
   readonly reagentResult: null;
@@ -81,32 +120,121 @@ export interface MicrowaveRecipe extends RecipeBase {
   readonly subtype?: string | readonly string[];
 }
 
+/**
+ * A reagent recipe combines reagents (and never entities) to produce another
+ * reagent or an entity.
+ */
 export interface ReagentRecipe extends RecipeBase {
   readonly method: 'mix';
-  readonly resultAmount: number;
+  readonly resultQty: number;
+  /** If non-null, the mixture must be heated to the indicated temperature. */
   readonly minTemp: number | null;
+  /**
+   * If non-null, the mixture must be *below* the indicated temperature.
+   * Hilariously, the game provides no way to cool mixtures, short of adding
+   * cooler reagents.
+   */
   readonly maxTemp: number | null;
 }
 
-export interface CutRecipe extends RecipeBase {
-  readonly method: 'cut';
+/**
+ * A "construct" recipe is anything that isn't microwaving or mixing.
+ * This broad category includes cutting, rolling, heating, stirring,
+ * shaking, assembling, and more. It's similar to the game's construction
+ * system, but obviously specialized for cooking.
+ */
+export interface ConstructRecipe extends RecipeBase {
+  readonly method: 'construct';
+  /** The main verb, shown on the side of the recipe. */
+  readonly mainVerb: ConstructVerb | null;
+  readonly steps: readonly ConstructionStep[];
+}
+
+export type ConstructVerb =
+  // Mix in a beaker or similar (makes it look like a reaction).
+  | 'mix'
+  // Cut with a knife.
+  | 'cut'
+  // Roll with a rolling pin or other cylindrical-ish implement.
+  | 'roll'
+  // Fire, baby!
+  | 'heat'
+  ;
+
+export type ConstructionStep =
+  | StartStep
+  | EndStep
+  | MixStep
+  | HeatStep
+  | HeatMixtureStep
+  | AddStep
+  | AddReagentStep
+  | SimpleInteractionStep
+  | AlsoMakesStep
+  ;
+
+/** "Start with ..." */
+export interface StartStep {
+  readonly type: 'start';
+  readonly entity: string;
+}
+
+/** "Finish with ..." */
+export interface EndStep {
+  readonly type: 'end';
+  readonly entity: OneOrMoreEntities;
+}
+
+/** "Add (ingredient)" */
+export interface AddStep {
+  readonly type: 'add';
+  readonly entity: OneOrMoreEntities;
+  readonly minCount?: number;
+  readonly maxCount?: number;
+}
+
+/** "Add (reagent)" */
+export interface AddReagentStep {
+  readonly type: 'addReagent';
+  readonly reagent: string;
+  readonly minCount: number;
   readonly maxCount: number;
-  readonly solidResult: string;
-  readonly reagentResult: null;
 }
 
-export interface RollRecipe extends RecipeBase {
-  readonly method: 'roll';
-  readonly solidResult: string;
-  readonly reagentResult: null;
+/** Combine in a beaker (or similar). */
+export interface MixStep {
+  readonly type: 'mix';
+  readonly reagents: Readonly<Record<string, ReagentIngredient>>;
 }
 
-export interface HeatRecipe extends RecipeBase {
-  readonly method: 'heat';
-  readonly solidResult: string;
-  readonly reagentResult: null;
+/** "Heat to (minTemp) K", when the target is an entity. */
+export interface HeatStep {
+  readonly type: 'heat';
   readonly minTemp: number;
 }
+
+/**
+ * "Heat to (minTemp) K" or "Heat to between (minTemp) K and (maxTemp) K",
+ * when the target is a solution.
+ */
+export interface HeatMixtureStep {
+  readonly type: 'heatMixture';
+  readonly minTemp: number;
+  readonly maxTemp: number | null;
+}
+
+/** Simple, single-verb interaction that doesn't need any extra data. */
+export interface SimpleInteractionStep {
+  readonly type: 'cut' | 'roll' | 'stir' | 'shake';
+}
+
+/** A pseudo-step that informs the user that the recipe makes other things. */
+export interface AlsoMakesStep {
+  readonly type: 'alsoMakes';
+  readonly entity: OneOrMoreEntities;
+}
+
+export type OneOrMoreEntities = string | readonly string[];
 
 /** Frontier: Deep-frying recipes */
 export interface DeepFryRecipe extends RecipeBase {
@@ -117,6 +245,7 @@ export interface DeepFryRecipe extends RecipeBase {
 
 export interface ReagentIngredient {
   readonly amount: number;
+  /** If true, the reagent is not consumed by the reaction. */
   readonly catalyst?: boolean;
 }
 

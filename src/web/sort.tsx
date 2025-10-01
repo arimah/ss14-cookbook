@@ -1,6 +1,7 @@
 import {Entity, Reagent, Recipe} from '../types';
 
-import {NeutralCollator} from './helpers';
+import {displayMethod, NeutralCollator} from './helpers';
+import {DisplayMethod} from './types';
 
 export type CompareFn = (a: Recipe, b: Recipe) => number;
 
@@ -52,17 +53,18 @@ export const getRecipeName = (
     ? entities.get(recipe.solidResult)!.name
     : reagents.get(recipe.reagentResult!)!.name;
 
-const MethodOrder: Readonly<Record<Recipe['method'], number>> = {
+const MethodOrder: Readonly<Record<DisplayMethod, number>> = {
   microwave: 0,
   heat: 1,
   deepFry: 2,
   mix: 3,
+  construct: 4,
   cut: 4,
-  roll: 5,
+  roll: 4,
 };
 
 export const compareByMethod: CompareFn = (a, b) =>
-  MethodOrder[a.method] - MethodOrder[b.method];
+  MethodOrder[displayMethod(a)] - MethodOrder[displayMethod(b)];
 
 export const compareByFav = (isFavorite: (id: string) => boolean): CompareFn =>
   (a, b) => +isFavorite(b.id) - +isFavorite(a.id);

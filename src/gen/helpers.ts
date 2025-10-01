@@ -1,6 +1,6 @@
 import {readFileSync} from 'fs';
 
-import {EntityPrototype} from './prototypes';
+import {EntityId, EntityMap, EntityPrototype} from './prototypes';
 
 /**
  * Synchronously reads a file as a string, assuming its contents are UTF-8,
@@ -13,7 +13,7 @@ export const readFileTextWithoutTheStupidBOM = (path: string): string => {
 
 export function* entityAndAncestors(
   entity: EntityPrototype,
-  allEntities: ReadonlyMap<string, EntityPrototype>
+  allEntities: EntityMap
 ): Generator<EntityPrototype, void, undefined> {
   // Traverse the entity's ancestors *first*, so the entity can override
   // properties later.
@@ -29,7 +29,9 @@ export function* entityAndAncestors(
   yield entity;
 }
 
-function* parents(entity: EntityPrototype): Generator<string, void, undefined> {
+function* parents(
+  entity: EntityPrototype
+): Generator<EntityId, void, undefined> {
   const {parent} = entity;
   if (typeof parent === 'string') {
     yield parent;

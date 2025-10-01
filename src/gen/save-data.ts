@@ -15,6 +15,7 @@ import {
 import {SpriteSheetData} from './build-spritesheet';
 import {ResolvedGameData} from './resolve-prototypes';
 import {ResolvedSpecials} from './resolve-specials';
+import {EntityId, TagId} from './prototypes';
 import {mapToObject} from './helpers';
 import {
   GameDataPath,
@@ -31,6 +32,8 @@ export interface ProcessedGameData {
   readonly default: boolean;
   readonly hidden?: boolean;
   readonly resolved: ResolvedGameData;
+  readonly foodSequenceStartPoints: ReadonlyMap<TagId, readonly EntityId[]>;
+  readonly foodSequenceElements: ReadonlyMap<TagId, readonly EntityId[]>;
   readonly specials: ResolvedSpecials,
   readonly sprites: SpriteSheetData;
   readonly microwaveRecipeTypes?: MicrowaveRecipeTypes;
@@ -61,6 +64,13 @@ export const saveData = async (
         name: entity.name,
         sprite: d.sprites.points.get(id)!,
         traits: getSpecialsMask(entity, d.specials),
+        seqStart: entity.foodSequenceStart?.key ? {
+          key: entity.foodSequenceStart.key,
+          maxCount: entity.foodSequenceStart.maxLayers,
+        } : undefined,
+        seqElem: entity.foodSequenceElement
+          ? entity.foodSequenceElement.keys
+          : undefined,
       });
     }
 
@@ -90,6 +100,8 @@ export const saveData = async (
       reagents,
       ingredients: Array.from(ingredients),
       recipes,
+      foodSequenceStartPoints: mapToObject(d.foodSequenceStartPoints),
+      foodSequenceElements: mapToObject(d.foodSequenceElements),
 
       methodSprites: mapToObject(d.sprites.methods),
       beakerFill: d.sprites.beakerFillPoint,

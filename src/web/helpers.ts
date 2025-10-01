@@ -3,7 +3,20 @@ import {customAlphabet} from 'nanoid';
 
 import {Recipe} from '../types';
 
+import {DisplayMethod} from './types';
+
 export const NeutralCollator = new Intl.Collator('en-US');
+
+export const displayMethod = (recipe: Recipe): DisplayMethod => {
+  switch (recipe.method) {
+    case 'microwave':
+    case 'mix':
+    case 'deepFry':
+      return recipe.method;
+    case 'construct':
+      return recipe.mainVerb ?? 'construct';
+  }
+};
 
 /**
  * Tests whether a recipe contains ANY solid ingredient from the

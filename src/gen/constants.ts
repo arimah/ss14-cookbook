@@ -1,4 +1,4 @@
-import {SpritePoint} from '../types';
+import {SimpleInteractionStep, SpritePoint} from '../types';
 import {ParsedColor} from './types';
 
 /**
@@ -18,6 +18,30 @@ export const DefaultRecipeGroup = 'Other';
  * `SliceableFoodComponent.TotalCount`.
  */
 export const DefaultTotalSliceCount = 5;
+
+/**
+ * MUST MIRROR C#! This matches the default value of the field
+ * `FoodSequenceStartPointComponent.MaxLayers`.
+ */
+export const DefaultFoodSequenceMaxLayers = 10;
+
+/**
+ * MUST MIRROR C#! This matches the default value of the field
+ * `Butcherable.Type`.`
+ */
+export const DefaultButcheringType = 'Knife';
+
+/**
+ * The name of the solution that contains all food reagents.
+ * We could extract this from the `FoodComponent`, but in practice literally
+ * every single food uses `food`.
+ */
+export const FoodSolutionName = 'food';
+
+export const MixerCategoryToStepType: ReadonlyMap<string, SimpleInteractionStep['type']> = new Map([
+  ['Stir', 'stir'],
+  ['Shake', 'shake'],
+]);
 
 export const GameDataPath = (id: string, hash: string) =>
   `public/data/data_${id}.${hash}.json`;
@@ -42,14 +66,11 @@ export const SpriteSheetFileName = (id: string, hash: string) =>
  * means "move the sprite down".
  */
 export const SpriteOffsets: Record<string, SpritePoint> = {
-  // The microwave is weirdly high up
+  // Table-mounted machines are all weirdly high up
   'KitchenMicrowave': [0, 5],
-
-  // As is the electric grill
   'KitchenElectricGrill': [0, 5],
-
-  // Frontier
   'KitchenAssembler': [0, 5],
+  'ChemistryHotplate': [0, 5],
 
   // Same with these two burgers
   'FoodBurgerSuper': [0, 5], // super bite burger
@@ -58,6 +79,9 @@ export const SpriteOffsets: Record<string, SpritePoint> = {
   // Aloe is weirdly low down
   'FoodAloe': [0, -4],
   'AloeCream': [0, -2],
+
+  // Let's lower the shaker a few pixels too
+  'DrinkShaker': [0, 3],
 };
 
 export const ColorWhite: ParsedColor = 0xFFFFFFFF;

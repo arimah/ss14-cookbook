@@ -80,6 +80,13 @@ export const GameDataProvider = memo((
       ),
       ingredients: raw.ingredients,
 
+      foodSequenceStartPoints: new Map(
+        Object.entries(raw.foodSequenceStartPoints)
+      ),
+      foodSequenceElements: new Map(
+        Object.entries(raw.foodSequenceElements)
+      ),
+
       methodSprites: raw.methodSprites,
       beakerFill: raw.beakerFill,
       microwaveRecipeTypes: raw.microwaveRecipeTypes,

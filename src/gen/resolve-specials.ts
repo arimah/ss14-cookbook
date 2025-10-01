@@ -1,4 +1,3 @@
-import {ResolvedGameData} from './resolve-prototypes';
 import {ResolvedEntity, SpecialDiet, SpecialReagent} from './types';
 
 export type ResolvedSpecials = readonly Special[];
@@ -18,7 +17,7 @@ export interface Special {
 const MAX_COUNT = 31;
 
 export const resolveSpecials = (
-  data: ResolvedGameData,
+  allEntities: ReadonlyMap<string, ResolvedEntity>,
   diets: readonly SpecialDiet[],
   reagents: readonly SpecialReagent[]
 ): ResolvedSpecials => {
@@ -37,9 +36,9 @@ export const resolveSpecials = (
 
   for (const diet of diets) {
     // If we get this far, then the we *know* the organ must exist.
-    const organ = data.entities.get(diet.organ)!;
-    const digestibleTags = organ.specialDigestibleTags;
-    const digestibleComps = organ.specialDigestibleComponents;
+    const {stomach} = allEntities.get(diet.organ)!;
+    const digestibleTags = stomach?.tags;
+    const digestibleComps = stomach?.components;
     if (!digestibleTags || !digestibleComps) {
       throw new Error(`Organ ${diet.organ} has no tags or components to filter by`);
     }

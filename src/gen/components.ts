@@ -1,3 +1,11 @@
+import {
+  ConstructionGraphId,
+  EntityId,
+  FoodSequenceElementId,
+  ReagentId,
+  TagId,
+} from './prototypes';
+
 /**
  * This type is a blatant lie. The game has *hundreds* of components. However,
  * this lie lets us find components *and* narrow them by type with a `switch`
@@ -7,27 +15,73 @@
  * components we care about".
  */
 export type Component =
-  | SpriteComponent
-  | SolutionContainerManagerComponent
-  | SliceableFoodComponent
-  | ExtractableComponent
-  | ProduceComponent
+  | ButcherableComponent
   | ConstructionComponent
-  | TagComponent
+  | DeepFrySpawnComponent
+  | ExtractableComponent
+  | FoodSequenceElementComponent
+  | FoodSequenceStartPointComponent
+  | ProduceComponent
+  | SliceableFoodComponent
+  | SolutionContainerManagerComponent
+  | SpriteComponent
   | StomachComponent
-  | DeepFrySpawnComponent;
+  | TagComponent
+  ;
 
-export interface SpriteComponent {
-  readonly type: 'Sprite';
-  readonly state?: string;
-  readonly sprite?: string;
-  readonly color?: string;
-  readonly layers?: readonly {
-    readonly sprite?: string;
-    readonly state: string;
-    readonly visible?: boolean;
-    readonly color?: string;
-  }[];
+export interface ButcherableComponent {
+  readonly type: 'Butcherable';
+  readonly butcheringType: string;
+  readonly spawned: readonly EntitySpawnEntry[];
+}
+
+export interface EntitySpawnEntry {
+  readonly id?: EntityId;
+  readonly prob?: number;
+  readonly amount?: number;
+  readonly maxAmount?: number;
+  readonly orGroup?: string;
+}
+
+export interface ConstructionComponent {
+  readonly type: 'Construction';
+  readonly graph?: ConstructionGraphId;
+  readonly node?: string;
+  readonly edge?: number;
+  readonly step?: number;
+}
+
+/** Frontier: Deep frying */
+export interface DeepFrySpawnComponent {
+  readonly type: 'DeepFrySpawn';
+  readonly output: EntityId;
+}
+
+export interface ExtractableComponent {
+  readonly type: 'Extractable';
+  readonly grindableSolutionName?: string;
+  readonly juiceSolution?: Solution;
+}
+
+export interface FoodSequenceElementComponent {
+  readonly type: 'FoodSequenceElement';
+  readonly entries?: Readonly<Record<TagId, FoodSequenceElementId>>;
+}
+
+export interface FoodSequenceStartPointComponent {
+  readonly type: 'FoodSequenceStartPoint';
+  readonly key?: TagId;
+  readonly maxLayers?: number;
+}
+
+export interface ProduceComponent {
+  readonly type: 'Produce';
+}
+
+export interface SliceableFoodComponent {
+  readonly type: 'SliceableFood';
+  readonly slice?: EntityId;
+  readonly count?: number;
 }
 
 export interface SolutionContainerManagerComponent {
@@ -41,37 +95,21 @@ export interface Solution {
 }
 
 export interface SolutionReagent {
-  readonly ReagentId: string;
+  readonly ReagentId: ReagentId;
   readonly Quantity: number;
 }
 
-export interface SliceableFoodComponent {
-  readonly type: 'SliceableFood';
-  readonly slice?: string;
-  readonly count?: number;
-}
-
-export interface ExtractableComponent {
-  readonly type: 'Extractable';
-  readonly grindableSolutionName?: string;
-  readonly juiceSolution?: Solution;
-}
-
-export interface ProduceComponent {
-  readonly type: 'Produce';
-}
-
-export interface ConstructionComponent {
-  readonly type: 'Construction';
-  readonly graph?: string;
-  readonly node?: string;
-  readonly edge?: number;
-  readonly step?: number;
-}
-
-export interface TagComponent {
-  readonly type: 'Tag';
-  readonly tags?: readonly string[];
+export interface SpriteComponent {
+  readonly type: 'Sprite';
+  readonly state?: string;
+  readonly sprite?: string;
+  readonly color?: string;
+  readonly layers?: readonly {
+    readonly sprite?: string;
+    readonly state: string;
+    readonly visible?: boolean;
+    readonly color?: string;
+  }[];
 }
 
 export interface StomachComponent {
@@ -87,13 +125,12 @@ export interface EntityWhitelist {
   // The C# class EntityWhitelist can also filter by size, but we don't actually
   // make use of that field. It's part of this interface's definition so we can
   // emit warnings if we encounter it.
-  readonly tags?: readonly string[];
+  readonly tags?: readonly TagId[];
   readonly components?: readonly string[];
   readonly sizes?: readonly string[];
 }
 
-/** Frontier: Deep frying */
-export interface DeepFrySpawnComponent {
-  readonly type: 'DeepFrySpawn';
-  readonly output: string;
+export interface TagComponent {
+  readonly type: 'Tag';
+  readonly tags?: readonly TagId[];
 }

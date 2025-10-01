@@ -1,23 +1,42 @@
 import {existsSync, readFileSync} from 'fs';
 import {resolve, join as joinPath} from 'path';
 
-import {Jimp, JimpInstance} from 'jimp';
+import {Jimp, JimpInstance, cssColorToHex} from 'jimp';
 
-import {SpritePoint, SpriteAttribution, Recipe} from '../types';
+import {SpritePoint, SpriteAttribution, CookingMethod} from '../types';
 
 import {ResolvedGameData} from './resolve-prototypes';
-import {SpriteOffsets, ColorWhite} from './constants';
+import {ColorWhite, SpriteOffsets} from './constants';
 import {readFileTextWithoutTheStupidBOM} from './helpers';
-import {ParsedColor, ResolvedEntity, ResolvedSpriteLayerState} from './types';
+import {ParsedColor, ResolvedEntity} from './types';
 
 export interface SpriteSheetData {
+  /** Informative. */
+  readonly spriteCount: number;
   readonly sheet: JimpInstance;
   readonly points: ReadonlyMap<string, SpritePoint>;
-  readonly methods: ReadonlyMap<Recipe['method'], SpritePoint>;
+  readonly methods: ReadonlyMap<CookingMethod, SpritePoint>;
   readonly beakerFillPoint: SpritePoint;
   /** Frontier */
   readonly microwaveRecipeTypes?: ReadonlyMap<string, SpritePoint>;
   readonly attributions: readonly SpriteAttribution[];
+}
+
+interface SpriteCollection {
+  readonly spritesByKey: Map<string, DrawableSprite>;
+  readonly entityToSpriteKey: Map<string, string>;
+  readonly beakerFillKey: string;
+}
+
+interface DrawableSprite {
+  readonly offset: SpritePoint;
+  readonly layers: readonly DrawableLayer[];
+}
+
+interface DrawableLayer {
+  readonly path: string;
+  readonly state: string;
+  readonly color: ParsedColor;
 }
 
 // Temporary type used while building attributions
@@ -27,7 +46,7 @@ type AttributionData = Omit<SpriteAttribution, 'sprites'> & {
 
 // All item sprites are 32x32 throughout the game
 const SpriteSize = 32;
-const SheetWidth = 24; // sprites
+const SheetWidth = 24; // sprites across
 
 const ZeroOffset: SpritePoint = [0, 0];
 
@@ -36,21 +55,12 @@ export const buildSpriteSheet = async (
   textureDir: string,
   mixFillState: string
 ): Promise<SpriteSheetData> => {
-  const spriteCount =
-    resolved.entities.size +
-    // Cooking methods
-    resolved.methodEntities.size +
-    // Frontier: microwave recipe types
-    (
-      resolved.microwaveRecipeTypeEntities
-        /* -1 for microwave, which is included above.
-         * Yes, this is a horrible hack.
-         */
-        ? resolved.microwaveRecipeTypeEntities.size - 1
-        : 0
-    ) +
-    // Beaker fill
-    1;
+  const {
+    spritesByKey,
+    entityToSpriteKey,
+    beakerFillKey,
+  } = collectSprites(resolved, mixFillState);
+  const spriteCount = spritesByKey.size;
 
   const width = SpriteSize * SheetWidth;
   const height = SpriteSize * Math.ceil(spriteCount / SheetWidth);
@@ -58,86 +68,169 @@ export const buildSpriteSheet = async (
 
   const spriteCache = new SpriteCache(textureDir);
 
-  const points = new Map<string, SpritePoint>();
+  // Mapping from sprite key to its corresponding location in the sprite
+  const spritePoints = new Map<string, SpritePoint>();
 
   let i = 0;
-  for (const [id, entity] of resolved.entities) {
-    const point = await drawEntity(sheet, i, entity, spriteCache);
-    points.set(id, point);
+  for (const [key, sprite] of spritesByKey) {
+    const point = placeSprite(i);
+    await drawSprite(sheet, point, sprite, spriteCache);
+    spritePoints.set(key, point);
     i++;
   }
 
-  const methods = new Map<Recipe['method'], SpritePoint>();
-  for (const [method, entity] of resolved.methodEntities) {
-    const point = await drawEntity(sheet, i, entity, spriteCache);
-    methods.set(method, point);
-    i++;
-  }
+  const entityPoints = new Map(
+    Array.from(resolved.entities.keys(), id =>
+      [id, spritePoints.get(entityToSpriteKey.get(id)!)!] as const
+    )
+  );
+
+  const methods = new Map<CookingMethod, SpritePoint>(
+    Array.from(resolved.methodEntities, ([method, {id}]) =>
+      [method, spritePoints.get(entityToSpriteKey.get(id)!)!] as const
+    )
+  );
 
   let microwaveRecipeTypes: Map<string, SpritePoint> | undefined;
   if (resolved.microwaveRecipeTypeEntities) {
-    microwaveRecipeTypes = new Map<string, SpritePoint>();
-    for (const [subtype, entity] of resolved.microwaveRecipeTypeEntities) {
-      let point: SpritePoint;
-      // This is a horrendous, hideous, ugly-ass hardcoded hack that I hate.
-      // FIXME: Come up with a better way to reuse sprites, for fuck's sake
-      if (subtype === 'Microwave') {
-        point = methods.get('microwave')!;
-      } else {
-        point = await drawEntity(sheet, i, entity, spriteCache);
-      }
-      microwaveRecipeTypes.set(subtype, point);
-      i++;
-    }
+    microwaveRecipeTypes = new Map<string, SpritePoint>(
+      Array.from(resolved.microwaveRecipeTypeEntities, ([subtype, {id}]) =>
+        [subtype, spritePoints.get(entityToSpriteKey.get(id)!)!] as const
+      )
+    );
   }
 
-  const beakerLarge = resolved.methodEntities.get('mix')!;
-  const beakerFillPoint: SpritePoint = [
-    SpriteSize * (i % SheetWidth),
-    SpriteSize * Math.floor(i / SheetWidth),
-  ];
-  await drawSprite(
-    sheet,
-    beakerFillPoint,
-    beakerLarge.color,
-    [{
-      // FIXME: Ugly
-      path: beakerLarge.spriteLayers[0].path,
-      state: mixFillState,
-      color: ColorWhite,
-    }],
-    spriteCache,
-    beakerLarge.id
-  );
-
   return {
+    spriteCount,
     sheet,
-    points,
+    points: entityPoints,
     methods,
-    beakerFillPoint,
+    beakerFillPoint: spritePoints.get(beakerFillKey)!,
     microwaveRecipeTypes,
     attributions: spriteCache.getAttributions(),
   };
 };
 
-const drawEntity = async (
-  sheet: JimpInstance,
-  index: number,
-  entity: ResolvedEntity,
-  spriteCache: SpriteCache
-): Promise<SpritePoint> => {
-  const point = placeSprite(index);
-  const offset = SpriteOffsets[entity.id] ?? ZeroOffset;
-  await drawSprite(
-    sheet,
-    [point[0] + offset[0], point[1] + offset[1]],
-    entity.color,
-    entity.spriteLayers,
-    spriteCache,
-    entity.id
-  );
-  return point;
+const collectSprites = (
+  resolved: ResolvedGameData,
+  mixFillState: string
+): SpriteCollection => {
+  // Mapping from sprite key to sprite data.
+  const spritesByKey = new Map<string, DrawableSprite>();
+  // Maps an entity to its corresponding sprite key.
+  // Translated later to a sprite point.
+  const entityToSpriteKey = new Map<string, string>();
+
+  for (const entity of resolved.entities.values()) {
+    tryCollectSprite(entity, spritesByKey, entityToSpriteKey);
+  }
+
+  for (const entity of resolved.methodEntities.values()) {
+    tryCollectSprite(entity, spritesByKey, entityToSpriteKey);
+  }
+
+  if (resolved.microwaveRecipeTypeEntities) {
+    for (const entity of resolved.microwaveRecipeTypeEntities.values()) {
+      tryCollectSprite(entity, spritesByKey, entityToSpriteKey);
+    }
+  }
+
+  // The beaker fill insert needs some special code, for funsies.
+  const beakerLargeEnt = resolved.methodEntities.get('mix')!;
+  const beakerLargeSpriteKey = entityToSpriteKey.get(beakerLargeEnt.id)!;
+  const beakerLargeSprite = spritesByKey.get(beakerLargeSpriteKey)!;
+
+  const beakerFillSprite: DrawableSprite = {
+    offset: beakerLargeSprite.offset,
+    layers: [{
+      path: beakerLargeSprite.layers[0].path,
+      state: mixFillState,
+      color: ColorWhite,
+    }],
+  };
+  const beakerFillKey = drawableSpriteKey(beakerFillSprite);
+  spritesByKey.set(beakerFillKey, beakerFillSprite);
+
+  return {
+    spritesByKey,
+    entityToSpriteKey,
+    beakerFillKey,
+  };
 };
+
+const tryCollectSprite = (
+  entity: ResolvedEntity,
+  spritesByKey: Map<string, DrawableSprite>,
+  entityToSpriteKey: Map<string, string>
+): void => {
+  if (entityToSpriteKey.has(entity.id)) {
+    return;
+  }
+
+  const sprite = toDrawableSprite(entity);
+  const key = drawableSpriteKey(sprite);
+
+  // This may overwrite an existing sprite if multiple entities share sprites,
+  // but that's okay as the sprite data is identical. If the data differed,
+  // the key would too.
+  spritesByKey.set(key, sprite);
+  entityToSpriteKey.set(entity.id, key);
+};
+
+const toDrawableSprite = (entity: ResolvedEntity): DrawableSprite => {
+  const {sprite} = entity;
+  const basePath = sprite.path;
+  const baseColor = sprite.color
+    ? cssColorToHex(sprite.color)
+    : ColorWhite;
+
+  const layers: DrawableLayer[] = [];
+  if (sprite.state && basePath) {
+    layers.push({
+      color: baseColor,
+      path: basePath,
+      state: sprite.state,
+    });
+  }
+
+  for (let i = 0; i < sprite.layers.length; i++) {
+    const layer = sprite.layers[i];
+    // Don't warn about missing state: this sometimes happens when a layer uses
+    // `map` to assign a state later at some point. A null state is fine in that
+    // case, and we just skip the layer altogether.
+    if (!layer.visible || !layer.state) {
+      continue;
+    }
+    // If it has a state but no path, however, that's an issue.
+    const path = layer.path ?? basePath;
+    if (!path) {
+      console.warn(`Entity '${entity.id}': sprite layer ${i} has no RSI path`);
+      continue;
+    }
+    const color = layer.color
+      ? cssColorToHex(layer.color)
+      : ColorWhite;
+
+    layers.push({
+      path,
+      state: layer.state,
+      color: multiplyColors(baseColor, color),
+    });
+  }
+
+  if (layers.length === 0) {
+    throw new Error(`Entity '${entity.id}': no layers to render`);
+  }
+
+  return {
+    offset: SpriteOffsets[entity.id] ?? ZeroOffset,
+    layers,
+  };
+};
+
+const drawableSpriteKey = (sprite: DrawableSprite): string =>
+  // Super sloppy and lazy. But it works okay.
+  JSON.stringify(sprite);
 
 const placeSprite = (index: number): SpritePoint =>
   [
@@ -148,29 +241,26 @@ const placeSprite = (index: number): SpritePoint =>
 const drawSprite = async (
   sheet: JimpInstance,
   point: SpritePoint,
-  color: ParsedColor,
-  layers: readonly ResolvedSpriteLayerState[],
-  spriteCache: SpriteCache,
-  forEntity: string
+  sprite: DrawableSprite,
+  spriteCache: SpriteCache
 ): Promise<void> => {
-  for (const layer of layers) {
+  const x = point[0] + sprite.offset[0];
+  const y = point[1] + sprite.offset[1];
+  for (const layer of sprite.layers) {
     let sprite = await spriteCache.read(
       layer.path,
       layer.state,
-      forEntity,
       point
     );
 
-    if (color !== ColorWhite || layer.color !== ColorWhite) {
-      const mixedColor = multiplyColors(color, layer.color);
-
+    if (layer.color !== ColorWhite) {
       sprite = sprite.clone();
-      modulateByColor(sprite, mixedColor);
+      modulateByColor(sprite, layer.color);
     }
 
     sheet.blit({
-      x: point[0],
-      y: point[1],
+      x,
+      y,
       src: sprite,
       srcX: 0,
       srcY: 0,
@@ -197,6 +287,13 @@ const multiplyColors = (
   color1: ParsedColor,
   color2: ParsedColor
 ): ParsedColor => {
+  if (color1 === ColorWhite) {
+    return color2;
+  }
+  if (color2 === ColorWhite) {
+    return color1;
+  }
+
   const r1 = (color1 >>> 24) & 0xFF;
   const r2 = (color2 >>> 24) & 0xFF;
 
@@ -234,7 +331,6 @@ class SpriteCache {
   public async read(
     path: string,
     state: string,
-    forEntity: string,
     point: SpritePoint
   ): Promise<JimpInstance> {
     const key = joinPath(path, `${state}.png`);
@@ -258,7 +354,7 @@ class SpriteCache {
             state
           }' in '${
             path
-          }' for ${forEntity}`
+          }'`
         );
         // Return an empty image...
         image = new Jimp({width: SpriteSize, height: SpriteSize});
@@ -305,6 +401,8 @@ class SpriteCache {
 
         buffer = buffer.subarray(0, buffer.length - 1);
         bytesStripped++;
+
+        console.log(`${fullPath}: trimming buffer (${bytesStripped} B)`);
       }
     }
   }
@@ -340,10 +438,20 @@ class SpriteCache {
         console.error(`${metaPath}: Error parsing attributions:`, e);
       }
 
+      let copyright = typeof meta.copyright === 'string'
+        ? meta.copyright
+        : '';
+      if (meta.extra_copyright && Array.isArray(meta.extra_copyright)) {
+        if (copyright) {
+          copyright += '\n';
+        }
+        copyright += meta.extra_copyright.join('\n');
+      }
+
       attribution = {
         path,
         license: typeof meta.license === 'string' ? meta.license : '',
-        copyright: typeof meta.copyright === 'string' ? meta.copyright : '',
+        copyright,
         sprites: new Map<string, SpritePoint>(),
       };
       this.attributions.set(path, attribution);

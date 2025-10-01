@@ -2,6 +2,7 @@ import {Dispatch, SetStateAction} from 'react';
 import {Entity, Reagent, Recipe} from '../../types';
 
 import {
+    displayMethod,
   recipeHasAllIngredients,
   recipeHasAllReagents,
   recipeHasAnyIngredient,
@@ -9,10 +10,11 @@ import {
   recipeHasOnlyIngredients,
   recipeHasOnlyReagents,
 } from '../helpers';
+import {DisplayMethod} from '../types';
 
 export interface RecipeFilter {
   /** Empty list = include all methods. */
-  readonly methods: readonly Method[];
+  readonly methods: readonly DisplayMethod[];
   /** Frontier. Empty list = don't filter by subtype. */
   readonly subtypes: readonly string[];
   /** Empty set = include all ingredients. */
@@ -40,8 +42,6 @@ export interface RecipeFilter {
 }
 
 export type UpdateFilterFn = Dispatch<SetStateAction<RecipeFilter>>;
-
-export type Method = Recipe['method'];
 
 export type IngredientMode = 'all' | 'any' | 'only';
 
@@ -112,7 +112,7 @@ const applyNonIngredientFilter = (
   // You're damned right it is.
   if (filter.methods.length > 0) {
     recipes = recipes.filter(recipe =>
-      filter.methods.includes(recipe.method)
+      filter.methods.includes(displayMethod(recipe))
     );
   }
   if (filter.subtypes.length > 0) {

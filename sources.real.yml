@@ -10,6 +10,10 @@ base:
     cut: KitchenKnife
     roll: RollingPin
     heat: KitchenElectricGrill
+    heatMixture: ChemistryHotplate
+    stir: Spoon
+    shake: DrinkShaker
+    construct: ClothingHeadHatChef # general recipes
     deepFry: null
   mixFillState: beakerlarge4
   specialDiets:
@@ -41,12 +45,36 @@ base:
     # we ignore these recipes altogether.
     - heat!FoodEggChickenFertilized
     - heat!FoodEggDuckFertilized
+  ignoredFoodSequenceElements: &ignoredFoodSequenceElements
+    # Ultra-rare botany mutation.
+    - FoodExtradimensionalOrange
+    # MobMouse is included, don't need all the other mice.
+    - MobMouseDead
+    - MobMouse1
+    - MobMouse2
+    - MobMouseCancer
+    - MobMouseAdmeme
+    # Looks identical to FoodRealCapfruit (the one that shoots blanks).
+    - FoodFakeCapfruit
+    # Ew. You can discover these on your own!
+    - OrganDionaBrain
+    - OrganDionaBrainNymph
+    - OrganHumanBrain
+    - SentientSlimeCore
+    - SentientSlimesCore
   ignoreSourcesOf: &ignoredSources
     # These reagents bloat the list without providing anything especially useful.
-    - Water
     - Blood
     - Nutriment
     - Vitamin
+    - Water
+    # These have sources that are too rare or weird to be meaningful.
+    - Chlorine # blue pumpkin, rare botany mutation
+    - Gold # golden apple, rare botany mutation; trivially obtained from gold
+    - Nothing # borderline meme reagent
+    - Saline # pickle (Frontier); trivially made with salt + water
+    - UncookedAnimalProteins # meatwheat, rare botany mutation; trivially obtained from meat
+    - Wine # holymelon, rare botany mutation; trivially obtained from bar
   forceIncludeReagentSources: &reagentSources
     # Eggs can be trivially cracked into raw egg.
     Egg: [FoodEgg]
@@ -62,6 +90,10 @@ frontier:
     cut: KitchenKnife
     roll: RollingPin
     heat: KitchenElectricGrill
+    heatMixture: ChemistryHotplate
+    stir: Spoon
+    shake: DrinkShaker
+    construct: ClothingHeadHatChef # general recipes
     deepFry: KitchenDeepFryer
   mixFillState: beakerlarge4
   microwaveRecipeTypes: &microwaveRecipeTypes
@@ -106,6 +138,26 @@ frontier:
     - NFRecipeBuildABuddySlime
     - NFRecipeBuildABuddyVulpkanin
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements:
+    # Ultra-rare botany mutation.
+    - FoodExtradimensionalOrange
+    # MobMouse is included, don't need all the other mice.
+    - MobMouseDead
+    - MobMouse1
+    - MobMouse2
+    - MobMouseCancer
+    - MobMouseAdmeme
+    # Looks identical to FoodRealCapfruit (the one that shoots blanks).
+    - FoodFakeCapfruit
+    # Ew. You can discover these on your own!
+    - Hairball
+    - OrganDionaBrain
+    - OrganDionaBrainNymph
+    - OrganGoblinBrain
+    - OrganShelegBrain
+    - OrganHumanBrain
+    - SentientSlimeCore
+    - SentientSlimesCore
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
 
@@ -128,6 +180,7 @@ delta-v:
     - *theobromine
   sortingIdRewrites: *baseRewrites
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
 
@@ -145,6 +198,7 @@ rmc-14:
     - *theobromine
   sortingIdRewrites: *baseRewrites
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
 
@@ -168,6 +222,7 @@ floof:
     - *theobromine
   sortingIdRewrites: *baseRewrites
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
 
@@ -199,6 +254,7 @@ impstation:
     - *theobromine
   sortingIdRewrites: *baseRewrites
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
 
@@ -216,5 +272,6 @@ moff:
     - *theobromine
   sortingIdRewrites: *baseRewrites
   ignoredSpecialRecipes: *ignoredSpecialRecipes
+  ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources

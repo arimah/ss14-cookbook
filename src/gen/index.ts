@@ -1,13 +1,18 @@
 import {readFileSync} from 'fs';
 import {resolve} from 'path';
 
+import {parse} from 'yaml';
+import {enableMapSet, setAutoFreeze} from 'immer';
+
 import {findResourceFiles, readRawGameData} from './read-raw';
+import {resolveComponents} from './resolve-components';
 import {filterRelevantPrototypes} from './filter-relevant';
 import {resolvePrototypes} from './resolve-prototypes';
 import {resolveSpecials} from './resolve-specials';
 import {buildSpriteSheet} from './build-spritesheet';
 import {getGitCommitHash} from './commit-hash';
 import {ProcessedGameData, saveData} from './save-data';
+import {EntityId, MicrowaveMealRecipeId, ReagentId} from './prototypes';
 import {
   MethodEntities,
   MicrowaveRecipeTypes,
@@ -15,7 +20,6 @@ import {
   SpecialDiet,
   SpecialReagent,
 } from './types';
-import { parse } from 'yaml';
 
 interface ForkInfo {
   readonly name: string;
@@ -31,10 +35,11 @@ interface ForkInfo {
   /** Frontier */
   readonly microwaveRecipeTypes?: MicrowaveRecipeTypes;
   readonly sortingIdRewrites?: string[];
-  readonly ignoredRecipes?: string[];
+  readonly ignoredRecipes?: MicrowaveMealRecipeId[];
   readonly ignoredSpecialRecipes?: string[];
-  readonly ignoreSourcesOf?: string[];
-  readonly forceIncludeReagentSources?: Record<string, string[]>;
+  readonly ignoredFoodSequenceElements?: EntityId[];
+  readonly ignoreSourcesOf?: ReagentId[];
+  readonly forceIncludeReagentSources?: Record<ReagentId, readonly EntityId[]>;
 }
 
 const PrototypesSubPath = './Resources/Prototypes';
@@ -51,36 +56,35 @@ const buildFork = async (id: string, fork: ForkInfo): Promise<ProcessedGameData>
   console.log(`Found ${yamlPaths.length} files`);
 
   const raw = readRawGameData(yamlPaths);
-  console.log(
-    `Loaded ${
-      raw.entities.size
-    } entities, ${
-      raw.reagents.size
-    } reagents, ${
-      raw.recipes.length
-    } microwave meal recipes, ${
-      raw.reactions.length
-    } reactions, ${
-      raw.stacks.size
-    } stacks`
-  );
+  console.log(`Loaded:\n${
+    Object.entries(raw)
+      .filter(([, val]) => (val.size ?? val.length) != null)
+      .map(([key, val]) => `- ${key}: ${val.size ?? val.length}`)
+      .join('\n')
+  }`);
+
+  const entities = resolveComponents(raw);
 
   const filtered = filterRelevantPrototypes(
     raw,
-    fork.specialDiets ?? [],
+    entities,
     {
       ignoredRecipes: new Set(fork.ignoredRecipes ?? []),
       ignoredSpecialRecipes: new Set(fork.ignoredSpecialRecipes ?? []),
       ignoreSourcesOf: new Set(fork.ignoreSourcesOf ?? []),
       forceIncludeReagentSources: new Map(
-        Object.entries(fork.forceIncludeReagentSources ?? {})
+        Object.entries(fork.forceIncludeReagentSources ?? {}) as
+          [ReagentId, readonly EntityId[]][]
+      ),
+      ignoredFoodSequenceElements: new Set(
+        fork.ignoredFoodSequenceElements ?? []
       ),
     }
   );
   console.log(
-    `${
+    `Filtered: ${
       filtered.recipes.length
-    } recipes use ${
+    } recipes, ${
       filtered.entities.size
     } entities, ${
       filtered.reagents.size
@@ -93,7 +97,7 @@ const buildFork = async (id: string, fork: ForkInfo): Promise<ProcessedGameData>
 
   const resolved = resolvePrototypes(
     filtered,
-    raw.entities,
+    entities,
     resolve(fork.path, LocaleSubPath),
     fork.methodEntities,
     fork.microwaveRecipeTypes
@@ -109,15 +113,11 @@ const buildFork = async (id: string, fork: ForkInfo): Promise<ProcessedGameData>
   );
 
   const specials = resolveSpecials(
-    resolved,
+    entities,
     fork.specialDiets ?? [],
     fork.specialReagents ?? []
   );
-  console.log(
-    `Resolved ${
-      specials.length
-    } special diets and reagents`
-  );
+  console.log(`Resolved ${specials.length} special diets and reagents`);
 
   const sortingIdRewrites = readRewrites(
     fork.sortingIdRewrites ?? [],
@@ -129,7 +129,7 @@ const buildFork = async (id: string, fork: ForkInfo): Promise<ProcessedGameData>
     resolve(fork.path, TexturesSubPath),
     fork.mixFillState
   );
-  console.log(`Built sprite sheet for ${spriteSheet.points.size} sprites`);
+  console.log(`Built sprite sheet for ${spriteSheet.spriteCount} sprites`);
 
   console.log(`Finished building ${id}`);
 
@@ -140,6 +140,8 @@ const buildFork = async (id: string, fork: ForkInfo): Promise<ProcessedGameData>
     default: fork.default ?? false,
     hidden: fork.hidden,
     resolved,
+    foodSequenceStartPoints: filtered.foodSequenceStartPoints,
+    foodSequenceElements: filtered.foodSequenceElements,
     specials,
     sprites: spriteSheet,
     microwaveRecipeTypes: fork.microwaveRecipeTypes,
@@ -193,6 +195,11 @@ const main = async () => {
   await saveData(forkData);
   console.log('Done.');
 };
+
+// I love you, Immer, yet you wound me so.
+enableMapSet();
+// Weird perf. issues, loads of objects to process.
+setAutoFreeze(false);
 
 main().catch(err => {
   console.error(err);
