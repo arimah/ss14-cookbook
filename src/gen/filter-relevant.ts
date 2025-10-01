@@ -739,7 +739,7 @@ const findTargetEntityByTag = (
     case 0:
       return null;
     case 1:
-      return matching[1];
+      return matching[0];
     default:
       return matching;
   }
