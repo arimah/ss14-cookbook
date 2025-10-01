@@ -50,6 +50,7 @@ export interface EntityPrototype extends PlainObject {
   readonly id: EntityId;
   readonly parent?: EntityId | EntityId[];
   readonly name?: string;
+  readonly abstract?: boolean;
   readonly components?: readonly Component[];
 }
 

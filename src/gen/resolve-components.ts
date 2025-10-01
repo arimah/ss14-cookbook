@@ -34,6 +34,10 @@ export const resolveComponents = (
   const result = new Map<EntityId, ResolvedEntity>();
 
   for (const entity of raw.entities.values()) {
+    if (entity.abstract) {
+      continue;
+    }
+
     const resolved = resolveEntity(entity, raw.entities);
     result.set(resolved.id, resolved);
   }
