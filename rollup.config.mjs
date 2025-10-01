@@ -17,6 +17,8 @@ const env = process.env.NODE_ENV || 'production';
 const isDev = env === 'development';
 const basePath = process.env.COOKBOOK_BASE_PATH || '';
 const repoUrl = process.env.COOKBOOK_REPO_URL || 'https://example.com';
+const trustedHosts = (process.env.COOKBOOK_TRUSTED_HOSTS || '').split(/\s+/).filter(Boolean);
+const canonicalUrl = process.env.COOKBOOK_CANONICAL_URL || null;
 
 const plugins = [
   // Resolve node modules in addition to local modules.
@@ -48,6 +50,8 @@ const plugins = [
       'IS_DEV': JSON.stringify(isDev),
       'BASE_PATH': JSON.stringify(basePath),
       'REPO_URL': JSON.stringify(repoUrl),
+      'TRUSTED_HOSTS': JSON.stringify(trustedHosts),
+      'CANONICAL_URL': JSON.stringify(canonicalUrl),
     },
   }),
 

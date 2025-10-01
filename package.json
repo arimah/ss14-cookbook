@@ -6,7 +6,8 @@
     "gen:recipes": "node ./bin/recipe-gen.js sources.yml",
     "diff:recipes": "node ./bin/recipe-diff.js",
     "watch": "env-cmd -f .env.development rollup -c --watch",
-    "start": "http-server --port 5514 --proxy http://localhost:5514/index.html?"
+    "start": "http-server --port 5514 --proxy http://localhost:5514/index.html?",
+    "start-alt": "http-server --port 5515 --proxy http://localhost:5515/index.html?"
   },
   "bin": {
     "ss14-cookbook-server": "./bin/server.js"

@@ -1,6 +1,6 @@
 # SS14 Cookbook
 
-This is the source code for the [SS14 Cookbook](https://heurl.in/ss14/recipes). You are free to fork it, clone it, set up your own cookbook and make changes. This source code is released under the terms of the [**AGPLv3**](./LICENSE.txt).
+This is the source code for the [SS14 Cookbook](https://ss14.recipes). You are free to fork it, clone it, set up your own cookbook and make changes. This source code is released under the terms of the [**AGPLv3**](./LICENSE.txt).
 
 
 ## Preamble
@@ -18,7 +18,7 @@ Lastly, the recipe code is *incredibly* specialized. If you're forking the cookb
 
 1. Clone the repo, optionally forking it first if you plan to make modifications. :)
 2. Make sure you have a recent version of [Node](https://nodejs.org/) and [npm](https://www.npmjs.com/) installed. Consider using [nvm](https://github.com/nvm-sh/nvm) or [nvm for Windows](https://github.com/coreybutler/nvm-windows) to make your life easier.
-3. Copy `.env.example` to `.env` and customize as necessary.
+3. Copy `.env.example` to `.env` and customize as necessary. *Note: development uses `.env.development`, which is pre-configured for you.*
 4. Clone the fork(s) you want to generate a cookbook for. Into a different folder somewhere else – don't put it in your cookbook repo.
 5. The cookbook gets recipes straight from the game data. You will need local clones of whatever fork(s) you want to provide recipes for. Read through `sources.example.yml` and `sources.real.yml` to get a feel for how to configure your fork(s). Copy one of these files to `sources.yml`, or write your own from scratch. If anything is filled in incorrectly, you'll probably get a cryptic error. *Read carefully.*
 6. In your terminal, run `npm run build` - this will build the recipe generator as well as the frontend.
@@ -31,10 +31,12 @@ You _do not_ need to fully initialize the repos for the cookbook; there's no nee
 ### Developing
 
 1. `npm run watch` - this builds the cookbook in dev mode.
-2. In another terminal, `npm run start`.
+2. In another terminal, `npm start`.
 3. You should now be able to visit http://localhost:5514 (mnemonic: 5514 ≈ SS14). Have fun. :)
 
 There is no hot module reloading. When you make changes, the reload button is your friend.
+
+To test data migrations, run `npm run start-alt` to get a server running on https://localhost:5515. With the default `.env.development`, this secondary version will offer to redirect to :5514 with data migrations and everything. *Caution:* Migrating will completely overwrite any saved data on the target origin.
 
 ### Publishing
 

@@ -163,6 +163,17 @@ export const joinListNatural = (
   return result;
 };
 
+export const intersperse = <T>(values: readonly T[], sep: T): T[] => {
+  const result: T[] = [];
+  for (let i = 0; i < values.length; i++) {
+    if (i > 0) {
+      result.push(sep);
+    }
+    result.push(values[i]);
+  }
+  return result;
+};
+
 /**
  * Deduplicates an array, keeping the *first* occurrence of each value.
  * This algorithm is O(n^2) and only suitable for small values of n.

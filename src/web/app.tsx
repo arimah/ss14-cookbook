@@ -8,6 +8,7 @@ import {GameDataProvider} from './context';
 import {FavoritesProvider} from './favorites';
 import {RecipeExplorerProvider} from './recipe-explorer';
 import {AttributionsLink} from './attributions';
+import {CanonicalRedirect} from './canonical-redirect';
 import {PrivacyPolicyLink} from './privacy';
 import {GitHubCommitUrl} from './helpers';
 import {NoticesProvider} from './notices';
@@ -126,6 +127,7 @@ export const App = (props: Props): JSX.Element => {
               <a href={REPO_URL} target='_blank' rel='noopener'>Source code</a>
             </p>
           </footer>
+          <CanonicalRedirect/>
         </GameDataProvider>
       </NoticesProvider>
     </UrlProvider>

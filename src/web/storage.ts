@@ -2,13 +2,24 @@ import {useMemo} from "react";
 
 export const FavoritesKey = 'ss14-cookbook/favorites';
 
-export const SavedFiltersKey = 'ss14-cookbook/saved-filters';
-
 export const SavedMenusKey = 'ss14-cookbook/menus';
 
 export const NoticesKey = 'ss14-cookbook/notices';
 
 export const FirstVisitKey = 'ss14-cookbook/first-visit';
+
+export const AllStorageKeys: readonly string[] = [
+  FavoritesKey,
+  SavedMenusKey,
+  NoticesKey,
+  FirstVisitKey,
+];
+
+const ImportantDataKeys = [
+  FavoritesKey,
+  SavedMenusKey,
+  // FirstVisitKey and NoticesKey deliberately excluded: non-critical data.
+];
 
 /**
  * A type safe-ish wrapper around local storage that primarily ensures the same
@@ -26,6 +37,21 @@ export const useStorage = <T>(key: string): Storage<T> =>
     read: initial => read(key, initial),
     write: value => write(key, value),
   }), [key]);
+
+export const hasImportantStoredData = (): boolean => {
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && ImportantDataKeys.includes(key)) {
+        return true;
+      }
+    }
+    return false;
+  } catch (e) {
+    console.warn(`hasStoredData: error accessing localStorage:`, e);
+    return false;
+  }
+};
 
 const has = (key: string): boolean => {
   try {

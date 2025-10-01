@@ -84,7 +84,7 @@ const AttributionsDialog = memo((
             )}
           </ul>
 
-          <Tooltip text='Close' provideLabel>
+          <Tooltip text='Close' placement='left' provideLabel>
             <button className='dialog_close' onClick={onClose}>
               <CloseIcon/>
             </button>

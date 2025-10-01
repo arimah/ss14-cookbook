@@ -1,6 +1,6 @@
 # This is a documented example file showing all possible fork options. For a
 # realistic example, see `sources.real.yml`. This contains the real, actual
-# configuration used by the SS14 Cookbook on heurl.in.
+# configuration used by the SS14 Cookbook on ss14.recipes.
 #
 # While large parts of the cookbook are configurable, some things are hardcoded.
 # Please see `src/gen/constants.ts` for hardcoded things, which may be necessary

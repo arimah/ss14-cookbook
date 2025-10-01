@@ -307,17 +307,13 @@ input {
     border: none;
   }
 
-  .input-group > .icon {
-    flex: none;
+  .input-group > .icon:first-child {
+    margin-left: 6px;
   }
 
-    .input-group > .icon:first-child {
-      margin-left: 6px;
-    }
-
-    .input-group > .icon:last-child {
-      margin-right: 6px;
-    }
+  .input-group > .icon:last-child {
+    margin-right: 6px;
+  }
 
 .checkbox {
   display: flex;
@@ -542,6 +538,7 @@ select {
 
 .dropdown {
   display: flex;
+  flex-shrink: 0;
   position: relative;
 }
 
@@ -744,6 +741,7 @@ select {
 
 .icon {
   color: var(--icon-fg);
+  flex: none;
 }
 
 .sprite {
@@ -2353,3 +2351,60 @@ select {
   .privacy_text p:not(:first-child) {
     margin-top: 16px;
   }
+
+.migrate {
+  box-sizing: border-box;
+  margin-inline: auto;
+  padding: 16px;
+  width: 100%;
+  max-width: 640px;
+  border-radius: 7px;
+  background-color: var(--bg-level-1);
+  box-shadow: var(--shadow-basic);
+}
+
+  .migrate p:not(:first-child) {
+    margin-top: 16px;
+  }
+
+  .migrate a > .icon {
+    vertical-align: -6px;
+    color: inherit;
+  }
+
+.redirect {
+  width: calc(100% - 16px);
+  max-width: 640px;
+}
+
+  .redirect_body > p {
+    margin-bottom: 8px;
+  }
+
+  p.redirect_canonical {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 8px;
+    font-size: 1.2rem;
+  }
+
+  .redirect_data {
+    display: flex;
+    flex-direction: row;
+    margin-top: 16px;
+    padding: 8px;
+    gap: 8px;
+    border-radius: 7px;
+    background-color: var(--bg-level-2);
+  }
+
+    .redirect_data > .icon {
+      color: var(--notice-info-fg-icon);
+    }
+
+    .redirect_data-body {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }

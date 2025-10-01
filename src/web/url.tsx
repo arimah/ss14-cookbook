@@ -10,6 +10,9 @@ export interface UrlGenerator {
   readonly menuNew: string;
   menuView(id: string): string;
   menuEdit(id: string): string;
+
+  migrateExport: string;
+  migrateImport(dataJson: string): string;
 }
 
 const UrlContext = createContext<UrlGenerator | null>(null);
@@ -24,11 +27,17 @@ export const UrlProvider = (props: UrlProviderProps): JSX.Element => {
   const [query] = useSearchParams();
   const urlGenerator = useMemo<UrlGenerator>(() => ({
     recipes: withFork('/', query),
+
     foodSequence: withFork('/combinations', query),
+
     menuList: withFork('/menu', query),
     menuNew: withFork('/menu/new', query),
-    menuView: (id: string) => withFork(`/menu/${id}`, query),
-    menuEdit: (id: string) => withFork(`/menu/${id}/edit`, query),
+    menuView: id => withFork(`/menu/${id}`, query),
+    menuEdit: id => withFork(`/menu/${id}/edit`, query),
+
+    migrateExport: '/migrate?export',
+    migrateImport: data =>
+      `/migrate?import&data=${encodeURIComponent(data)}`,
   }), [query]);
 
   return (
