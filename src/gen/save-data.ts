@@ -58,7 +58,16 @@ export const saveData = async (
   const index: ForkData[] = [];
   for (const d of dataWithSpriteHash) {
     const entities: Entity[] = [];
+
+    const hasFoodSequence = (k: TagId): boolean =>
+      d.foodSequenceStartPoints.has(k);
+
     for (const [id, entity] of d.resolved.entities) {
+      const foodSeqElem = entity
+        .foodSequenceElement
+        ?.keys
+        .filter(hasFoodSequence);
+
       entities.push({
         id,
         name: entity.name,
@@ -68,8 +77,8 @@ export const saveData = async (
           key: entity.foodSequenceStart.key,
           maxCount: entity.foodSequenceStart.maxLayers,
         } : undefined,
-        seqElem: entity.foodSequenceElement
-          ? entity.foodSequenceElement.keys
+        seqElem: foodSeqElem && foodSeqElem?.length > 0
+          ? foodSeqElem
           : undefined,
       });
     }
