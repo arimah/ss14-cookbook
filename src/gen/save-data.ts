@@ -77,7 +77,7 @@ export const saveData = async (
           key: entity.foodSequenceStart.key,
           maxCount: entity.foodSequenceStart.maxLayers,
         } : undefined,
-        seqElem: foodSeqElem && foodSeqElem?.length > 0
+        seqElem: foodSeqElem && foodSeqElem.length > 0
           ? foodSeqElem
           : undefined,
       });

@@ -79,7 +79,7 @@ interface StartStepProps {
 const StartStep = (props: StartStepProps): JSX.Element => {
   const {step} = props;
   return (
-    <li className='recipe_step recipe_step--start'>
+    <li className='recipe_step recipe_step--compact'>
       Take <SolidIngredient id={step.entity}/>
     </li>
   );
@@ -93,7 +93,7 @@ const EndStep = (props: EndStepProps): JSX.Element => {
   const {step} = props;
   if (typeof step.entity === 'string') {
     return (
-      <li className='recipe_step recipe_step--end'>
+      <li className='recipe_step recipe_step--compact'>
         Finish with <SolidIngredient id={step.entity}/>
       </li>
     );
@@ -122,7 +122,7 @@ const MixStep = (props: MixStepProps): JSX.Element => {
     const id = keys[0];
     const ingredient = step.reagents[id];
     return (
-      <li className='recipe_step recipe_step--start'>
+      <li className='recipe_step recipe_step--compact'>
         {'Take '}
         <ReagentIngredient
           id={id}
@@ -168,7 +168,7 @@ const AddStep = (props: AddStepProps): JSX.Element => {
   // More compact appearance if only one entity matches
   if (typeof step.entity === 'string') {
     return (
-      <li className='recipe_step recipe_step--start'>
+      <li className='recipe_step recipe_step--compact'>
         {text} <SolidIngredient id={step.entity}/>
       </li>
     );
@@ -199,7 +199,7 @@ const AddReagentStep = (props: AddReagentStepProps): JSX.Element => {
     : step.minCount;
 
   return (
-    <li className='recipe_step recipe_step--start'>
+    <li className='recipe_step recipe_step--compact'>
       Add <ReagentIngredient id={step.reagent} amount={amount}/>
     </li>
   );
@@ -278,13 +278,13 @@ const AlsoMakesStep = (props: AlsoMakesStepProps): JSX.Element => {
   // More compact appearance if there's only one other entity
   if (typeof step.entity === 'string') {
     return (
-      <li className='recipe_step recipe_step--start'>
+      <li className='recipe_step recipe_step--compact recipe_step--also'>
         Also makes <SolidIngredient id={step.entity}/>
       </li>
     );
   } else {
     return (
-      <li className='recipe_step recipe_step--add'>
+      <li className='recipe_step recipe_step--add recipe_step--also'>
         <span>Also makes:</span>
         {step.entity.map(id => <SolidIngredient key={id} id={id}/>)}
       </li>

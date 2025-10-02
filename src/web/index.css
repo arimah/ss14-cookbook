@@ -660,8 +660,10 @@ select {
 
 .tabs {
   display: flex;
+  flex-direction: column;
   flex: none;
   gap: 8px;
+  margin-top: -8px;
 }
 
   .tabs_list {
@@ -674,8 +676,9 @@ select {
   }
 
   .tabs_tab {
-    flex: none;
+    flex: 1 0 auto;
     padding: 8px 12px;
+    max-width: 250px;
     position: relative;
     border: none;
     box-shadow: var(--shadow-basic);
@@ -708,34 +711,44 @@ select {
         width: calc(100% - 8px);
       }
 
-  .tabs_fork > .dropdown_trigger {
-    padding-left: 8px;
-    box-shadow: var(--shadow-basic);
+  .tabs_secondary {
+    display: flex;
+    flex: none;
+    gap: 8px;
+    align-self: end;
+    order: -1;
+  }
+
+    .tabs_fork > .dropdown_trigger,
+    .tabs_settings > button {
+      box-shadow: var(--shadow-basic);
+    }
+
+    .tabs_settings {
+      display: flex;
+      flex: none;
+      position: relative;
+    }
+
+  @media (min-width: 600px) {
+    .tabs {
+      margin-top: 0;
+      flex-direction: row;
+    }
+
+    .tabs_secondary {
+      order: 0;
+      align-self: normal;
+    }
   }
 
   @media (min-width: 650px) {
     .tabs_tab {
       padding: 10px 16px;
-      min-width: 100px;
     }
-  }
 
-  @media (min-width: 800px) {
-    .tabs_tab {
-      padding: 10px 16px;
-      min-width: 150px;
-    }
-  }
-
-  @media (min-width: 950px) {
-    .tabs_tab {
-      min-width: 200px;
-    }
-  }
-
-  @media (min-width: 1100px) {
-    .tabs_tab {
-      min-width: 250px;
+    .tabs_settings > button {
+      padding-inline: 12px;
     }
   }
 
@@ -952,17 +965,25 @@ select {
         color: var(--fg-subtle);
       }
 
-      :is(.recipe_step--start, .recipe_step--end) > .recipe_ingredient {
+      .recipe_step--compact > .recipe_ingredient {
         display: contents;
       }
 
-        :is(.recipe_step--start, .recipe_step--end) > .recipe_ingredient > :is(.sprite, .reagent) {
+        .recipe_step--compact > .recipe_ingredient > :is(.sprite, .reagent) {
           margin-right: 2px;
         }
 
       .recipe_step--simple > .sprite {
         margin-right: 4px;
       }
+
+      .recipe_step--also {
+        list-style-type: disc;
+      }
+
+        .recipe_step--also::marker {
+          content: '+ ';
+        }
 
   .recipe_method {
     align-self: center;
@@ -2285,6 +2306,43 @@ select {
         right: 8px;
       }
   }
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  position: absolute;
+  top: calc(100% + 4px);
+  right: -8px;
+  z-index: 101;
+  width: max-content;
+  border-radius: 7px;
+  background-color: var(--bg-level-2);
+  box-shadow: 0 2px 7px var(--shadow-color);
+}
+
+  .settings:focus {
+    outline: none;
+  }
+
+  .settings_name {
+    font-weight: bold;
+  }
+
+  .settings_value {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: -12px;
+    margin-left: 8px;
+  }
+
+    .settings_option {
+      display: flex;
+      flex: none;
+      gap: 8px;
+    }
 
 .attributions {
   top: 4px;

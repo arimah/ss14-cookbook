@@ -8,16 +8,20 @@ export const NoticesKey = 'ss14-cookbook/notices';
 
 export const FirstVisitKey = 'ss14-cookbook/first-visit';
 
+export const SettingsKey = 'ss14-cookbook/settings';
+
 export const AllStorageKeys: readonly string[] = [
   FavoritesKey,
   SavedMenusKey,
   NoticesKey,
   FirstVisitKey,
+  SettingsKey,
 ];
 
 const ImportantDataKeys = [
   FavoritesKey,
   SavedMenusKey,
+  SettingsKey,
   // FirstVisitKey and NoticesKey deliberately excluded: non-critical data.
 ];
 

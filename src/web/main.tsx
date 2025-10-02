@@ -6,6 +6,7 @@ import {ForkData} from '../types';
 import {useFork} from './fork-context';
 import {UrlGenerator, useUrl} from './url';
 import {Dropdown, DropdownOption} from './dropdown';
+import {SettingsButton} from './settings';
 import {NoticeList} from './notices';
 import {RouteHandle} from './routes';
 
@@ -53,7 +54,10 @@ export const Cookbook = (): JSX.Element => {
           </Tab>
         )}
       </div>
-      <ForkSwitcher value={fork} allForks={allForks} onSetFork={setFork}/>
+      <div className='tabs_secondary'>
+        <ForkSwitcher value={fork} allForks={allForks} onSetFork={setFork}/>
+        <SettingsButton/>
+      </div>
     </header>
     <Outlet/>
   </>;
