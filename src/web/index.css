@@ -719,8 +719,7 @@ select {
     order: -1;
   }
 
-    .tabs_fork > .dropdown_trigger,
-    .tabs_settings > button {
+    .tabs_fork > .dropdown_trigger {
       box-shadow: var(--shadow-basic);
     }
 
@@ -729,6 +728,12 @@ select {
       flex: none;
       position: relative;
     }
+
+      .tabs_settings > button {
+        min-width: 44px;
+        min-height: 34px;
+        box-shadow: var(--shadow-basic);
+      }
 
   @media (min-width: 600px) {
     .tabs {
@@ -2322,6 +2327,17 @@ select {
   box-shadow: 0 2px 7px var(--shadow-color);
 }
 
+  .settings::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    right: 18px;
+    width: 24px;
+    height: 12px;
+    background-color: inherit;
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  }
+
   .settings:focus {
     outline: none;
   }
@@ -2335,13 +2351,25 @@ select {
     flex-direction: column;
     gap: 4px;
     margin-top: -12px;
-    margin-left: 8px;
   }
 
     .settings_option {
       display: flex;
       flex: none;
       gap: 8px;
+      padding-block: 4px; /* larger surface for touch */
+    }
+
+    @media (min-width: 600px) {
+      .settings_option {
+        padding-block: 2px;
+      }
+    }
+
+    @media (min-width: 850px) {
+      .settings_option {
+        padding-block: 0;
+      }
     }
 
 .attributions {

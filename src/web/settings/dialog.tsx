@@ -49,7 +49,7 @@ export const SettingsDialog = (props: SettingsDialogProps): JSX.Element => {
     <FocusTrap onPointerDownOutside={onClose}>
       <div className='settings' tabIndex={-1} onKeyDown={handleKeyDown}>
         <div className='settings_name'>
-          Colour Scheme:
+          Colour scheme:
         </div>
         <div className='settings_value'>
           <label className='settings_option'>
@@ -60,7 +60,7 @@ export const SettingsDialog = (props: SettingsDialogProps): JSX.Element => {
               checked={settings.theme === 'dark'}
               onChange={handleChangeTheme}
             />
-            Dark Theme
+            Dark theme
           </label>
           <label className='settings_option'>
             <input
@@ -70,12 +70,12 @@ export const SettingsDialog = (props: SettingsDialogProps): JSX.Element => {
               checked={settings.theme === 'light'}
               onChange={handleChangeTheme}
             />
-            Light Theme
+            Light theme
           </label>
         </div>
 
         <div className='settings_name'>
-          Temperature Unit:
+          Temperature unit:
         </div>
         <div className='settings_value'>
           <label className='settings_option'>
