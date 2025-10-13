@@ -63,6 +63,7 @@ const typeTag = (name: string): CollectionTag => ({
 const customTags: CollectionTag[] = [
   // Add more tags here as necessary
   typeTag('CreateEntityReactionEffect'),
+  typeTag('SpawnEntity'),
   typeTag('SequenceLength'),
   typeTag('LastElementHasTags'),
   typeTag('ElementHasTags'),

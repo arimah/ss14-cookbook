@@ -97,6 +97,13 @@ export interface Reactant {
 export interface CreateEntityReactionEffect {
   readonly '!type': 'CreateEntityReactionEffect';
   readonly entity: EntityId;
+  readonly number?: number;
+}
+
+export interface SpawnEntityEntityEffect {
+  readonly '!type': 'SpawnEntity';
+  readonly entity: EntityId;
+  readonly number?: number;
 }
 
 export interface StackPrototype {
@@ -233,4 +240,11 @@ export const isCreateEntityEffect = (
 ): node is CreateEntityReactionEffect =>
   isPlainObject(node) &&
   node['!type'] === 'CreateEntityReactionEffect' &&
+  typeof node.entity === 'string';
+
+export const isSpawnEntityEffect = (
+  node: unknown
+): node is SpawnEntityEntityEffect =>
+  isPlainObject(node) &&
+  node['!type'] === 'SpawnEntity' &&
   typeof node.entity === 'string';

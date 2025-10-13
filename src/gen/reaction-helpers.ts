@@ -1,4 +1,10 @@
-import {EntityId, ReactionPrototype, ReagentId, isCreateEntityEffect} from './prototypes';
+import {
+  EntityId,
+  ReactionPrototype,
+  ReagentId,
+  isCreateEntityEffect,
+  isSpawnEntityEffect,
+} from './prototypes';
 
 export const getReagentResult = (
   reaction: ReactionPrototype
@@ -24,7 +30,7 @@ export const getSolidResult = (
   let result: EntityId | null = null;
 
   for (const effect of reaction.effects) {
-    if (isCreateEntityEffect(effect)) {
+    if (isCreateEntityEffect(effect) || isSpawnEntityEffect(effect)) {
       if (result) {
         // This reaction makes more than one solid result - abort.
         return null;
