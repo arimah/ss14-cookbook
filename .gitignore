@@ -8,5 +8,6 @@ public/assets/*.js
 public/data/*.json
 public/img/sprites*.webp
 
+privacy.html
 sources.yml
 .env

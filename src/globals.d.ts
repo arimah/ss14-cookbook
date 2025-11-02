@@ -3,6 +3,7 @@ declare const BASE_PATH: string;
 declare const REPO_URL: string;
 declare const TRUSTED_HOSTS: string[];
 declare const CANONICAL_URL: string | null;
+declare const PRIVACY_POLICY_HTML: string;
 
 declare module '*.css' {
   const ClassMap: {

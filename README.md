@@ -59,9 +59,11 @@ There is no built-in tool for automatically deploying updated recipes. As per th
 
 ## Privacy policy
 
-The privacy policy is hardcoded. If you publish your own copy of the cookbook, **it's your responsibility to ensure the privacy policy is accurate to your server**. An inaccurate privacy policy can leave you liable in some jurisdictions. Please see the corresponding code in [`src/web/privacy.tsx`](./src/web/privacy.tsx).
+If you publish your own copy of the cookbook, **it's your responsibility to ensure the privacy policy is accurate to your server**. An inaccurate privacy policy can leave you liable in some jurisdictions.
 
-***TODO:** Move the privacy policy to a separate file that can more easily be edited.*
+The privacy policy is read from `privacy.html` in the repo root. This is an *HTML snippet*, not an entire HTML document. It is passed directly to `dangerouslySetInnerHTML`. Once the cookbook is built, there is no way to control the privacy policy from the outside; you don't need to worry about XSS.
+
+If you change the privacy policy, you must rebuild the cookbook and republish it. See above under [Publishing](#publishing).
 
 
 ## Notices

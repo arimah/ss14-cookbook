@@ -11,7 +11,21 @@ import html from '@rollup/plugin-html';
 import postcssNested from 'postcss-nested';
 
 const dir = import.meta.dirname;
-const pkg = JSON.parse(fs.readFileSync(`${dir}/package.json`));
+const pkg = JSON.parse(fs.readFileSync(`${dir}/package.json`, {
+  encoding: 'utf-8',
+}));
+
+let privacyPolicy;
+try {
+  privacyPolicy = fs.readFileSync(`${dir}/privacy.html`, {
+    encoding: 'utf-8',
+  });
+} catch (e) {
+  if (e.code !== 'ENOENT') {
+    throw e;
+  }
+  privacyPolicy = `<p>No privacy policy is configured.</p>`;
+}
 
 const env = process.env.NODE_ENV || 'production';
 const isDev = env === 'development';
@@ -52,6 +66,7 @@ const plugins = [
       'REPO_URL': JSON.stringify(repoUrl),
       'TRUSTED_HOSTS': JSON.stringify(trustedHosts),
       'CANONICAL_URL': JSON.stringify(canonicalUrl),
+      'PRIVACY_POLICY_HTML': JSON.stringify(privacyPolicy),
     },
   }),
 
