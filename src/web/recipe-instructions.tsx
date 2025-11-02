@@ -1,4 +1,4 @@
-import {memo} from 'react';
+import {ReactElement, memo} from 'react';
 
 import {
   AddReagentStep,
@@ -29,7 +29,7 @@ export interface RecipeInstructionsProps {
 
 export const RecipeInstructions = memo((
   props: RecipeInstructionsProps
-): JSX.Element => {
+): ReactElement => {
   const {visible, steps} = props;
   return (
     <ol className='recipe_instructions'>
@@ -45,7 +45,7 @@ interface StepProps {
   visible: boolean;
 }
 
-const Step = (props: StepProps): JSX.Element => {
+const Step = (props: StepProps): ReactElement => {
   const {step, visible} = props;
   switch (step.type) {
     case 'start':
@@ -76,7 +76,7 @@ interface StartStepProps {
   step: StartStep;
 }
 
-const StartStep = (props: StartStepProps): JSX.Element => {
+const StartStep = (props: StartStepProps): ReactElement => {
   const {step} = props;
   return (
     <li className='recipe_step recipe_step--compact'>
@@ -89,7 +89,7 @@ interface EndStepProps {
   step: EndStep;
 }
 
-const EndStep = (props: EndStepProps): JSX.Element => {
+const EndStep = (props: EndStepProps): ReactElement => {
   const {step} = props;
   if (typeof step.entity === 'string') {
     return (
@@ -112,7 +112,7 @@ interface MixStepProps {
   visible: boolean;
 }
 
-const MixStep = (props: MixStepProps): JSX.Element => {
+const MixStep = (props: MixStepProps): ReactElement => {
   const {step, visible} = props;
 
   // Slightly more compact view if there's only one ingredient.
@@ -149,7 +149,7 @@ interface AddStepProps {
   step: AddStep;
 }
 
-const AddStep = (props: AddStepProps): JSX.Element => {
+const AddStep = (props: AddStepProps): ReactElement => {
   const {step} = props;
 
   let text: string;
@@ -191,7 +191,7 @@ interface AddReagentStepProps {
   step: AddReagentStep;
 }
 
-const AddReagentStep = (props: AddReagentStepProps): JSX.Element => {
+const AddReagentStep = (props: AddReagentStepProps): ReactElement => {
   const {step} = props;
 
   const amount = step.minCount !== step.maxCount
@@ -209,7 +209,7 @@ interface HeatStepProps {
   step: HeatStep;
 }
 
-const HeatStep = (props: HeatStepProps): JSX.Element => {
+const HeatStep = (props: HeatStepProps): ReactElement => {
   const {step} = props;
 
   const {methodSprites} = useGameData();
@@ -226,7 +226,7 @@ interface HeatMixtureStepProps {
   step: HeatMixtureStep;
 }
 
-const HeatMixtureStep = (props: HeatMixtureStepProps): JSX.Element => {
+const HeatMixtureStep = (props: HeatMixtureStepProps): ReactElement => {
   const {step} = props;
 
   const {methodSprites} = useGameData();
@@ -248,7 +248,7 @@ interface SimpleStepProps {
   step: SimpleInteractionStep;
 }
 
-const SimpleStep = (props: SimpleStepProps): JSX.Element => {
+const SimpleStep = (props: SimpleStepProps): ReactElement => {
   const {step} = props;
 
   const {methodSprites} = useGameData();
@@ -272,7 +272,7 @@ interface AlsoMakesStepProps {
   step: AlsoMakesStep;
 }
 
-const AlsoMakesStep = (props: AlsoMakesStepProps): JSX.Element => {
+const AlsoMakesStep = (props: AlsoMakesStepProps): ReactElement => {
   const {step} = props;
 
   // More compact appearance if there's only one other entity

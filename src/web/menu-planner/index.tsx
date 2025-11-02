@@ -1,12 +1,12 @@
-import {memo} from 'react';
-import {Outlet, RouteObject} from 'react-router-dom';
+import {ReactElement, memo} from 'react';
+import {Outlet, RouteObject} from 'react-router';
 
 import {StoredMenuProvider} from './storage';
 import {MenuList} from './list';
 import {MenuViewer} from './view';
 import {MenuEditor} from './edit';
 
-export const MenuPlanner = memo((): JSX.Element => {
+export const MenuPlanner = memo((): ReactElement => {
   return (
     <StoredMenuProvider>
       <main>

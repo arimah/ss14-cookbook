@@ -1,5 +1,6 @@
 import {
   MouseEvent,
+  ReactElement,
   ReactNode,
   createContext,
   memo,
@@ -29,7 +30,7 @@ interface FavoritesProviderProps {
 
 export const FavoritesProvider = (
   props: FavoritesProviderProps
-): JSX.Element => {
+): ReactElement => {
   const {children} = props;
 
   const storage = useStorage<string[]>(FavoritesKey);
@@ -72,7 +73,7 @@ export interface FavoriteButtonProps {
 
 export const FavoriteButton = memo((
   props: FavoriteButtonProps
-): JSX.Element => {
+): ReactElement => {
   const {id} = props;
 
   const {isFavorite, toggleFavorite} = useContext(Context);

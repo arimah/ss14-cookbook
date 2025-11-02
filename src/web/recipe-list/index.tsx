@@ -1,5 +1,13 @@
-import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {
+  ReactElement,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import {useLocation, useNavigate} from 'react-router';
 
 import {MicrowaveRecipeType, Recipe as RecipeData} from '../../types';
 
@@ -46,7 +54,7 @@ const SortOptions: DropdownOption[] = [
   {value: 'alpha', name: 'Alphabetic'},
 ];
 
-export const RecipeList = memo((): JSX.Element => {
+export const RecipeList = memo((): ReactElement => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -237,7 +245,7 @@ interface ResultCountProps {
   totalCount: number;
 }
 
-const ResultCount = (props: ResultCountProps): JSX.Element => {
+const ResultCount = (props: ResultCountProps): ReactElement => {
   const {search, filter, resultCount, totalCount} = props;
 
   const {microwaveRecipeTypes, specialTraits} = useGameData();

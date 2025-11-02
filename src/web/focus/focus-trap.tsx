@@ -1,4 +1,4 @@
-import {cloneElement, useRef, useEffect} from 'react';
+import {ReactElement, cloneElement, useRef, useEffect} from 'react';
 
 import {combineRefs} from '../helpers';
 
@@ -29,7 +29,7 @@ const getBehavior = (active: Active): FocusScopeBehavior =>
     ? FocusScopeBehavior.PASSTHRU
     : FocusScopeBehavior.CONTAIN;
 
-export const FocusTrap = (props: FocusTrapProps): JSX.Element => {
+export const FocusTrap = (props: FocusTrapProps): ReactElement => {
   const {
     active = true,
     return: restore = true,
@@ -85,7 +85,7 @@ export const FocusTrap = (props: FocusTrapProps): JSX.Element => {
   }, [enabled]);
 
   const childWithRef = cloneElement(children, {
-    ref: combineRefs(rootRef, children.ref),
+    ref: combineRefs(rootRef, children.props.ref),
   });
   return childWithRef;
 };

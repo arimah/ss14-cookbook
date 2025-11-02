@@ -1,4 +1,11 @@
-import {KeyboardEvent, ReactNode, useCallback, useMemo, useState} from 'react';
+import {
+  KeyboardEvent,
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 
 import {DropdownIcon} from './icons';
 import {DropdownList, DropdownListItem} from './dropdown-list';
@@ -26,7 +33,7 @@ export interface DropdownExtraItem {
   readonly activate: (close: () => void) => void;
 }
 
-export const Dropdown = (props: Props): JSX.Element => {
+export const Dropdown = (props: Props): ReactElement => {
   const {
     className,
     icon,

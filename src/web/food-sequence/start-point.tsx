@@ -1,4 +1,4 @@
-import {memo, useMemo} from 'react';
+import {ReactElement, memo, useMemo} from 'react';
 
 import {Entity} from '../../types';
 
@@ -11,7 +11,7 @@ export interface SeqStartPointProps {
   entity: Entity;
 }
 
-export const SeqStartPoint = memo((props: SeqStartPointProps): JSX.Element => {
+export const SeqStartPoint = memo((props: SeqStartPointProps): ReactElement => {
   const {entity} = props;
 
   const {
@@ -55,7 +55,7 @@ interface SeqElementProps {
   id: string;
 }
 
-const SeqElement = (props: SeqElementProps): JSX.Element => {
+const SeqElement = (props: SeqElementProps): ReactElement => {
   const {id} = props;
 
   const {recipesBySolidResult, entityMap} = useGameData();

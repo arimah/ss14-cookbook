@@ -3,6 +3,7 @@ import {
   CSSProperties,
   KeyboardEvent,
   PointerEvent,
+  ReactElement,
   Ref,
   useCallback,
   useEffect,
@@ -35,7 +36,7 @@ const DefaultTimeout = 750; // ms
 const DefaultUsageHint = 'Press and hold to confirm';
 const ReleaseHint = 'Release to confirm';
 
-export const ConfirmButton = (props: Props): JSX.Element => {
+export const ConfirmButton = (props: Props): ReactElement => {
   const {
     className,
     style,

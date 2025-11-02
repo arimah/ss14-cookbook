@@ -1,4 +1,4 @@
-import {memo, useMemo} from 'react';
+import {ReactElement, memo, useMemo} from 'react';
 
 import {useGameData} from '../context';
 import {Recipe} from '../recipe';
@@ -20,7 +20,7 @@ export interface Props {
   onAddRecipe: (id: string) => void;
 }
 
-export const IngredientList = memo((props: Props): JSX.Element => {
+export const IngredientList = memo((props: Props): ReactElement => {
   const {
     availableIngredients,
     hiddenIngredients,
@@ -66,7 +66,7 @@ interface IngredientProps {
   onAddRecipe: (id: string) => void;
 }
 
-const Ingredient = memo((props: IngredientProps): JSX.Element => {
+const Ingredient = memo((props: IngredientProps): ReactElement => {
   const {ingredient, visible, onToggleVisible, onAddRecipe} = props;
 
   const {recipeMap, entityMap, reagentMap} = useGameData();
@@ -149,7 +149,7 @@ interface AddRecipeButtonProps {
   onAdd: (id: string) => void;
 }
 
-const AddRecipeButton = memo((props: AddRecipeButtonProps): JSX.Element => {
+const AddRecipeButton = memo((props: AddRecipeButtonProps): ReactElement => {
   const {recipeId, index, totalCount, onAdd} = props;
 
   const {parentRef, popupRef, visible} = usePopupTrigger<

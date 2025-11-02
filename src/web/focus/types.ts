@@ -1,8 +1,8 @@
-import {Ref, RefObject} from 'react';
+import {ReactElement, Ref, RefObject} from 'react';
 
-export type ElementChild = JSX.Element & {
+export type ElementChild = ReactElement<{
   ref?: Ref<Element>;
-};
+}>;
 
 export type FocusableElement = Element & {
   focus(): void;

@@ -11,7 +11,7 @@ export interface Props {
   }>;
 }
 
-export const RecipePopup = (props: Props): JSX.Element => {
+export const RecipePopup = (props: Props): ReactElement => {
   const {id, children} = props;
 
   const {visible, popupRef, parentRef} = usePopupTrigger<HTMLDivElement>(
@@ -33,7 +33,7 @@ export const RecipePopup = (props: Props): JSX.Element => {
   </>;
 };
 
-const renderRecipe = (id: string): JSX.Element =>
+const renderRecipe = (id: string): ReactElement =>
   <Recipe
     key={id}
     id={id}

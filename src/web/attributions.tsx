@@ -1,5 +1,6 @@
 import {
   MouseEvent,
+  ReactElement,
   ReactNode,
   memo,
   useCallback,
@@ -8,7 +9,7 @@ import {
   useState,
 } from 'react';
 import {createPortal} from 'react-dom';
-import {useBlocker} from 'react-router-dom';
+import {useBlocker} from 'react-router';
 
 import {MetaData, SpriteAttribution} from '../types';
 
@@ -28,7 +29,7 @@ export interface Props {
   meta: MetaData,
 }
 
-export const AttributionsLink = memo((props: Props): JSX.Element => {
+export const AttributionsLink = memo((props: Props): ReactElement => {
   const {value, meta} = props;
 
   const [open, setOpen] = useState(false);
@@ -59,7 +60,7 @@ interface AttributionsDialogProps {
 
 const AttributionsDialog = memo((
   props: AttributionsDialogProps
-): JSX.Element => {
+): ReactElement => {
   const {value, meta, onClose} = props;
 
   const ref = useRef<HTMLElement>(null);
@@ -138,7 +139,7 @@ interface LicenceTextProps {
   license: string;
 }
 
-const LicenseText = (props: LicenceTextProps): JSX.Element => {
+const LicenseText = (props: LicenceTextProps): ReactElement => {
   const {license} = props;
 
   let url: string | null = null;

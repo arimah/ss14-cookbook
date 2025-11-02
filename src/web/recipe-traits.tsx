@@ -1,4 +1,4 @@
-import {CSSProperties} from 'react';
+import {CSSProperties, ReactElement} from 'react';
 
 import {Recipe} from '../types';
 
@@ -11,7 +11,7 @@ export interface RecipeTraitsProps {
 
 export const RecipeTraits = (
   props: RecipeTraitsProps
-): JSX.Element | null => {
+): ReactElement | null => {
   const {recipe} = props;
 
   const {entityMap, specialTraits, renderedTraitCache} = useGameData();

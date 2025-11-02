@@ -1,4 +1,5 @@
 import {
+  ReactElement,
   ReactNode,
   createContext,
   useCallback,
@@ -40,7 +41,7 @@ export interface SettingsProviderProps {
   children: ReactNode;
 }
 
-export const SettingsProvider = (props: SettingsProviderProps): JSX.Element => {
+export const SettingsProvider = (props: SettingsProviderProps): ReactElement => {
   const {children} = props;
 
   const storage = useStorage<Settings>(SettingsKey);

@@ -1,4 +1,4 @@
-import {memo} from 'react';
+import {ReactElement, memo} from 'react';
 
 import {Recipe} from '../types';
 
@@ -10,7 +10,7 @@ export interface RecipeResultProps {
   recipe: Recipe;
 }
 
-export const RecipeResult = memo((props: RecipeResultProps): JSX.Element => {
+export const RecipeResult = memo((props: RecipeResultProps): ReactElement => {
   const {recipe} = props;
 
   const {entityMap, reagentMap} = useGameData();

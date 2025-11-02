@@ -1,4 +1,4 @@
-import {KeyboardEvent, useCallback} from 'react';
+import {KeyboardEvent, ReactElement, useCallback} from 'react';
 
 import {FocusTrap} from '../focus';
 import {Overlay} from '../overlay';
@@ -9,7 +9,7 @@ export interface Props {
   onDiscard: () => void;
 }
 
-export const DiscardChangesDialog = (props: Props): JSX.Element => {
+export const DiscardChangesDialog = (props: Props): ReactElement => {
   const {onStay, onSave, onDiscard} = props;
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {

@@ -1,4 +1,11 @@
-import {Fragment, ReactNode, useContext, useEffect, useMemo} from 'react';
+import {
+  Fragment,
+  ReactElement,
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+} from 'react';
 
 import {RecipePopup} from '../recipe-popup';
 import {NoticeData, NoticeIcon} from '../types';
@@ -12,14 +19,14 @@ export interface NoticeListProps {
   currentFork: string;
 }
 
-const Icons: Record<NoticeIcon, JSX.Element> = {
+const Icons: Record<NoticeIcon, ReactElement> = {
   info: <InformationIcon/>,
   warn: <WarningIcon/>,
   error: <ErrorIcon/>,
   star: <StarOnIcon/>,
 };
 
-export const NoticeList = (props: NoticeListProps): JSX.Element => {
+export const NoticeList = (props: NoticeListProps): ReactElement => {
   const {currentFork} = props;
 
   // We need the context here so we can skip rendering dismissed notices

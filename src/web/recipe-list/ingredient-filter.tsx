@@ -1,6 +1,7 @@
 import {
   Dispatch,
   MouseEvent,
+  ReactElement,
   ReactNode,
   SetStateAction,
   memo,
@@ -29,7 +30,7 @@ type SearchResult =
 
 export const IngredientSuggestions = memo((
   props: Props
-): JSX.Element | null => {
+): ReactElement | null => {
   const {search, filter, setFilter, clearSearch} = props;
 
   const {entityMap, ingredients, reagentList} = useGameData();
@@ -103,7 +104,7 @@ interface SuggestionProps {
   onClick: (value: SearchResult) => void;
 }
 
-const Suggestion = memo((props: SuggestionProps): JSX.Element => {
+const Suggestion = memo((props: SuggestionProps): ReactElement => {
   const {value, selected, onClick} = props;
 
   let icon: ReactNode;

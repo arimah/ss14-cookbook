@@ -1,4 +1,11 @@
-import {ReactNode, createContext, memo, useContext, useMemo} from 'react';
+import {
+  ReactElement,
+  ReactNode,
+  createContext,
+  memo,
+  useContext,
+  useMemo,
+} from 'react';
 
 import {GameData, Entity, Reagent, Recipe} from '../types';
 
@@ -15,7 +22,7 @@ const GameDataContext = createContext<SearchableRecipeData | null>(null);
 
 export const GameDataProvider = memo((
   props: GameDataProviderProps
-): JSX.Element => {
+): ReactElement => {
   const {forkId, raw, children} = props;
 
   const value = useMemo<SearchableRecipeData>(() => {

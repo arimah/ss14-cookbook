@@ -1,4 +1,4 @@
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactElement, ReactNode, useEffect, useState} from 'react';
 
 import {ArrowRightIcon} from '../icons';
 import {Notice} from '../notices';
@@ -48,7 +48,7 @@ interface ErrorState {
 
 const RedirectTimeout = 1000; // ms
 
-export const ExportSection = (): JSX.Element => {
+export const ExportSection = (): ReactElement => {
   const [state, setState] = useState(getInitialState);
 
   const url = useUrl();
@@ -66,7 +66,7 @@ export const ExportSection = (): JSX.Element => {
     }
   }, [state]);
 
-  let children: JSX.Element;
+  let children: ReactElement;
   switch (state.type) {
     case 'notAvailable':
       children = <>

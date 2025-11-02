@@ -1,4 +1,4 @@
-import {ReactNode, memo} from 'react';
+import {ReactElement, ReactNode, memo} from 'react';
 
 // Icon paths are taken from MDI React: https://pictogrammers.com/library/mdi/
 
@@ -10,7 +10,7 @@ export interface IconProps {
 type IconComponent = (props: IconProps) => ReactNode;
 
 const icon = (path: string): IconComponent =>
-  memo(({className, size = 24}: IconProps): JSX.Element =>
+  memo(({className, size = 24}: IconProps): ReactElement =>
     <svg
       className={className ? `icon ${className}` : 'icon'}
       viewBox='0 0 24 24'

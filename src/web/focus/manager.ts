@@ -467,7 +467,9 @@ const manager = (() => {
   };
 })();
 
-export const useManagedFocus = (props: FocusScopeProps): RefObject<Element> => {
+export const useManagedFocus = (
+  props: FocusScopeProps
+): RefObject<Element | null> => {
   const key = useUniqueId();
 
   manager.set(key, props);

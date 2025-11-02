@@ -1,5 +1,5 @@
-import {ReactNode, useEffect, useState} from 'react';
-import {Link, useSearchParams} from 'react-router-dom';
+import {ReactElement, ReactNode, useEffect, useState} from 'react';
+import {Link, useSearchParams} from 'react-router';
 
 import {Notice} from '../notices';
 import {ArrowRightIcon} from '../icons';
@@ -44,7 +44,7 @@ interface ErrorState {
 
 const TrustedHosts = TRUSTED_HOSTS;
 
-export const ImportSection = (): JSX.Element => {
+export const ImportSection = (): ReactElement => {
   const [query] = useSearchParams();
 
   const url = useUrl();
@@ -57,7 +57,7 @@ export const ImportSection = (): JSX.Element => {
     }
   }, [state]);
 
-  let children: JSX.Element;
+  let children: ReactElement;
   switch (state.type) {
     case 'loading':
       children = <p>Importing...</p>;

@@ -1,4 +1,4 @@
-import {cloneElement} from 'react';
+import {ReactElement, cloneElement} from 'react';
 
 import {combineRefs} from '../helpers';
 
@@ -13,7 +13,7 @@ export interface FocusScopeProps {
 const getBehavior = (active: boolean): FocusScopeBehavior =>
   active ? FocusScopeBehavior.PASSTHRU : FocusScopeBehavior.EXCLUDE;
 
-export const FocusScope = (props: FocusScopeProps): JSX.Element => {
+export const FocusScope = (props: FocusScopeProps): ReactElement => {
   const {
     active = true,
     children,
@@ -24,7 +24,7 @@ export const FocusScope = (props: FocusScopeProps): JSX.Element => {
   });
 
   const childWithRef = cloneElement(children, {
-    ref: combineRefs(rootRef, children.ref),
+    ref: combineRefs(rootRef, children.props.ref),
   });
   return childWithRef;
 };

@@ -1,5 +1,5 @@
-import {useCallback, useEffect, useMemo, useState} from 'react';
-import {Outlet, useSearchParams} from 'react-router-dom';
+import {ReactElement, useCallback, useEffect, useMemo, useState} from 'react';
+import {Outlet, useSearchParams} from 'react-router';
 
 import {ForkData, GameData} from '../types';
 
@@ -25,7 +25,7 @@ const NoticesPath = `${BASE_PATH}/data/notices.json`;
 const ForkDataPath = (id: string, hash: string) =>
   `${BASE_PATH}/data/data_${id}.${hash}.json`;
 
-export const App = (props: Props): JSX.Element => {
+export const App = (props: Props): ReactElement => {
   const {forks} = props;
 
   const [query, setQuery] = useSearchParams();

@@ -1,6 +1,6 @@
-import {ReactNode, useEffect, useState} from 'react';
+import {ReactElement, ReactNode, useEffect, useState} from 'react';
 import {createRoot} from 'react-dom/client';
-import {RouterProvider, createBrowserRouter} from 'react-router-dom';
+import {RouterProvider, createBrowserRouter} from 'react-router';
 import {enableMapSet} from 'immer';
 
 import {App} from './app';
@@ -11,7 +11,7 @@ import './index.css';
 
 const IndexPath = `${BASE_PATH}/data/index.json`;
 
-const ForkListLoader = (): JSX.Element => {
+const ForkListLoader = (): ReactElement => {
   // This is a pretty bad implementation.
   // TODO: Maybe move things to a ForkListContext or something.
   const [children, setChildren] = useState<ReactNode>('Loading...');

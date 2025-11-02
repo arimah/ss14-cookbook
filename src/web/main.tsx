@@ -1,5 +1,5 @@
-import {MouseEvent, ReactNode, memo, useMemo} from 'react';
-import {Link, Outlet, useMatches} from 'react-router-dom';
+import {MouseEvent, ReactElement, ReactNode, memo, useMemo} from 'react';
+import {Link, Outlet, useMatches} from 'react-router';
 
 import {ForkData} from '../types';
 
@@ -34,7 +34,7 @@ const HeaderTabs: readonly HeaderTab[] = [
   },
 ];
 
-export const Cookbook = (): JSX.Element => {
+export const Cookbook = (): ReactElement => {
   const {fork, allForks, setFork} = useFork();
 
   const routes = useMatches();
@@ -69,7 +69,7 @@ interface TabProps {
   children: ReactNode;
 }
 
-const Tab = memo((props: TabProps): JSX.Element => {
+const Tab = memo((props: TabProps): ReactElement => {
   const {target, selected, children} = props;
   return (
     <Link
@@ -100,7 +100,7 @@ interface ForkSwitcherProps {
   onSetFork: (value: string) => void;
 }
 
-const ForkSwitcher = memo((props: ForkSwitcherProps): JSX.Element => {
+const ForkSwitcher = memo((props: ForkSwitcherProps): ReactElement => {
   const {value, allForks, onSetFork} = props;
 
   const options = useMemo<DropdownOption[]>(() => {

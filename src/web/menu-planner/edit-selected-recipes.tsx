@@ -1,4 +1,4 @@
-import {memo, useEffect, useMemo, useRef, useState} from 'react';
+import {ReactElement, memo, useEffect, useMemo, useRef, useState} from 'react';
 
 import {useGameData} from '../context';
 import {InputGroup} from '../input-group';
@@ -17,7 +17,7 @@ export interface Props {
   onMoveRecipe: (fromIndex: number, delta: 1 | -1) => void;
 }
 
-export const SelectedRecipes = memo((props: Props): JSX.Element => {
+export const SelectedRecipes = memo((props: Props): ReactElement => {
   const {recipes, onAddRecipe, onRemoveRecipe, onMoveRecipe} = props;
 
   const {recipeMap} = useGameData();
@@ -77,7 +77,7 @@ interface MenuRecipeProps {
   onMove: (fromIndex: number, delta: 1 | -1) => void;
 }
 
-const MenuRecipe = memo((props: MenuRecipeProps): JSX.Element => {
+const MenuRecipe = memo((props: MenuRecipeProps): ReactElement => {
   const {id, index, total, onRemove, onMove} = props;
 
   return (
@@ -129,7 +129,7 @@ const DefaultPage: PageInfo = {
   query: '',
 };
 
-const SearchResults = memo((props: SearchResultsProps): JSX.Element | null => {
+const SearchResults = memo((props: SearchResultsProps): ReactElement | null => {
   const {query, selectedRecipes, onAddRecipe} = props;
 
   const {

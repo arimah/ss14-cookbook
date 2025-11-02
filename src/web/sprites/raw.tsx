@@ -1,4 +1,4 @@
-import {memo} from 'react';
+import {ReactElement, memo} from 'react';
 
 import {SpritePoint} from '../../types';
 
@@ -7,7 +7,7 @@ export interface RawSpriteProps {
   alt: string;
 }
 
-export const RawSprite = memo((props: RawSpriteProps): JSX.Element => {
+export const RawSprite = memo((props: RawSpriteProps): ReactElement => {
   const {position, alt} = props;
 
   return (

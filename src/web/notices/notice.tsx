@@ -1,4 +1,4 @@
-import {ReactNode, memo, useContext} from 'react';
+import {ReactElement, ReactNode, memo, useContext} from 'react';
 
 import {Tooltip} from '../tooltip';
 import {InformationIcon, WarningIcon, ErrorIcon, CloseIcon} from '../icons';
@@ -18,7 +18,7 @@ const Icons = {
   error: <ErrorIcon/>,
 } as const;
 
-export const Notice = memo((props: Props): JSX.Element | null => {
+export const Notice = memo((props: Props): ReactElement | null => {
   const {id, kind = 'info', icon, children} = props;
 
   const context = useContext(NoticesContext);

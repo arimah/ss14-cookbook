@@ -1,12 +1,12 @@
-import {memo, useEffect, useMemo, useRef} from 'react';
-import {useLocation} from 'react-router-dom';
+import {ReactElement, memo, useEffect, useMemo, useRef} from 'react';
+import {useLocation} from 'react-router';
 
 import {useGameData} from '../context';
 import {NeutralCollator} from '../helpers';
 
 import {SeqStartPoint} from './start-point';
 
-export const FoodSequences = memo((): JSX.Element => {
+export const FoodSequences = memo((): ReactElement => {
   const {entityList, entityMap, reagentMap} = useGameData();
 
   const startPoints = useMemo(() => {

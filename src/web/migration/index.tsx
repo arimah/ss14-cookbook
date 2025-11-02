@@ -1,4 +1,5 @@
-import {Link, useSearchParams} from 'react-router-dom';
+import {ReactElement} from 'react';
+import {Link, useSearchParams} from 'react-router';
 
 import {useUrl} from '../url';
 import {ArrowRightIcon} from '../icons';
@@ -6,7 +7,7 @@ import {ArrowRightIcon} from '../icons';
 import {ExportSection} from './export-section';
 import {ImportSection} from './import-section';
 
-export const MigratePage = (): JSX.Element => {
+export const MigratePage = (): ReactElement => {
   const [query] = useSearchParams();
 
   const url = useUrl();
@@ -18,7 +19,7 @@ export const MigratePage = (): JSX.Element => {
     return <ExportSection/>;
   }
 
-  let children: JSX.Element;
+  let children: ReactElement;
   if (!CANONICAL_URL) {
     children = <>
       <p>The server has no configured address to migrate to.</p>

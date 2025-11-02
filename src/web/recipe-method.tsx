@@ -1,4 +1,4 @@
-import {memo} from 'react';
+import {ReactElement, memo} from 'react';
 
 import {Recipe, SpritePoint} from '../types';
 
@@ -13,7 +13,7 @@ export interface RecipeMethodProps {
 
 export const RecipeMethod = memo((
   props: RecipeMethodProps
-): JSX.Element | null => {
+): ReactElement | null => {
   const {recipe} = props;
 
   const {methodSprites, microwaveRecipeTypes} = useGameData();
@@ -23,7 +23,7 @@ export const RecipeMethod = memo((
     return null;
   }
 
-  let text: JSX.Element;
+  let text: ReactElement;
   let sprite: SpritePoint = methodSprites[method]!;
   let spriteAlt: string;
 

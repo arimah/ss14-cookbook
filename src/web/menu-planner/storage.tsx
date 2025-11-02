@@ -1,4 +1,12 @@
-import {ReactNode, createContext, memo, useContext, useMemo, useState} from 'react';
+import {
+  ReactElement,
+  ReactNode,
+  createContext,
+  memo,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import {Draft, produce} from 'immer';
 
 import {SavedMenusKey, useStorage} from '../storage';
@@ -29,7 +37,7 @@ export interface StoredMenuProviderProps {
 
 export const StoredMenuProvider = memo((
   props: StoredMenuProviderProps
-): JSX.Element => {
+): ReactElement => {
   const {children} = props;
 
   const storage = useStorage<SavedMenus>(SavedMenusKey);

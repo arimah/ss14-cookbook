@@ -1,6 +1,6 @@
-import {useEffect, useRef, useState} from 'react';
+import {ReactElement, useEffect, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
-import {Link} from 'react-router-dom';
+import {Link} from 'react-router';
 
 import {getPopupRoot} from './popup-impl';
 import {FocusTrap} from './focus';
@@ -9,7 +9,7 @@ import {ArrowRightIcon, CloseIcon, InformationIcon} from './icons';
 import {hasImportantStoredData} from './storage';
 import {useUrl} from './url';
 
-export const CanonicalRedirect = (): JSX.Element | null => {
+export const CanonicalRedirect = (): ReactElement | null => {
   if (!CANONICAL_URL) {
     // No canonical URL to redirect to.
     return null;
@@ -28,7 +28,7 @@ export const CanonicalRedirect = (): JSX.Element | null => {
   return <CanonicalRedirectDialog/>;
 };
 
-const CanonicalRedirectDialog = (): JSX.Element | null => {
+const CanonicalRedirectDialog = (): ReactElement | null => {
   const [open, setOpen] = useState(true);
 
   const ref = useRef<HTMLElement>(null);
@@ -81,7 +81,7 @@ interface DataMigrationNoticeProps {
 
 const DataMigrationNotice = (
   props: DataMigrationNoticeProps
-): JSX.Element | null => {
+): ReactElement | null => {
   const {onClose} = props;
 
   const url = useUrl();

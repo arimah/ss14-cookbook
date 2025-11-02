@@ -1,4 +1,10 @@
-import {ReactNode, createContext, useContext, useMemo} from 'react';
+import {
+  ReactElement,
+  ReactNode,
+  createContext,
+  useContext,
+  useMemo,
+} from 'react';
 
 import {ForkData} from '../types';
 
@@ -21,7 +27,7 @@ export interface ForkProviderProps {
   children: ReactNode;
 }
 
-export const ForkProvider = (props: ForkProviderProps): JSX.Element => {
+export const ForkProvider = (props: ForkProviderProps): ReactElement => {
   const {fork, allForks, setFork, children} = props;
   const value = useMemo(() => ({
     fork,

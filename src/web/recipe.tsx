@@ -1,6 +1,6 @@
-import {RefObject, memo, useMemo, useRef} from 'react';
+import {ReactElement, RefObject, memo, useMemo, useRef} from 'react';
 import {createPortal} from 'react-dom';
-import {Link} from 'react-router-dom';
+import {Link} from 'react-router';
 
 import {Entity, Recipe as RecipeData} from '../types';
 
@@ -11,12 +11,12 @@ import {useExploreRecipe, useCurrentExploredRecipe} from './recipe-explorer';
 import {useRecipeVisibility} from './recipe-visibility-context';
 import {RecipeTraits} from './recipe-traits';
 import {RecipeMethod} from './recipe-method';
+import {RecipeResult} from './recipe-result';
 import {RecipeIngredients} from './recipe-ingredients';
+import {RecipeInstructions} from './recipe-instructions';
 import {EntitySprite} from './sprites';
 import {Tooltip} from './tooltip';
 import {getPopupRoot, usePopupTrigger} from './popup-impl';
-import {RecipeResult} from './recipe-result';
-import {RecipeInstructions} from './recipe-instructions';
 import {useUrl} from './url';
 
 export interface Props {
@@ -24,11 +24,11 @@ export interface Props {
   id: string;
   canFavorite?: boolean;
   canExplore?: boolean;
-  headerAction?: JSX.Element;
+  headerAction?: ReactElement;
   skipDefaultHeaderAction?: boolean;
 }
 
-export const Recipe = memo((props: Props): JSX.Element => {
+export const Recipe = memo((props: Props): ReactElement => {
   const {
     className,
     id,
@@ -124,7 +124,7 @@ const FoodSequenceStartTooltip =
 const defaultHeaderAction = (
   recipe: RecipeData,
   entities: ReadonlyMap<string, Entity>
-): JSX.Element | null => {
+): ReactElement | null => {
   if (recipe.solidResult) {
     const entity = entities.get(recipe.solidResult)!;
     if (entity.seqStart) {
@@ -141,7 +141,7 @@ interface SeqStartButtonProps {
   entityId: string;
 }
 
-const SeqStartButton = memo((props: SeqStartButtonProps): JSX.Element => {
+const SeqStartButton = memo((props: SeqStartButtonProps): ReactElement => {
   const {entityId} = props;
 
   const url = useUrl();
@@ -164,7 +164,7 @@ interface SeqElemIconProps {
   entityId: string;
 }
 
-const SeqElemIcon = memo((props: SeqElemIconProps): JSX.Element => {
+const SeqElemIcon = memo((props: SeqElemIconProps): ReactElement => {
   const {entityId} = props;
 
   const {foodSequenceStartPoints, entityMap} = useGameData();
@@ -208,7 +208,7 @@ interface ExploreButtonProps {
   id: string;
 }
 
-const ExploreButton = memo((props: ExploreButtonProps): JSX.Element => {
+const ExploreButton = memo((props: ExploreButtonProps): ReactElement => {
   const {id} = props;
 
   const explore = useExploreRecipe();

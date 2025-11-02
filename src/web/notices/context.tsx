@@ -1,4 +1,4 @@
-import {ReactNode, createContext, useMemo, useState} from 'react';
+import {ReactElement, ReactNode, createContext, useMemo, useState} from 'react';
 import {produce} from 'immer';
 
 import {NoticesKey, useStorage} from '../storage';
@@ -31,7 +31,7 @@ export interface NoticesProviderProps {
 
 export const NoticesProvider = (
   props: NoticesProviderProps
-): JSX.Element => {
+): ReactElement => {
   const {all, children} = props;
 
   const storage = useStorage<NoticesData>(NoticesKey);

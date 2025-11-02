@@ -1,5 +1,6 @@
 import {
   ChangeEvent,
+  ReactElement,
   useCallback,
   useEffect,
   useMemo,
@@ -7,7 +8,7 @@ import {
   useState,
 } from 'react';
 import {createPortal} from 'react-dom';
-import {Link, useBlocker, useNavigate, useParams} from 'react-router-dom';
+import {Link, useBlocker, useNavigate, useParams} from 'react-router';
 import {produce} from 'immer';
 
 import {useGameData} from '../context';
@@ -31,7 +32,7 @@ import {
   isSolidIngredient,
 } from './types';
 
-export const MenuEditor = (): JSX.Element => {
+export const MenuEditor = (): ReactElement => {
   const params = useParams();
   const id = params.id || null;
 
@@ -330,7 +331,7 @@ interface ActionsProps {
   onDelete: () => void;
 }
 
-const Actions = (props: ActionsProps): JSX.Element => {
+const Actions = (props: ActionsProps): ReactElement => {
   const {isNew, isDirty, onSave, onDiscard, onDelete} = props;
   return (
     <div className='planner_editor-actions'>

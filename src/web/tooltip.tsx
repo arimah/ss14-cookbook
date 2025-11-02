@@ -15,7 +15,7 @@ interface ChildProps {
   ref?: Ref<HTMLElement>;
 }
 
-export const Tooltip = (props: Props): JSX.Element => {
+export const Tooltip = (props: Props): ReactElement => {
   const {text, placement = 'above', provideLabel = false, children} = props;
 
   const {visible, popupRef, parentRef} = usePopupTrigger<HTMLDivElement>(

@@ -1,5 +1,5 @@
-import {memo, useMemo} from 'react';
-import {Link, useParams} from 'react-router-dom';
+import {ReactElement, memo, useMemo} from 'react';
+import {Link, useParams} from 'react-router';
 
 import {useGameData} from '../context';
 import {useUrl} from '../url';
@@ -13,7 +13,7 @@ import {NeutralCollator} from '../helpers';
 import {findIngredients, ingredientName} from './ingredients';
 import {useStoredMenus} from './storage';
 
-export const MenuViewer = memo((): JSX.Element => {
+export const MenuViewer = memo((): ReactElement => {
   const params = useParams();
   const id = params.id!;
 

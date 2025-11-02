@@ -1,10 +1,10 @@
-import {ReactNode, useEffect} from 'react';
+import {ReactElement, ReactNode, useEffect} from 'react';
 
 export interface Props {
   children: ReactNode;
 }
 
-export const Overlay = (props: Props): JSX.Element => {
+export const Overlay = (props: Props): ReactElement => {
   const {children} = props;
 
   useEffect(() => {

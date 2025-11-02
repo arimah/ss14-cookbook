@@ -1,6 +1,7 @@
 import {
   KeyboardEvent,
   memo,
+  ReactElement,
   useCallback,
   useEffect,
   useRef,
@@ -30,7 +31,7 @@ export interface Separator {
   readonly separator: true;
 }
 
-export const DropdownList = memo((props: Props): JSX.Element => {
+export const DropdownList = memo((props: Props): ReactElement => {
   const {
     className,
     initialIndex,

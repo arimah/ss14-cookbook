@@ -1,5 +1,6 @@
 import {
   Dispatch,
+  ReactElement,
   Ref,
   SetStateAction,
   forwardRef,
@@ -11,7 +12,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import {useBlocker} from 'react-router-dom';
+import {useBlocker} from 'react-router';
 
 import {useGameData} from '../context';
 import {CloseIcon} from '../icons';
@@ -34,7 +35,7 @@ const RecipeMargin = 8;
  */
 const RelatedRecipeMargin = 4;
 
-export const RecipeExplorer = memo((props: Props): JSX.Element => {
+export const RecipeExplorer = memo((props: Props): ReactElement => {
   const {id, setRecipe} = props;
 
   const exploreFn = useCallback<ExploreRecipeFn>((id: string) => {
@@ -111,6 +112,7 @@ export const RecipeExplorer = memo((props: Props): JSX.Element => {
 
 interface ExploredRecipeProps {
   id: string;
+  ref: Ref<ExploredRecipeHandle>;
 }
 
 interface ExploredRecipeHandle {
@@ -125,12 +127,9 @@ interface ExploredRecipeDimensions {
 
 type ActiveSection = 'madeWith' | 'usedIn' | null;
 
-const ExploredRecipe = memo(forwardRef((
-  props: ExploredRecipeProps,
-  ref: Ref<ExploredRecipeHandle>
-): JSX.Element => {
+const ExploredRecipe = memo((props: ExploredRecipeProps): ReactElement => {
 
-  const {id} = props;
+  const {id, ref} = props;
 
   const {
     recipeMap,
@@ -303,7 +302,7 @@ const ExploredRecipe = memo(forwardRef((
       </>}
     </div>
   );
-}));
+});
 
 const getActiveSection = (
   selected: ActiveSection,

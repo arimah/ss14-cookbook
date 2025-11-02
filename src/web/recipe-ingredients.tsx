@@ -1,4 +1,4 @@
-import {memo} from 'react';
+import {ReactElement, memo} from 'react';
 
 import {ReagentIngredient as ReagentIngredientData} from '../types';
 
@@ -17,7 +17,7 @@ const IngredientSpriteHeight = 32;
 
 export const RecipeIngredients = memo((
   props: RecipeIngredientsProps
-): JSX.Element => {
+): ReactElement => {
   const {visible, solids, reagents} = props;
 
   if (!visible) {
@@ -56,7 +56,7 @@ export interface SolidIngredientProps {
   qty?: number;
 }
 
-export const SolidIngredient = (props: SolidIngredientProps): JSX.Element => {
+export const SolidIngredient = (props: SolidIngredientProps): ReactElement => {
   const {id, qty} = props;
 
   const {entityMap, recipesBySolidResult} = useGameData();
@@ -87,7 +87,9 @@ export interface ReagentIngredientProps {
   catalyst?: boolean;
 }
 
-export const ReagentIngredient = (props: ReagentIngredientProps): JSX.Element => {
+export const ReagentIngredient = (
+  props: ReagentIngredientProps
+): ReactElement => {
   const {id, amount, catalyst = false} = props;
 
   const {reagentMap, recipesByReagentResult} = useGameData();

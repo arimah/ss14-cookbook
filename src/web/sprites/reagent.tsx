@@ -1,4 +1,4 @@
-import {memo} from 'react';
+import {ReactElement, memo} from 'react';
 
 import {useGameData} from '../context';
 
@@ -8,7 +8,7 @@ export interface ReagentSpriteProps {
   id: string;
 }
 
-export const ReagentSprite = memo((props: ReagentSpriteProps): JSX.Element => {
+export const ReagentSprite = memo((props: ReagentSpriteProps): ReactElement => {
   const {id} = props;
 
   const {

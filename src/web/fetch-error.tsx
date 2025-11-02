@@ -1,8 +1,10 @@
+import {ReactElement} from 'react';
+
 export interface FetchErrorProps {
   message: string;
 }
 
-export const FetchError = (props: FetchErrorProps): JSX.Element => {
+export const FetchError = (props: FetchErrorProps): ReactElement => {
   const {message} = props;
   return <>
     <p>{message} :(</p>

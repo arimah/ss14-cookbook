@@ -1,5 +1,6 @@
 import {
   MouseEvent,
+  ReactElement,
   memo,
   useCallback,
   useEffect,
@@ -14,7 +15,7 @@ import {Overlay} from './overlay';
 import {Tooltip} from './tooltip';
 import {CloseIcon} from './icons';
 
-export const PrivacyPolicyLink = memo((): JSX.Element => {
+export const PrivacyPolicyLink = memo((): ReactElement => {
   const [open, setOpen] = useState(false);
 
   const handleClick = useCallback((e: MouseEvent) => {
@@ -41,7 +42,7 @@ interface PrivacyPolicyDialogProps {
 
 const PrivacyPolicyDialog = memo((
   props: PrivacyPolicyDialogProps
-): JSX.Element => {
+): ReactElement => {
   const {onClose} = props;
 
   const ref = useRef<HTMLElement>(null);

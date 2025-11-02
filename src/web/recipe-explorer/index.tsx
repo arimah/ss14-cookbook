@@ -1,4 +1,4 @@
-import {ReactNode, useContext, useEffect, useState} from 'react'
+import {ReactElement, ReactNode, useContext, useEffect, useState} from 'react';
 
 import {
   ExploreRecipeFn,
@@ -11,7 +11,7 @@ export interface Props {
   children: ReactNode;
 }
 
-export const RecipeExplorerProvider = (props: Props): JSX.Element => {
+export const RecipeExplorerProvider = (props: Props): ReactElement => {
   const {children} = props;
 
   const [currentRecipe, setCurrentRecipe] = useState<string | null>(null);

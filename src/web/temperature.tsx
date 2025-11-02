@@ -1,4 +1,4 @@
-import {memo} from 'react';
+import {ReactElement, memo} from 'react';
 
 import {Tooltip} from './tooltip';
 import {useSettings} from './settings';
@@ -13,7 +13,7 @@ interface Temps {
   fahrenheit: string;
 }
 
-export const Temperature = memo((props: Props): JSX.Element => {
+export const Temperature = memo((props: Props): ReactElement => {
   const [settings] = useSettings();
 
   const temps = format(props.k);

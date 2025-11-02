@@ -2,6 +2,7 @@ import {
   CSSProperties,
   ChangeEvent,
   Dispatch,
+  ReactElement,
   ReactNode,
   SetStateAction,
   memo,
@@ -46,7 +47,7 @@ export interface Props {
 
 type Updater = (draft: Draft<RecipeFilter>) => void;
 
-export const FilterEditor = memo((props: Props): JSX.Element => {
+export const FilterEditor = memo((props: Props): ReactElement => {
   const {open, filter, setFilter} = props;
 
   const updateFilter = useCallback((updater: Updater) => {
@@ -100,7 +101,7 @@ interface FilterProps {
   update: (updater: Updater) => void;
 }
 
-const MethodFilter = (props: FilterProps): JSX.Element => {
+const MethodFilter = (props: FilterProps): ReactElement => {
   const {filter, update} = props;
 
   const {methods, subtypes} = filter;
@@ -216,7 +217,7 @@ interface IngredientProps {
   hideRarelyUsed: boolean;
 }
 
-const IngredientFilter = (props: FilterProps & IngredientProps): JSX.Element => {
+const IngredientFilter = (props: FilterProps & IngredientProps): ReactElement => {
   const {filter, hideRarelyUsed, update} = props;
 
   const {ingredients} = filter;
@@ -319,7 +320,7 @@ const IngredientFilter = (props: FilterProps & IngredientProps): JSX.Element => 
   </>;
 };
 
-const ReagentFilter = (props: FilterProps & IngredientProps): JSX.Element => {
+const ReagentFilter = (props: FilterProps & IngredientProps): ReactElement => {
   const {filter, hideRarelyUsed, update} = props;
 
   const {reagents} = filter;
@@ -410,7 +411,7 @@ const ReagentFilter = (props: FilterProps & IngredientProps): JSX.Element => {
   </>;
 };
 
-const ModeOption = (props: FilterProps): JSX.Element => {
+const ModeOption = (props: FilterProps): ReactElement => {
   const {filter, update} = props;
 
   const handleChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
@@ -440,7 +441,7 @@ const ModeOption = (props: FilterProps): JSX.Element => {
   </>;
 };
 
-const GroupFilter = (props: FilterProps): JSX.Element | null => {
+const GroupFilter = (props: FilterProps): ReactElement | null => {
   const {filter, update} = props;
 
   const {recipeGroups} = useGameData();
@@ -487,7 +488,7 @@ const GroupFilter = (props: FilterProps): JSX.Element | null => {
   </>;
 };
 
-const TraitFilter = (props: FilterProps): JSX.Element => {
+const TraitFilter = (props: FilterProps): ReactElement => {
   const {filter, update} = props;
 
   const {specialTraits} = useGameData();
@@ -529,7 +530,7 @@ interface FilterOptionProps<T> {
   children: ReactNode;
 }
 
-function FilterOption<T>(props: FilterOptionProps<T>): JSX.Element {
+function FilterOption<T>(props: FilterOptionProps<T>): ReactElement {
   const {selected, value, onClick, children} = props;
   return (
     <li>
@@ -553,7 +554,7 @@ interface IngredientToolbarProps {
   reset: () => void;
 }
 
-const IngredientToolbar = (props: IngredientToolbarProps): JSX.Element => {
+const IngredientToolbar = (props: IngredientToolbarProps): ReactElement => {
   const {
     selectedCount,
     query,

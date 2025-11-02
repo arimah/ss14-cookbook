@@ -13,12 +13,12 @@ export interface InputGroupProps {
   className?: string;
   iconBefore?: ReactNode;
   iconAfter?: ReactNode;
-  children: ReactElement<{ref: Ref<HTMLInputElement>}> & {
-    ref?: Ref<HTMLInputElement>;
-  };
+  children: ReactElement<{
+    ref: Ref<HTMLInputElement>;
+  }>;
 }
 
-export const InputGroup = (props: InputGroupProps): JSX.Element => {
+export const InputGroup = (props: InputGroupProps): ReactElement => {
   const {className, iconBefore, iconAfter, children} = props;
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -30,7 +30,7 @@ export const InputGroup = (props: InputGroupProps): JSX.Element => {
     }
   }, []);
 
-  const ref = combineRefs(children.ref, inputRef);
+  const ref = combineRefs(children.props.ref, inputRef);
 
   const childrenWithRef = cloneElement(children, {ref});
 

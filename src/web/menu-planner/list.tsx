@@ -1,5 +1,5 @@
-import {memo, useMemo} from 'react';
-import {Link} from 'react-router-dom';
+import {ReactElement, memo, useMemo} from 'react';
+import {Link} from 'react-router';
 
 import {useGameData} from '../context';
 import {useUrl} from '../url';
@@ -9,7 +9,7 @@ import {Tooltip} from '../tooltip';
 import {useStoredMenus} from './storage';
 import {CookingMenu} from './types';
 
-export const MenuList = memo((): JSX.Element => {
+export const MenuList = memo((): ReactElement => {
   const storage = useStoredMenus();
   const url = useUrl();
 
@@ -51,7 +51,7 @@ interface ItemProps {
   menu: CookingMenu;
 }
 
-const Item = memo((props: ItemProps): JSX.Element => {
+const Item = memo((props: ItemProps): ReactElement => {
   const {menu} = props;
 
   const {recipeMap, entityMap, reagentMap} = useGameData();

@@ -1,4 +1,5 @@
 import {
+  ReactElement,
   ReactNode,
   RefObject,
   createContext,
@@ -22,7 +23,7 @@ export interface RecipeVisibilityProviderProps {
 
 export const RecipeVisibilityProvider = (
   props: RecipeVisibilityProviderProps
-): JSX.Element => {
+): ReactElement => {
   const {children} = props;
 
   const [value] = useState<VisibilityContextType>(() => {
@@ -60,7 +61,9 @@ export const RecipeVisibilityProvider = (
   );
 };
 
-export const useRecipeVisibility = (ref: RefObject<HTMLElement>): boolean => {
+export const useRecipeVisibility = (
+  ref: RefObject<HTMLElement | null>
+): boolean => {
   const context = useContext(VisibilityContext);
   // Start invisible if there is an observer; otherwise, always visible.
   const [visible, setVisible] = useState(!context);

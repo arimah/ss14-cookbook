@@ -1,4 +1,10 @@
-import {ChangeEvent, KeyboardEvent, useCallback, useId} from 'react';
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  ReactElement,
+  useCallback,
+  useId,
+} from 'react';
 
 import {FocusTrap} from '../focus';
 
@@ -8,7 +14,7 @@ export interface SettingsDialogProps {
   onClose: () => void;
 }
 
-export const SettingsDialog = (props: SettingsDialogProps): JSX.Element => {
+export const SettingsDialog = (props: SettingsDialogProps): ReactElement => {
   const {onClose} = props;
 
   const [settings, update] = useSettings();

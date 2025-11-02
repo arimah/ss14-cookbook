@@ -1,5 +1,11 @@
-import {ReactNode, createContext, useContext, useMemo} from 'react';
-import {useSearchParams} from 'react-router-dom';
+import {
+  ReactElement,
+  ReactNode,
+  createContext,
+  useContext,
+  useMemo,
+} from 'react';
+import {useSearchParams} from 'react-router';
 
 export interface UrlGenerator {
   readonly recipes: string;
@@ -21,7 +27,7 @@ export interface UrlProviderProps {
   children: ReactNode;
 }
 
-export const UrlProvider = (props: UrlProviderProps): JSX.Element => {
+export const UrlProvider = (props: UrlProviderProps): ReactElement => {
   const {children} = props;
 
   const [query] = useSearchParams();

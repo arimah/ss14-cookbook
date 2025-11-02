@@ -1,3 +1,5 @@
+import {ReactElement} from 'react';
+
 import {
   CookingMethod,
   Entity,
@@ -75,7 +77,7 @@ export interface SearchableRecipeData {
    * WILL NOT CHANGE unless the game data is reloaded. Assigning to an existing
    * key WILL NOT update already rendered RecipeTraits components.
    */
-  readonly renderedTraitCache: Map<number, JSX.Element>;
+  readonly renderedTraitCache: Map<number, ReactElement>;
 }
 
 export interface NoticeData {
