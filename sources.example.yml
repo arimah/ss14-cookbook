@@ -170,7 +170,7 @@ mystation:
   # capfruit).
   #
   # The values below are examples; see `sources.real.yml` for the real values.
-  # Optiona. Default value: []    (include everything)
+  # Optional. Default value: []    (include everything)
   ignoredFoodSequenceElements:
     - FoodFakeCapfruit
     - MobMouseDead
@@ -193,3 +193,21 @@ mystation:
   forceIncludeReagentSources:
     # Eggs can be trivially cracked into raw egg.
     Egg: [FoodEgg]
+  # Some sprites are a little bit strangely aligned, in ways that look ugly in
+  # the UI. The idea is to keep the sprite visually centered within its 32x32
+  # bounding box.
+  #
+  # The key is the entity prototype ID, the value is a list of two numbers,
+  # [dx, dy]. Note that these offsets are *added* to the sprite position, and
+  # that y=0 is at the *top*. That means a positive dy moves the sprite *down*,
+  # not up.
+  #
+  # Keep this list fairly small. Updates to the game can easily break it, as
+  # has already happened with the microwave sprite.
+  #
+  # The values below are examples; see `sources.real.yml` for the real values.
+  # Optional. Default value: null
+  spriteOffsets:
+    KitchenElectricGrill: [0, 5]
+    KitchenAssembler: [0, 5]
+    ChemistryHotplate: [0, 5]

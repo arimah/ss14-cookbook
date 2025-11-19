@@ -78,6 +78,23 @@ base:
   forceIncludeReagentSources: &reagentSources
     # Eggs can be trivially cracked into raw egg.
     Egg: [FoodEgg]
+  spriteOffsets: &standardSpriteOffsets
+    # Table-mounted machines are all weirdly high up
+    # microwave has been fixed
+    KitchenElectricGrill: [0, 5]
+    KitchenAssembler: [0, 5]
+    ChemistryHotplate: [0, 5]
+
+    # Same with these two burgers
+    FoodBurgerSuper: [0, 5] # super bite burger
+    FoodBurgerBig: [0, 4] # big bite burger
+
+    # Aloe is weirdly low down
+    FoodAloe: [0, -4]
+    AloeCream: [0, -2]
+
+    # Let's lower the shaker a few pixels too
+    DrinkShaker: [0, 3]
 
 frontier:
   name: "Frontier"
@@ -160,6 +177,23 @@ frontier:
     - SentientSlimesCore
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
+  spriteOffsets: &legacySpriteOffsets
+    # Table-mounted machines are all weirdly high up
+    KitchenMicrowave: [0, 5] # not updated to the new microwave sprite yet
+    KitchenElectricGrill: [0, 5]
+    KitchenAssembler: [0, 5]
+    ChemistryHotplate: [0, 5]
+
+    # Same with these two burgers
+    FoodBurgerSuper: [0, 5] # super bite burger
+    FoodBurgerBig: [0, 4] # big bite burger
+
+    # Aloe is weirdly low down
+    FoodAloe: [0, -4]
+    AloeCream: [0, -2]
+
+    # Let's lower the shaker a few pixels too
+    DrinkShaker: [0, 3]
 
 delta-v:
   name: "Delta-V"
@@ -183,6 +217,7 @@ delta-v:
   ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
+  spriteOffsets: *legacySpriteOffsets
 
 rmc-14:
   name: "RMC-14"
@@ -201,6 +236,7 @@ rmc-14:
   ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
+  spriteOffsets: *legacySpriteOffsets
 
 floof:
   name: "Floof"
@@ -225,6 +261,7 @@ floof:
   ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
+  spriteOffsets: *legacySpriteOffsets
 
 impstation:
   name: "Impstation"
@@ -257,6 +294,7 @@ impstation:
   ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
+  spriteOffsets: *standardSpriteOffsets
 
 moff:
   name: "Moff Station"
@@ -275,3 +313,4 @@ moff:
   ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
+  spriteOffsets: *standardSpriteOffsets

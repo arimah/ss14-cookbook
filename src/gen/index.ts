@@ -4,6 +4,8 @@ import {resolve} from 'path';
 import {parse} from 'yaml';
 import {enableMapSet, setAutoFreeze} from 'immer';
 
+import {SpritePoint} from '../types';
+
 import {findResourceFiles, readRawGameData} from './read-raw';
 import {resolveComponents} from './resolve-components';
 import {filterRelevantPrototypes} from './filter-relevant';
@@ -40,6 +42,7 @@ interface ForkInfo {
   readonly ignoredFoodSequenceElements?: EntityId[];
   readonly ignoreSourcesOf?: ReagentId[];
   readonly forceIncludeReagentSources?: Record<ReagentId, readonly EntityId[]>;
+  readonly spriteOffsets?: Record<string, SpritePoint>;
 }
 
 const PrototypesSubPath = './Resources/Prototypes';
@@ -127,7 +130,8 @@ const buildFork = async (id: string, fork: ForkInfo): Promise<ProcessedGameData>
   const spriteSheet = await buildSpriteSheet(
     resolved,
     resolve(fork.path, TexturesSubPath),
-    fork.mixFillState
+    fork.mixFillState,
+    new Map(Object.entries(fork.spriteOffsets ?? {}))
   );
   console.log(`Built sprite sheet for ${spriteSheet.spriteCount} sprites`);
 

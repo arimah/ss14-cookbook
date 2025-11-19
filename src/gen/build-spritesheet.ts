@@ -6,7 +6,7 @@ import {Jimp, JimpInstance, cssColorToHex} from 'jimp';
 import {SpritePoint, SpriteAttribution, CookingMethod} from '../types';
 
 import {ResolvedGameData} from './resolve-prototypes';
-import {ColorWhite, SpriteOffsets} from './constants';
+import {ColorWhite} from './constants';
 import {readFileTextWithoutTheStupidBOM} from './helpers';
 import {ParsedColor, ResolvedEntity} from './types';
 
@@ -21,6 +21,8 @@ export interface SpriteSheetData {
   readonly microwaveRecipeTypes?: ReadonlyMap<string, SpritePoint>;
   readonly attributions: readonly SpriteAttribution[];
 }
+
+export type SpriteOffsets = Map<string, SpritePoint>;
 
 interface SpriteCollection {
   readonly spritesByKey: Map<string, DrawableSprite>;
@@ -53,13 +55,14 @@ const ZeroOffset: SpritePoint = [0, 0];
 export const buildSpriteSheet = async (
   resolved: ResolvedGameData,
   textureDir: string,
-  mixFillState: string
+  mixFillState: string,
+  spriteOffsets: SpriteOffsets
 ): Promise<SpriteSheetData> => {
   const {
     spritesByKey,
     entityToSpriteKey,
     beakerFillKey,
-  } = collectSprites(resolved, mixFillState);
+  } = collectSprites(resolved, mixFillState, spriteOffsets);
   const spriteCount = spritesByKey.size;
 
   const width = SpriteSize * SheetWidth;
@@ -113,7 +116,8 @@ export const buildSpriteSheet = async (
 
 const collectSprites = (
   resolved: ResolvedGameData,
-  mixFillState: string
+  mixFillState: string,
+  spriteOffsets: SpriteOffsets
 ): SpriteCollection => {
   // Mapping from sprite key to sprite data.
   const spritesByKey = new Map<string, DrawableSprite>();
@@ -122,16 +126,16 @@ const collectSprites = (
   const entityToSpriteKey = new Map<string, string>();
 
   for (const entity of resolved.entities.values()) {
-    tryCollectSprite(entity, spritesByKey, entityToSpriteKey);
+    tryCollectSprite(entity, spritesByKey, entityToSpriteKey, spriteOffsets);
   }
 
   for (const entity of resolved.methodEntities.values()) {
-    tryCollectSprite(entity, spritesByKey, entityToSpriteKey);
+    tryCollectSprite(entity, spritesByKey, entityToSpriteKey, spriteOffsets);
   }
 
   if (resolved.microwaveRecipeTypeEntities) {
     for (const entity of resolved.microwaveRecipeTypeEntities.values()) {
-      tryCollectSprite(entity, spritesByKey, entityToSpriteKey);
+      tryCollectSprite(entity, spritesByKey, entityToSpriteKey, spriteOffsets);
     }
   }
 
@@ -161,13 +165,14 @@ const collectSprites = (
 const tryCollectSprite = (
   entity: ResolvedEntity,
   spritesByKey: Map<string, DrawableSprite>,
-  entityToSpriteKey: Map<string, string>
+  entityToSpriteKey: Map<string, string>,
+  spriteOffsets: SpriteOffsets
 ): void => {
   if (entityToSpriteKey.has(entity.id)) {
     return;
   }
 
-  const sprite = toDrawableSprite(entity);
+  const sprite = toDrawableSprite(entity, spriteOffsets);
   const key = drawableSpriteKey(sprite);
 
   // This may overwrite an existing sprite if multiple entities share sprites,
@@ -177,7 +182,10 @@ const tryCollectSprite = (
   entityToSpriteKey.set(entity.id, key);
 };
 
-const toDrawableSprite = (entity: ResolvedEntity): DrawableSprite => {
+const toDrawableSprite = (
+  entity: ResolvedEntity,
+  spriteOffsets: SpriteOffsets
+): DrawableSprite => {
   const {sprite} = entity;
   const basePath = sprite.path;
   const baseColor = sprite.color
@@ -223,7 +231,7 @@ const toDrawableSprite = (entity: ResolvedEntity): DrawableSprite => {
   }
 
   return {
-    offset: SpriteOffsets[entity.id] ?? ZeroOffset,
+    offset: spriteOffsets.get(entity.id) ?? ZeroOffset,
     layers,
   };
 };

@@ -54,34 +54,4 @@ export const SpriteSheetPath = (id: string, hash: string) =>
 export const SpriteSheetFileName = (id: string, hash: string) =>
   `sprites_${id}.${hash}.webp`;
 
-/**
- * (X, Y) offsets for sprites, manually curated. Some sprites are not centered
- * within the 32x32 box; these offsets aim to align them better. The key is
- * the entity prototype ID.
- *
- * This list is to be kept as small as possible, as updates to the game can
- * easily break it.
- *
- * NOTE: These offsets are *added* to the sprite's position. A positive Y offset
- * means "move the sprite down".
- */
-export const SpriteOffsets: Record<string, SpritePoint> = {
-  // Table-mounted machines are all weirdly high up
-  'KitchenMicrowave': [0, 5],
-  'KitchenElectricGrill': [0, 5],
-  'KitchenAssembler': [0, 5],
-  'ChemistryHotplate': [0, 5],
-
-  // Same with these two burgers
-  'FoodBurgerSuper': [0, 5], // super bite burger
-  'FoodBurgerBig': [0, 4], // big bite burger
-
-  // Aloe is weirdly low down
-  'FoodAloe': [0, -4],
-  'AloeCream': [0, -2],
-
-  // Let's lower the shaker a few pixels too
-  'DrinkShaker': [0, 3],
-};
-
 export const ColorWhite: ParsedColor = 0xFFFFFFFF;
