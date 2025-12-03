@@ -90,8 +90,10 @@ export const RecipeMethod = memo((
       spriteAlt = 'deep fry';
       break;
   }
-  return <>
-    <RawSprite position={sprite} alt={spriteAlt}/>
-    {text}
-  </>;
+  return (
+    <div className='recipe_method'>
+      <RawSprite position={sprite} alt={spriteAlt}/>
+      {text}
+    </div>
+  );
 });

@@ -959,7 +959,19 @@ select {
 
   .recipe_instructions {
     list-style-type: decimal;
+    margin-block: -2px;
+    margin-right: -4px;
+    padding-block: 2px;
+    padding-right: 4px;
+    overflow: auto;
+    max-height: 380px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--input-border) var(--input-bg);
   }
+
+    .recipe_instructions:last-child {
+      grid-column: span 2;
+    }
 
     .recipe_step {
       margin-left: 22px;

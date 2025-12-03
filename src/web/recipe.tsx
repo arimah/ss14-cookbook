@@ -110,9 +110,7 @@ export const Recipe = memo((props: Props): ReactElement => {
           reagents={recipe.reagents}
         />
       )}
-      <div className='recipe_method'>
-        <RecipeMethod recipe={recipe}/>
-      </div>
+      <RecipeMethod recipe={recipe}/>
     </div>
   );
 });

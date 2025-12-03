@@ -391,6 +391,7 @@ const tryBalanceColumns = (
   // and calculate the average amount of white space, defined as the average
   // of the difference between each column and the highest column. Then we
   // try again with highest column - 1, and repeat until we exceed maxColumns.
+  const MaxAttempts = 10;
 
   interface Candidate {
     readonly height: number;
@@ -399,7 +400,13 @@ const tryBalanceColumns = (
   let bestCandidate: Candidate | null = null;
 
   let maxHeight = initialMaxHeight;
-  for (;;) {
+  let attempts = 0;
+  while (attempts <= MaxAttempts) {
+    if (attempts === MaxAttempts) {
+      // Something went wrong. Bail.
+      return initialMaxHeight;
+    }
+
     const columnHeights = [];
     let lastColumn = 0;
 
@@ -427,6 +434,7 @@ const tryBalanceColumns = (
 
     // Try again with a lower maxHeight
     maxHeight = highestColumn - 1;
+    attempts++;
   }
 
   return bestCandidate?.height ?? initialMaxHeight;
