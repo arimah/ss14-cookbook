@@ -2356,19 +2356,68 @@ select {
     .settings_option {
       display: flex;
       flex: none;
-      gap: 8px;
-      padding-block: 4px; /* larger surface for touch */
+      gap: 12px;
+      align-items: center;
+      margin-block: -2px;
+      margin-inline: -8px;
+      padding-block: 6px; /* larger surface for touch */
+      padding-inline: 8px;
+      position: relative;
     }
+
+      .settings_input {
+        appearance: none;
+        position: absolute;
+        top: 0;
+        left: 1px;
+        height: 100%;
+        aspect-ratio: 1;
+      }
+
+        .settings_input:focus {
+          outline: none;
+        }
+
+    .settings_marker {
+      box-sizing: border-box;
+      position: relative;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--input-border);
+      border-radius: 50%;
+      background-color: var(--input-bg);
+    }
+
+      .settings_input:checked + .settings_marker::before {
+        content: '';
+        position: absolute;
+        inset: 2px;
+        border-radius: 50%;
+        background-color: var(--input-fg);
+      }
+
+      .settings_input:focus + .settings_marker {
+        outline: 2px solid var(--focus-color);
+        outline-offset: 2px;
+      }
 
     @media (min-width: 600px) {
       .settings_option {
-        padding-block: 2px;
+        padding-block: 4px;
+      }
+
+      .settings_input {
+        left: 2px;
       }
     }
 
     @media (min-width: 850px) {
       .settings_option {
-        padding-block: 0;
+        padding-block: 2px;
+      }
+
+      .settings_input {
+        left: 3px;
       }
     }
 
