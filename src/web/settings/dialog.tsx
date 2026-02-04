@@ -1,15 +1,9 @@
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  ReactElement,
-  useCallback,
-  useId,
-} from 'react';
+import {KeyboardEvent, ReactElement, useCallback} from 'react';
 
 import {FocusTrap} from '../focus';
 
+import {Option, OptionGroup} from './option-group';
 import {TemperatureUnitSetting, ThemeSetting, useSettings} from './context';
-import { Option, OptionGroup } from './option-group';
 
 export interface SettingsDialogProps {
   onClose: () => void;
@@ -45,8 +39,6 @@ export const SettingsDialog = (props: SettingsDialogProps): ReactElement => {
       draft.temperatureUnit = value;
     });
   }, [update]);
-
-  const id = useId();
 
   return (
     <FocusTrap onPointerDownOutside={onClose}>

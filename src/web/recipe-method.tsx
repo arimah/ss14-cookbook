@@ -44,22 +44,24 @@ export const RecipeMethod = memo((
           spriteAlt = subtype.filterSummary; // good enough
         } else {
           // *cries*
-          return <>
-            <span>
-              {recipe.subtype.map(t => {
-                const subtype = microwaveRecipeTypes[t];
-                return (
-                  <RawSprite
-                    key={t}
-                    position={subtype.sprite}
-                    alt={subtype.filterSummary}
-                  />
-                );
-              })}
-            </span>
-            <span>Cook</span>
-            {text}
-          </>;
+          return (
+            <div className='recipe_method'>
+              <span>
+                {recipe.subtype.map(t => {
+                  const subtype = microwaveRecipeTypes[t];
+                  return (
+                    <RawSprite
+                      key={t}
+                      position={subtype.sprite}
+                      alt={subtype.filterSummary}
+                    />
+                  );
+                })}
+              </span>
+              <span>Cook</span>
+              {text}
+            </div>
+          );
         }
       }
       break;

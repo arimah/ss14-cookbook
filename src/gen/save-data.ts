@@ -3,6 +3,7 @@ import {dirname, resolve} from 'path';
 import {createHash} from 'crypto';
 
 import {JimpInstance} from 'jimp';
+import sharp from 'sharp';
 
 import {
   GameData,
@@ -168,18 +169,17 @@ export const saveData = async (
     encoding: 'utf-8',
   });
 
-  const createWebp = (await import('imagemin-webp')).default({
-    alphaQuality: 100,
-    quality: 100,
-    lossless: true,
-    preset: 'drawing',
-    metadata: 'none',
-  });
-
   await Promise.all(dataWithSpriteHash.map(async d => {
     const fullPath = resolve(dir, SpriteSheetPath(d.id, d.spriteHash));
     const png = await d.sprites.sheet.getBuffer('image/png');
-    const webp = await createWebp(png);
+    const webp = await sharp(png)
+      .webp({
+        alphaQuality: 100,
+        quality: 100,
+        lossless: true,
+        preset: 'drawing',
+      })
+      .toBuffer();
     if (!existsSync(fullPath)) {
       console.log(`Create: ${fullPath}`);
     }
