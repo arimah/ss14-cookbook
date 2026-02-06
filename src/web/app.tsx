@@ -25,6 +25,9 @@ const NoticesPath = `${BASE_PATH}/data/notices.json`;
 const ForkDataPath = (id: string, hash: string) =>
   `${BASE_PATH}/data/data_${id}.${hash}.json`;
 
+const SpriteSheetPath = (fileName: string) =>
+  `${BASE_PATH}/data/${fileName}`;
+
 export const App = (props: Props): ReactElement => {
   const {forks} = props;
 
@@ -64,7 +67,7 @@ export const App = (props: Props): ReactElement => {
         setData(data);
         document.body.style.setProperty(
           '--sprite-url',
-          `url('${BASE_PATH}/img/${data.spriteSheet}')`
+          `url('${SpriteSheetPath(data.spriteSheet)}')`
         );
       });
 

@@ -6,7 +6,7 @@ public/index.html
 public/assets/*.css
 public/assets/*.js
 public/data/*.json
-public/img/sprites*.webp
+public/data/sprites*.webp
 
 privacy.html
 sources.yml

@@ -52,7 +52,7 @@ To test data migrations, run `npm run start-alt` to get a server running on http
 
 1. `git update` all the repos listed in your `sources.yml` file. There is no built-in tool for this.
 2. `npm run gen:recipes`
-3. Now you can publish recipe data files in `public/data/` and sprite files in `public/img/`. There is no need to republish JS or CSS assets.
+3. Now you can publish the files in `public/data/`. This directory contains recipe data as well as sprites. There is no need to republish JS or CSS assets.
 
 There is no built-in tool for automatically deploying updated recipes. As per the note above, old recipe data files are *retained*. Cleanup is your responsibility.
 
