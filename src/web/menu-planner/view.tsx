@@ -1,24 +1,36 @@
-import {ReactElement, memo, useMemo} from 'react';
+import {
+  ReactElement,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState
+} from 'react';
 import {Link, useParams} from 'react-router';
 
 import {useGameData} from '../context';
-import {useUrl} from '../url';
+import {NeutralCollator, tryCopyToClipboard} from '../helpers';
+import {ArrowLeftIcon, EditIcon, ExportIcon} from '../icons';
+import {Notice} from '../notices';
 import {Recipe} from '../recipe';
 import {RecipePopup} from '../recipe-popup';
-import {ArrowLeftIcon, EditIcon} from '../icons';
+import {Tooltip} from '../tooltip';
 import {EntitySprite, ReagentSprite} from '../sprites';
-import {Notice} from '../notices';
-import {NeutralCollator} from '../helpers';
+import {useUrl} from '../url';
 
 import {findIngredients, ingredientName} from './ingredients';
 import {useStoredMenus} from './storage';
+import {exportMenu} from './transfer';
+import {MenuWarning} from './warning';
+import {ExportMenuDialog} from './dialogs';
+
+const CopySuccessTimeout = 2500;
 
 export const MenuViewer = memo((): ReactElement => {
   const params = useParams();
   const id = params.id!;
 
   const {
-    forkId,
     recipeMap,
     recipesBySolidResult,
     recipesByReagentResult,
@@ -62,6 +74,29 @@ export const MenuViewer = memo((): ReactElement => {
     reagentMap,
   ]);
 
+  const [exportData, setExportData] = useState<string | null>(null);
+  const [exportSuccess, setExportSuccess] = useState(false);
+  const handleExport = useCallback(() => {
+    if (!menu) {
+      return;
+    }
+    const exported = exportMenu(menu);
+    const importUrl = location.origin + url.menuImport(exported);
+    tryCopyToClipboard(importUrl).then(
+      () => setExportSuccess(true),
+      // If copying fails, show the ugly dialog
+      () => setExportData(importUrl)
+    );
+  }, [menu, url]);
+  useEffect(() => {
+    if (exportSuccess) {
+      const timeoutId = setTimeout(() => {
+        setExportSuccess(false);
+      }, CopySuccessTimeout);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [exportSuccess]);
+
   const backButton =
     <Link to={url.menuList} className='btn floating'>
       <ArrowLeftIcon/>
@@ -78,7 +113,7 @@ export const MenuViewer = memo((): ReactElement => {
   }
 
   const unavailableRecipeCount = menu.recipes.reduce(
-    (count, id) => !recipeMap.has(id) ? count + 1 : count,
+    (count, id) => count + +!recipeMap.has(id),
     0
   );
 
@@ -91,23 +126,24 @@ export const MenuViewer = memo((): ReactElement => {
           <EditIcon/>
           <span>Edit</span>
         </Link>
+
         <span className='spacer'/>
+
+        <Tooltip open={exportSuccess} text='Link copied to clipboard!'>
+          <button className='floating' onClick={handleExport}>
+            <ExportIcon/>
+            <span>Export</span>
+          </button>
+        </Tooltip>
         <Notice kind='info'>
-          Your menu is private. The web address won’t work in another browser.
+          Your menu is private. Export to share it with others.
         </Notice>
       </div>
 
-      {(menu.lastFork !== forkId || unavailableRecipeCount > 0) && (
-        <Notice kind='warning'>
-          <p>
-            {menu.lastFork !== forkId &&
-              'This menu was made for a different fork. Recipes and ingredients may be different. '}
-            {unavailableRecipeCount
-              ? unavailableRecipeWarning(unavailableRecipeCount)
-              : ''}
-          </p>
-        </Notice>
-      )}
+      <MenuWarning
+        menuFork={menu.lastFork}
+        unavailableRecipeCount={unavailableRecipeCount}
+      />
 
       {ingredients.length > 0 && <>
         <h3>Ingredients</h3>
@@ -142,9 +178,13 @@ export const MenuViewer = memo((): ReactElement => {
           </li>
         ) : null)}
       </ul>
+
+      {exportData != null && (
+        <ExportMenuDialog
+          menuExport={exportData}
+          onClose={() => setExportData(null)}
+        />
+      )}
     </div>
   );
 });
-
-const unavailableRecipeWarning = (count: number) =>
-  `${count} recipe${count > 1 ? 's are' : ' is'} unavailable.`;

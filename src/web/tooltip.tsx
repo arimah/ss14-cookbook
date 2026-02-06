@@ -7,6 +7,7 @@ export interface Props {
   text: string;
   placement?: PopupPlacement;
   provideLabel?: boolean;
+  open?: boolean;
   children: ReactElement<ChildProps>;
 }
 
@@ -16,11 +17,18 @@ interface ChildProps {
 }
 
 export const Tooltip = (props: Props): ReactElement => {
-  const {text, placement = 'above', provideLabel = false, children} = props;
+  const {
+    text,
+    placement = 'above',
+    provideLabel = false,
+    children,
+    open,
+  } = props;
 
   const {visible, popupRef, parentRef} = usePopupTrigger<HTMLDivElement>(
     placement,
-    text
+    text,
+    {open}
   );
 
   const changedProps: ChildProps = {ref: parentRef};

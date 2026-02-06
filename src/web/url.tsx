@@ -16,6 +16,7 @@ export interface UrlGenerator {
   readonly menuNew: string;
   menuView(id: string): string;
   menuEdit(id: string): string;
+  menuImport(data: string): string;
 
   migrateExport: string;
   migrateImport(dataJson: string): string;
@@ -40,6 +41,10 @@ export const UrlProvider = (props: UrlProviderProps): ReactElement => {
     menuNew: withFork('/menu/new', query),
     menuView: id => withFork(`/menu/${id}`, query),
     menuEdit: id => withFork(`/menu/${id}/edit`, query),
+    menuImport: data => withFork(
+      `/menu?import=${encodeURIComponent(data)}`,
+      query
+    ),
 
     migrateExport: '/migrate?export',
     migrateImport: data =>
@@ -58,7 +63,8 @@ const withFork = (url: string, query: URLSearchParams): string => {
   if (!fork) {
     return url;
   }
-  return `${url}?fork=${encodeURIComponent(fork)}`;
+  const sep = url.includes('?') ? '&' : '?';
+  return `${url}${sep}fork=${encodeURIComponent(fork)}`;
 };
 
 export const useUrl = (): UrlGenerator => {

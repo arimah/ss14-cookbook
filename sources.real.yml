@@ -62,6 +62,8 @@ base:
     - OrganHumanBrain
     - SentientSlimeCore
     - SentientSlimesCore
+    # Impstation. Looks identical to MobBros.
+    - MobBrosPoly
   ignoreSourcesOf: &ignoredSources
     # These reagents bloat the list without providing anything especially useful.
     - Blood
@@ -95,6 +97,14 @@ base:
 
     # Let's lower the shaker a few pixels too
     DrinkShaker: [0, 3]
+
+    # Impstation.
+    MobBros: [0, 6]
+    MobFoes: [0, 6]
+    MobSeof: [0, 6]
+    MobSorb: [0, 6]
+    PlushieBros: [0, 6]
+    PlushieSorb: [0, 6]
 
 frontier:
   name: "Frontier"

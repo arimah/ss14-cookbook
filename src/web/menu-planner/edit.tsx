@@ -16,7 +16,6 @@ import {ConfirmButton} from '../confirm-button';
 import {ArrowLeftIcon, SaveIcon} from '../icons';
 import {getPopupRoot} from '../popup-impl';
 import {Tooltip} from '../tooltip';
-import {Notice} from '../notices';
 import {useUrl} from '../url';
 import {useUniqueId} from '../helpers';
 
@@ -25,6 +24,7 @@ import {SelectedRecipes} from './edit-selected-recipes';
 import {IngredientList} from './edit-ingredients';
 import {findIngredients} from './ingredients';
 import {DiscardChangesDialog} from './discard-changes-dialog';
+import {MenuWarning} from './warning';
 import {
   CookingMenu,
   genId,
@@ -239,17 +239,10 @@ export const MenuEditor = (): ReactElement => {
         />
       </div>
 
-      {(menu.lastFork !== forkId || unavailableRecipeCount > 0) && (
-        <Notice kind='warning'>
-          <p>
-            {menu.lastFork !== forkId &&
-              'This menu was made for a different fork. Recipes and ingredients may be different. '}
-            {unavailableRecipeCount
-              ? unavailableRecipeWarning(unavailableRecipeCount)
-              : ''}
-          </p>
-        </Notice>
-      )}
+      <MenuWarning
+        menuFork={menu.lastFork}
+        unavailableRecipeCount={unavailableRecipeCount}
+      />
 
       <SelectedRecipes
         recipes={menu.recipes}

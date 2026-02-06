@@ -235,3 +235,22 @@ export const GitHubFolderUrl = (
   path: string
 ): string =>
   `https://github.com/${repo}/tree/${commit}/${path}`;
+
+export const tryCopyToClipboard = async (text: string): Promise<boolean> => {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (e) {
+    console.warn('navigator.clipboard.writeText() failed:', e);
+    return false;
+  }
+};
+
+export const tryPasteFromClipboard = async (): Promise<string | null> => {
+  try {
+    return await navigator.clipboard.readText();
+  } catch (e) {
+    console.warn('navigator.clipboard.readText() failed:', e);
+    return null;
+  }
+};
