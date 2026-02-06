@@ -25,6 +25,7 @@ export interface GameData {
   readonly recipes: readonly Recipe[];
   readonly foodSequenceStartPoints: Readonly<Record<string, readonly string[]>>;
   readonly foodSequenceElements: Readonly<Record<string, readonly string[]>>;
+  readonly foodSequenceEndPoints: Readonly<Record<string, readonly string[]>>;
   readonly methodSprites: Readonly<Record<CookingMethod, SpritePoint>>;
   readonly beakerFill: SpritePoint;
   /** Frontier */
@@ -52,9 +53,18 @@ export interface Entity {
    */
   readonly seqStart?: FoodSeqStart;
   /**
-   * If present, contains the food sequences this entity can be put in.
+   * If present, contains the food sequences this entity can be put in as a
+   * "regular" ingredient.
    */
   readonly seqElem?: readonly string[];
+  /**
+   * If present, contains the food sequences this entity *ends*. No more items
+   * can be added to a food sequence past the end point, and the end point can
+   * be added even if the food sequence is otherwise full.
+   *
+   * Basically, top buns.
+   */
+  readonly seqEnd?: readonly string[];
 }
 
 export interface FoodSeqStart {

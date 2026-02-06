@@ -141,9 +141,10 @@ export interface ConstructionGraphStep {
 export interface FoodSequenceElementPrototype {
   readonly type: 'foodSequenceElement';
   readonly id: FoodSequenceElementId;
+  readonly tags?: readonly TagId[];
+  readonly final?: boolean;
   // Food sequence elements have more fields than this, but we only care about
   // tags. Name, scale, sprites etc. aren't relevant to us.
-  readonly tags?: readonly TagId[];
 }
 
 export interface MetamorphRecipePrototype {

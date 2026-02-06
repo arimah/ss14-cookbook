@@ -35,6 +35,7 @@ export interface ProcessedGameData {
   readonly resolved: ResolvedGameData;
   readonly foodSequenceStartPoints: ReadonlyMap<TagId, readonly EntityId[]>;
   readonly foodSequenceElements: ReadonlyMap<TagId, readonly EntityId[]>;
+  readonly foodSequenceEndPoints: ReadonlyMap<TagId, readonly EntityId[]>;
   readonly specials: ResolvedSpecials,
   readonly sprites: SpriteSheetData;
   readonly microwaveRecipeTypes?: MicrowaveRecipeTypes;
@@ -60,27 +61,13 @@ export const saveData = async (
   for (const d of dataWithSpriteHash) {
     const entities: Entity[] = [];
 
-    const hasFoodSequence = (k: TagId): boolean =>
-      d.foodSequenceStartPoints.has(k);
-
     for (const [id, entity] of d.resolved.entities) {
-      const foodSeqElem = entity
-        .foodSequenceElement
-        ?.keys
-        .filter(hasFoodSequence);
-
       entities.push({
         id,
         name: entity.name,
         sprite: d.sprites.points.get(id)!,
         traits: getSpecialsMask(entity, d.specials),
-        seqStart: entity.foodSequenceStart?.key ? {
-          key: entity.foodSequenceStart.key,
-          maxCount: entity.foodSequenceStart.maxLayers,
-        } : undefined,
-        seqElem: foodSeqElem && foodSeqElem.length > 0
-          ? foodSeqElem
-          : undefined,
+        ...getFoodSequenceData(entity, d.foodSequenceStartPoints),
       });
     }
 
@@ -112,6 +99,7 @@ export const saveData = async (
       recipes,
       foodSequenceStartPoints: mapToObject(d.foodSequenceStartPoints),
       foodSequenceElements: mapToObject(d.foodSequenceElements),
+      foodSequenceEndPoints: mapToObject(d.foodSequenceEndPoints),
 
       methodSprites: mapToObject(d.sprites.methods),
       beakerFill: d.sprites.beakerFillPoint,
@@ -198,6 +186,40 @@ const getSpecialsMask = (
     }
   }
   return mask;
+};
+
+const getFoodSequenceData = (
+  ent: ResolvedEntity,
+  foodSequenceStartPoints: ReadonlyMap<TagId, readonly EntityId[]>
+): Pick<Entity, 'seqStart' | 'seqElem' | 'seqEnd'> | null => {
+  // Can this entity *start* a food sequence?
+  const seqStart = ent.foodSequenceStart?.key ? {
+    key: ent.foodSequenceStart.key,
+    maxCount: ent.foodSequenceStart.maxLayers,
+  } : undefined;
+
+  // Can this entity be *part* of a food sequence (middle or end)?
+  let seqElem: readonly string[] | undefined;
+  let seqEnd: readonly string[] | undefined;
+  if (ent.foodSequenceElement) {
+    const elem = ent.foodSequenceElement;
+    // Each food sequence that the entity can participate in must have
+    // a start point. We use this information to show "X can be put in Y"
+    // in the UI; if Y is empty, it can't *actually* be put in anything.
+    const allElements = Array.from(elem);
+    seqElem = allElements
+      .filter(([k, e]) => foodSequenceStartPoints.has(k) && !e.final)
+      .map(kvp => kvp[0]);
+    seqEnd = allElements
+      .filter(([k, e]) => foodSequenceStartPoints.has(k) && e.final)
+      .map(kvp => kvp[0]);
+  }
+
+  return {
+    seqStart,
+    seqElem: seqElem && seqElem.length > 0 ? seqElem : undefined,
+    seqEnd: seqEnd && seqEnd.length > 0 ? seqEnd : undefined,
+  };
 };
 
 const getSpriteHash = async (sheet: JimpInstance): Promise<string> => {

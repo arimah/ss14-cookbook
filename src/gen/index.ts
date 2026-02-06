@@ -146,6 +146,7 @@ const buildFork = async (id: string, fork: ForkInfo): Promise<ProcessedGameData>
     resolved,
     foodSequenceStartPoints: filtered.foodSequenceStartPoints,
     foodSequenceElements: filtered.foodSequenceElements,
+    foodSequenceEndPoints: filtered.foodSequenceEndPoints,
     specials,
     sprites: spriteSheet,
     microwaveRecipeTypes: fork.microwaveRecipeTypes,

@@ -17,6 +17,7 @@ export const SeqStartPoint = memo((props: SeqStartPointProps): ReactElement => {
   const {
     recipesBySolidResult,
     foodSequenceElements,
+    foodSequenceEndPoints,
     entityMap,
   } = useGameData();
 
@@ -32,6 +33,15 @@ export const SeqStartPoint = memo((props: SeqStartPointProps): ReactElement => {
         return NeutralCollator.compare(entA.name, entB.name);
       });
   }, [seqStart, foodSequenceElements, entityMap]);
+  const endPoints = useMemo(() => {
+    return foodSequenceEndPoints.get(seqStart.key)
+      ?.slice(0)
+      .sort((a, b) => {
+        const entA = entityMap.get(a)!;
+        const entB = entityMap.get(b)!;
+        return NeutralCollator.compare(entA.name, entB.name);
+      });
+  }, [seqStart, foodSequenceEndPoints, entityMap]);
 
   return <>
     <p className='foodseq_start'>
@@ -48,6 +58,13 @@ export const SeqStartPoint = memo((props: SeqStartPointProps): ReactElement => {
     <ul className='foodseq_elements'>
       {elements.map(id => <SeqElement key={id} id={id}/>)}
     </ul>
+
+    {endPoints && endPoints.length > 0 && <>
+      <p>and can be finished with one of:</p>
+      <ul className='foodseq_elements'>
+        {endPoints.map(id => <SeqElement key={id} id={id}/>)}
+      </ul>
+    </>}
   </>;
 });
 

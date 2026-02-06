@@ -1,4 +1,4 @@
-import {ReactElement, RefObject, memo, useMemo, useRef} from 'react';
+import {ReactElement, ReactNode, RefObject, memo, useMemo, useRef} from 'react';
 import {createPortal} from 'react-dom';
 import {Link} from 'react-router';
 
@@ -128,8 +128,8 @@ const defaultHeaderAction = (
     if (entity.seqStart) {
       return <SeqStartButton entityId={entity.id}/>;
     }
-    if (entity.seqElem) {
-      return <SeqElemIcon entityId={entity.id}/>;
+    if (entity.seqElem || entity.seqEnd) {
+      return <SeqElemIcon seqElem={entity.seqElem} seqEnd={entity.seqEnd}/>;
     }
   }
   return null;
@@ -159,36 +159,29 @@ const SeqStartButton = memo((props: SeqStartButtonProps): ReactElement => {
 });
 
 interface SeqElemIconProps {
-  entityId: string;
+  seqElem: readonly string[] | undefined;
+  seqEnd: readonly string[] | undefined;
 }
 
 const SeqElemIcon = memo((props: SeqElemIconProps): ReactElement => {
-  const {entityId} = props;
+  const {seqElem, seqEnd} = props;
 
-  const {foodSequenceStartPoints, entityMap} = useGameData();
-
-  const entity = entityMap.get(entityId)!;
   const tooltipContent = useMemo(() => <>
-    <p>You can put this food inside:</p>
-    {entity.seqElem!
-      .flatMap(k => foodSequenceStartPoints.get(k)!)
-      .map(id => {
-        const startEnt = entityMap.get(id)!;
-        return (
-          <p key={id} className='popup_entity'>
-            <EntitySprite id={startEnt.id}/>
-            {startEnt.name}
-          </p>
-        );
-      })}
-  </>, [entity, foodSequenceStartPoints, entityMap]);
+    {seqElem && <>
+      <p>You can put this food inside:</p>
+      <SeqElemList sequences={seqElem}/>
+    </>}
+    {seqEnd && <>
+      <p>This food can finish off:</p>
+      <SeqElemList sequences={seqEnd}/>
+    </>}
+  </>, [seqElem, seqEnd]);
 
   const {visible, popupRef, parentRef} = usePopupTrigger<HTMLDivElement>(
     'above',
     tooltipContent
   );
 
-  // TODO: Maybe use different icons for starts and elements
   return <>
     <span className='recipe_info-icon' ref={parentRef}>
       <FoodSequenceIcon/>
@@ -201,6 +194,29 @@ const SeqElemIcon = memo((props: SeqElemIconProps): ReactElement => {
     )}
   </>;
 });
+
+interface SeqElemListProps {
+  sequences: readonly string[];
+}
+
+const SeqElemList = (props: SeqElemListProps): ReactNode => {
+  const {sequences} = props;
+
+  const {foodSequenceStartPoints, entityMap} = useGameData();
+  return (
+    sequences
+      .flatMap(k => foodSequenceStartPoints.get(k)!)
+      .map(id => {
+        const startEnt = entityMap.get(id)!;
+        return (
+          <p key={id} className='popup_entity'>
+            <EntitySprite id={startEnt.id}/>
+            {startEnt.name}
+          </p>
+        );
+      })
+  );
+};
 
 interface ExploreButtonProps {
   id: string;

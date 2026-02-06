@@ -1,6 +1,12 @@
 import {createDraft, Draft, finishDraft} from 'immer';
 import {RawGameData} from './read-raw';
-import {EntityId, EntityMap, EntityPrototype, TagId} from './prototypes';
+import {
+  EntityId,
+  EntityMap,
+  EntityPrototype,
+  FoodSequenceElementMap,
+  TagId,
+} from './prototypes';
 import {
   ButcherableComponent,
   Component,
@@ -15,7 +21,7 @@ import {
   StomachComponent,
 } from './components';
 import {
-    DefaultButcheringType,
+  DefaultButcheringType,
   DefaultFoodSequenceMaxLayers,
   DefaultTotalSliceCount,
   FoodSolutionName,
@@ -38,7 +44,11 @@ export const resolveComponents = (
       continue;
     }
 
-    const resolved = resolveEntity(entity, raw.entities);
+    const resolved = resolveEntity(
+      entity,
+      raw.entities,
+      raw.foodSequenceElements
+    );
     result.set(resolved.id, resolved);
   }
 
@@ -73,7 +83,8 @@ const EmptyComponents: Component[] = [];
 
 const resolveEntity = (
   entity: EntityPrototype,
-  allEntities: EntityMap
+  allEntities: EntityMap,
+  foodSequenceElements: FoodSequenceElementMap
 ): ResolvedEntity => {
   const draft = createDraft(InitialState);
   draft.id = entity.id;
@@ -100,7 +111,7 @@ const resolveEntity = (
           resolveExtractable(draft, comp);
           break;
         case 'FoodSequenceElement':
-          resolveFoodSequenceElement(draft, comp);
+          resolveFoodSequenceElement(draft, comp, foodSequenceElements);
           break;
         case 'FoodSequenceStartPoint':
           resolveFoodSequenceStartPoint(draft, comp);
@@ -206,17 +217,18 @@ const resolveExtractable = (
 
 const resolveFoodSequenceElement = (
   draft: Draft<ResolvedEntity>,
-  comp: FoodSequenceElementComponent
+  comp: FoodSequenceElementComponent,
+  elements: FoodSequenceElementMap
 ): void => {
-  if (!draft.foodSequenceElement) {
-    draft.foodSequenceElement = {
-      keys: [],
-      elements: [],
-    };
-  }
   if (comp.entries != null) {
-    draft.foodSequenceElement.keys = Object.keys(comp.entries) as TagId[];
-    draft.foodSequenceElement.elements = Object.values(comp.entries);
+    draft.foodSequenceElement = new Map(
+      Object.entries(comp.entries).map(([seqId, elemId]) =>
+        [seqId as TagId, {
+          element: elemId,
+          final: elements.get(elemId)?.final ?? false,
+        }]
+      )
+    );
   }
 };
 

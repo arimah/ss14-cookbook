@@ -60,6 +60,8 @@ export interface SearchableRecipeData {
   readonly foodSequenceStartPoints: ReadonlyMap<string, readonly string[]>;
   /** Food sequence elements indexed by food sequence key. */
   readonly foodSequenceElements: ReadonlyMap<string, readonly string[]>;
+  /** Food sequence end points indexed by food sequence key. */
+  readonly foodSequenceEndPoints: ReadonlyMap<string, readonly string[]>;
 
   readonly methodSprites: Readonly<Partial<Record<CookingMethod, SpritePoint>>>;
   readonly beakerFill: SpritePoint;

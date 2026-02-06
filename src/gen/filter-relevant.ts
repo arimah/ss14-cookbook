@@ -40,6 +40,7 @@ export interface PrunedGameData {
   readonly reagentSources: ReadonlyMap<ReagentId, readonly EntityId[]>;
   readonly foodSequenceStartPoints: ReadonlyMap<TagId, readonly EntityId[]>;
   readonly foodSequenceElements: ReadonlyMap<TagId, readonly EntityId[]>;
+  readonly foodSequenceEndPoints: ReadonlyMap<TagId, readonly EntityId[]>;
 }
 
 export interface FilterParams {
@@ -166,6 +167,7 @@ export const filterRelevantPrototypes = (
     reagentSources,
     foodSequenceStartPoints: foodSequences.startPoints,
     foodSequenceElements: foodSequences.elements,
+    foodSequenceEndPoints: foodSequences.endPoints,
   };
 };
 
@@ -363,14 +365,8 @@ const findMetamorphIngredients = (
 
   // Second, let's find all entities that use any of the matching food
   // sequence elements.
-  const isRelevantElem = (elem: FoodSequenceElementId): boolean =>
-    elements.has(elem);
-
   const entities = allEntities.values()
-    .filter(ent =>
-      ent.foodSequenceElement !== null &&
-      ent.foodSequenceElement.elements.some(isRelevantElem)
-    )
+    .filter(ent => entityCanBeFoodSequenceElem(ent, elements))
     .map(ent => ent.id)
     .toArray();
   switch (entities.length) {
@@ -381,6 +377,21 @@ const findMetamorphIngredients = (
     default:
       return entities;
   }
+};
+
+const entityCanBeFoodSequenceElem = (
+  ent: ResolvedEntity,
+  soughtIds: ReadonlySet<FoodSequenceElementId>
+): boolean => {
+  if (!ent.foodSequenceElement) {
+    return false;
+  }
+  for (const elem of ent.foodSequenceElement.values()) {
+    if (soughtIds.has(elem.element)) {
+      return true;
+    }
+  }
+  return false;
 };
 
 const tryAddSpecialRecipes = (
@@ -823,6 +834,7 @@ const findGrindableProduceReagents = (
 interface FoodSequences {
   startPoints: Map<TagId, EntityId[]>;
   elements: Map<TagId, EntityId[]>;
+  endPoints: Map<TagId, EntityId[]>;
 }
 
 const collectFoodSequences = (
@@ -839,10 +851,11 @@ const collectFoodSequences = (
   }
 
   const elements = new Map<TagId, EntityId[]>();
+  const endPoints = new Map<TagId, EntityId[]>();
   for (const entity of allEntities.values()) {
     if (
       !entity.foodSequenceElement ||
-      entity.foodSequenceElement.keys.length === 0 ||
+      entity.foodSequenceElement.size === 0 ||
       ignoredFoodSequenceElements.has(entity.id)
     ) {
       continue;
@@ -850,14 +863,14 @@ const collectFoodSequences = (
 
     usedEntities.add(entity.id);
 
-    for (const key of entity.foodSequenceElement.keys) {
+    for (const [key, elem] of entity.foodSequenceElement) {
       if (!startPoints.has(key)) {
         continue;
       }
-      appendAtKey(elements, key, entity.id);
+      appendAtKey(elem.final ? endPoints : elements, key, entity.id);
     }
   }
-  return {startPoints, elements};
+  return {startPoints, elements, endPoints};
 };
 
 const appendAtKey = <K, V>(map: Map<K, V[]>, key: K, value: V): void => {

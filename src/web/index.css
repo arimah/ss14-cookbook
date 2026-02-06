@@ -1697,6 +1697,9 @@ select {
   }
 
     .foodseq_list > li {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
       margin-top: 16px;
     }
 
@@ -1707,7 +1710,6 @@ select {
   .foodseq_elements {
     list-style-type: none;
     display: grid;
-    margin-top: 4px;
     margin-inline: -4px;
     padding: 4px;
     gap: 4px 8px;

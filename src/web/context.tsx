@@ -93,6 +93,9 @@ export const GameDataProvider = memo((
       foodSequenceElements: new Map(
         Object.entries(raw.foodSequenceElements)
       ),
+      foodSequenceEndPoints: new Map(
+        Object.entries(raw.foodSequenceEndPoints)
+      ),
 
       methodSprites: raw.methodSprites,
       beakerFill: raw.beakerFill,
