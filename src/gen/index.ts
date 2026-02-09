@@ -1,20 +1,17 @@
-import {readFileSync} from 'fs';
-import {resolve} from 'path';
-
-import {parse} from 'yaml';
-import {enableMapSet, setAutoFreeze} from 'immer';
-
-import {SpritePoint} from '../types';
-
-import {findResourceFiles, readRawGameData} from './read-raw';
-import {resolveComponents} from './resolve-components';
-import {filterRelevantPrototypes} from './filter-relevant';
-import {resolvePrototypes} from './resolve-prototypes';
-import {resolveSpecials} from './resolve-specials';
-import {buildSpriteSheet} from './build-spritesheet';
-import {getGitCommitHash} from './commit-hash';
-import {ProcessedGameData, saveData} from './save-data';
-import {EntityId, MicrowaveMealRecipeId, ReagentId} from './prototypes';
+import { enableMapSet, setAutoFreeze } from 'immer';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { parse } from 'yaml';
+import { SpritePoint } from '../types';
+import { buildSpriteSheet } from './build-spritesheet';
+import { getGitCommitHash } from './commit-hash';
+import { filterRelevantPrototypes } from './filter-relevant';
+import { EntityId, MicrowaveMealRecipeId, ReagentId } from './prototypes';
+import { findResourceFiles, readRawGameData } from './read-raw';
+import { resolveComponents } from './resolve-components';
+import { resolvePrototypes } from './resolve-prototypes';
+import { resolveSpecials } from './resolve-specials';
+import { ProcessedGameData, saveData } from './save-data';
 import {
   MethodEntities,
   MicrowaveRecipeTypes,

@@ -1,4 +1,4 @@
-import {ChangeEvent, ReactElement, useId} from 'react';
+import { ChangeEvent, ReactElement, useId } from 'react';
 
 export interface OptionGroupProps<T extends string> {
   options: readonly Option<T>[];
@@ -11,11 +11,11 @@ export interface Option<T extends string> {
   readonly value: T;
 }
 
-export const OptionGroup = <T extends string>(
-  props: OptionGroupProps<T>
-): ReactElement => {
-  const {options, value, onChange} = props;
-
+export const OptionGroup = <T extends string>({
+  options,
+  value,
+  onChange,
+}: OptionGroupProps<T>): ReactElement => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
       onChange(e.target.value as T);

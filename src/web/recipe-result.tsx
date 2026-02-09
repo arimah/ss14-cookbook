@@ -1,19 +1,17 @@
-import {ReactElement, memo} from 'react';
-
-import {Recipe} from '../types';
-
-import {useGameData} from './context';
-import {EntitySprite, ReagentSprite} from './sprites';
-import {Tooltip} from './tooltip';
+import { ReactElement, memo } from 'react';
+import { Recipe } from '../types';
+import { useGameData } from './context';
+import { EntitySprite, ReagentSprite } from './sprites';
+import { Tooltip } from './tooltip';
 
 export interface RecipeResultProps {
   recipe: Recipe;
 }
 
-export const RecipeResult = memo((props: RecipeResultProps): ReactElement => {
-  const {recipe} = props;
-
-  const {entityMap, reagentMap} = useGameData();
+export const RecipeResult = memo(({
+  recipe,
+}: RecipeResultProps): ReactElement => {
+  const { entityMap, reagentMap } = useGameData();
 
   const solidResult = recipe.solidResult
     ? entityMap.get(recipe.solidResult)
@@ -39,7 +37,7 @@ export const RecipeResult = memo((props: RecipeResultProps): ReactElement => {
     );
   }
   if (reagentResult) {
-    const {id: resultId, name: resultName} = reagentResult;
+    const { id: resultId, name: resultName } = reagentResult;
     return (
       <span className='recipe_result'>
         <ReagentSprite id={resultId}/>

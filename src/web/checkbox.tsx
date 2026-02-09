@@ -1,4 +1,4 @@
-import {ChangeEvent, ReactElement, ReactNode, memo} from 'react';
+import { ChangeEvent, ReactElement, ReactNode, memo } from 'react';
 
 export interface Props {
   className?: string;
@@ -7,9 +7,12 @@ export interface Props {
   children?: ReactNode;
 }
 
-export const Checkbox = memo((props: Props): ReactElement => {
-  const {className, checked, onChange, children} = props;
-
+export const Checkbox = memo(({
+  className,
+  checked,
+  onChange,
+  children,
+}: Props): ReactElement => {
   return (
     <label className={className ? `checkbox ${className}` : 'checkbox'}>
       <input type='checkbox' checked={checked} onChange={onChange}/>

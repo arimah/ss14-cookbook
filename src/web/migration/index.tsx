@@ -1,11 +1,9 @@
-import {ReactElement} from 'react';
-import {Link, useSearchParams} from 'react-router';
-
-import {useUrl} from '../url';
-import {ArrowRightIcon} from '../icons';
-
-import {ExportSection} from './export-section';
-import {ImportSection} from './import-section';
+import { ReactElement } from 'react';
+import { Link, useSearchParams } from 'react-router';
+import { ArrowRightIcon } from '../icons';
+import { useUrl } from '../url';
+import { ExportSection } from './export-section';
+import { ImportSection } from './import-section';
 
 export const MigratePage = (): ReactElement => {
   const [query] = useSearchParams();

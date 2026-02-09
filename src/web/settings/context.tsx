@@ -1,16 +1,15 @@
+import { produce, Producer } from 'immer';
 import {
+  createContext,
   ReactElement,
   ReactNode,
-  createContext,
   useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
 } from 'react';
-import {produce, Producer} from 'immer';
-
-import {SettingsKey, useStorage} from '../storage';
+import { SettingsKey, useStorage } from '../storage';
 
 export interface Settings {
   readonly theme: ThemeSetting;
@@ -41,9 +40,9 @@ export interface SettingsProviderProps {
   children: ReactNode;
 }
 
-export const SettingsProvider = (props: SettingsProviderProps): ReactElement => {
-  const {children} = props;
-
+export const SettingsProvider = ({
+  children,
+}: SettingsProviderProps): ReactElement => {
   const storage = useStorage<Settings>(SettingsKey);
 
   const [settings, setSettings] = useState(() => storage.read(DefaultSettings));

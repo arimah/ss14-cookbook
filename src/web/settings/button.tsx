@@ -1,9 +1,7 @@
-import {ReactElement, useState} from 'react';
-
-import {SettingsIcon} from '../icons';
-import {Tooltip} from '../tooltip';
-
-import {SettingsDialog} from './dialog';
+import { ReactElement, useState } from 'react';
+import { SettingsIcon } from '../icons';
+import { Tooltip } from '../tooltip';
+import { SettingsDialog } from './dialog';
 
 export const SettingsButton = (): ReactElement => {
   const [open, setOpen] = useState(false);

@@ -9,9 +9,8 @@ import {
   useEffect,
   useState,
 } from 'react';
-import {createPortal} from 'react-dom';
-
-import {getPopupRoot, usePopupTrigger} from './popup-impl';
+import { createPortal } from 'react-dom';
+import { getPopupRoot, usePopupTrigger } from './popup-impl';
 
 export type Props = {
   timeout?: number;
@@ -36,18 +35,16 @@ const DefaultTimeout = 750; // ms
 const DefaultUsageHint = 'Press and hold to confirm';
 const ReleaseHint = 'Release to confirm';
 
-export const ConfirmButton = (props: Props): ReactElement => {
-  const {
-    className,
-    style,
-    timeout = DefaultTimeout,
-    tooltip = '',
-    usageHint = DefaultUsageHint,
-    onClick,
-    children,
-    ...rest
-  } = props;
-
+export const ConfirmButton = ({
+  className,
+  style,
+  timeout = DefaultTimeout,
+  tooltip = '',
+  usageHint = DefaultUsageHint,
+  onClick,
+  children,
+  ...rest
+}: Props): ReactElement => {
   const [state, setState] = useState<State>('up');
 
   const startHold = useCallback(() => {

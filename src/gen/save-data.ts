@@ -1,30 +1,27 @@
-import {existsSync, writeFileSync} from 'fs';
-import {dirname, resolve} from 'path';
-import {createHash} from 'crypto';
-
-import {JimpInstance} from 'jimp';
+import { JimpInstance } from 'jimp';
+import { createHash } from 'node:crypto';
+import { existsSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import sharp from 'sharp';
-
 import {
-  GameData,
   Entity,
+  ForkData,
+  GameData,
   Reagent,
   Recipe,
-  ForkData,
 } from '../types';
-
-import {SpriteSheetData} from './build-spritesheet';
-import {ResolvedGameData} from './resolve-prototypes';
-import {ResolvedSpecials} from './resolve-specials';
-import {EntityId, TagId} from './prototypes';
-import {mapToObject} from './helpers';
+import { SpriteSheetData } from './build-spritesheet';
 import {
-  GameDataPath,
-  SpriteSheetPath,
-  SpriteSheetFileName,
   ForkListPath,
+  GameDataPath,
+  SpriteSheetFileName,
+  SpriteSheetPath,
 } from './constants';
-import {MicrowaveRecipeTypes, ResolvedEntity} from './types';
+import { mapToObject } from './helpers';
+import { EntityId, TagId } from './prototypes';
+import { ResolvedGameData } from './resolve-prototypes';
+import { ResolvedSpecials } from './resolve-specials';
+import { MicrowaveRecipeTypes, ResolvedEntity } from './types';
 
 export interface ProcessedGameData {
   readonly id: string;
@@ -85,7 +82,7 @@ export const saveData = async (
 
     const recipes: Recipe[] = [];
     for (const [id, recipe] of d.resolved.recipes) {
-      recipes.push({id, ...recipe});
+      recipes.push({ id, ...recipe });
 
       for (const solid of Object.keys(recipe.solids)) {
         ingredients.add(solid);

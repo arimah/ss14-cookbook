@@ -1,14 +1,19 @@
-import {ReactElement, memo, useEffect, useMemo, useRef, useState} from 'react';
-
-import {useGameData} from '../context';
-import {InputGroup} from '../input-group';
-import {Recipe} from '../recipe';
-import {ArrowDownIcon, ArrowUpIcon, SearchIcon} from '../icons';
-import {compareByName} from '../sort';
-import {searchByName} from '../recipe-list';
-
-import {RecipeAction} from './edit-recipe-action';
-import {Tooltip} from '../tooltip';
+import {
+  ReactElement,
+  memo,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { useGameData } from '../context';
+import { ArrowDownIcon, ArrowUpIcon, SearchIcon } from '../icons';
+import { InputGroup } from '../input-group';
+import { Recipe } from '../recipe';
+import { searchByName } from '../recipe-list';
+import { compareByName } from '../sort';
+import { Tooltip } from '../tooltip';
+import { RecipeAction } from './edit-recipe-action';
 
 export interface Props {
   recipes: readonly string[];
@@ -17,10 +22,13 @@ export interface Props {
   onMoveRecipe: (fromIndex: number, delta: 1 | -1) => void;
 }
 
-export const SelectedRecipes = memo((props: Props): ReactElement => {
-  const {recipes, onAddRecipe, onRemoveRecipe, onMoveRecipe} = props;
-
-  const {recipeMap} = useGameData();
+export const SelectedRecipes = memo(({
+  recipes,
+  onAddRecipe,
+  onRemoveRecipe,
+  onMoveRecipe,
+}: Props): ReactElement => {
+  const { recipeMap } = useGameData();
 
   const [query, setQuery] = useState('');
 
@@ -77,9 +85,13 @@ interface MenuRecipeProps {
   onMove: (fromIndex: number, delta: 1 | -1) => void;
 }
 
-const MenuRecipe = memo((props: MenuRecipeProps): ReactElement => {
-  const {id, index, total, onRemove, onMove} = props;
-
+const MenuRecipe = memo(({
+  id,
+  index,
+  total,
+  onRemove,
+  onMove,
+}: MenuRecipeProps): ReactElement => {
   return (
     <li key={id} className='planner_editor-recipe'>
       <div className='planner_editor-recipe-header'>
@@ -129,9 +141,11 @@ const DefaultPage: PageInfo = {
   query: '',
 };
 
-const SearchResults = memo((props: SearchResultsProps): ReactElement | null => {
-  const {query, selectedRecipes, onAddRecipe} = props;
-
+const SearchResults = memo(({
+  query,
+  selectedRecipes,
+  onAddRecipe,
+}: SearchResultsProps): ReactElement | null => {
   const {
     recipeList: allRecipes,
     searchableRecipeNames,

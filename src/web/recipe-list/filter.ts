@@ -1,8 +1,7 @@
-import {Dispatch, SetStateAction} from 'react';
-import {Entity, Reagent, Recipe} from '../../types';
-
+import { Dispatch, SetStateAction } from 'react';
+import { Entity, Reagent, Recipe } from '../../types';
 import {
-    displayMethod,
+  displayMethod,
   recipeHasAllIngredients,
   recipeHasAllReagents,
   recipeHasAnyIngredient,
@@ -10,7 +9,7 @@ import {
   recipeHasOnlyIngredients,
   recipeHasOnlyReagents,
 } from '../helpers';
-import {DisplayMethod} from '../types';
+import { DisplayMethod } from '../types';
 
 export interface RecipeFilter {
   /** Empty list = include all methods. */

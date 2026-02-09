@@ -21,11 +21,9 @@ export interface RecipeVisibilityProviderProps {
   children: ReactNode;
 }
 
-export const RecipeVisibilityProvider = (
-  props: RecipeVisibilityProviderProps
-): ReactElement => {
-  const {children} = props;
-
+export const RecipeVisibilityProvider = ({
+  children,
+}: RecipeVisibilityProviderProps): ReactElement => {
   const [value] = useState<VisibilityContextType>(() => {
     const subs = new Map<HTMLElement, () => void>;
     const handleChange: IntersectionObserverCallback = entries => {

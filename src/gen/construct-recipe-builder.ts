@@ -5,19 +5,18 @@ import {
   ReagentIngredient,
   SimpleInteractionStep,
 } from '../types';
-
-import {DefaultRecipeGroup} from './constants';
-import {EntityId, ReagentId} from './prototypes';
-import {ResolvedConstructionRecipe} from './types';
+import { DefaultRecipeGroup } from './constants';
+import { EntityId, ReagentId } from './prototypes';
+import { ResolvedConstructionRecipe } from './types';
 
 // The lack of `amount` field is technically invalid, but for construct recipes
 // in particular, the amount is not used.
 const EmptyReagentIngredient = {} as ReagentIngredient;
 
-const CutStep: SimpleInteractionStep = {type: 'cut'};
-const RollStep: SimpleInteractionStep = {type: 'roll'};
-const StirStep: SimpleInteractionStep = {type: 'stir'};
-const ShakeStep: SimpleInteractionStep = {type: 'shake'};
+const CutStep: SimpleInteractionStep = { type: 'cut' };
+const RollStep: SimpleInteractionStep = { type: 'roll' };
+const StirStep: SimpleInteractionStep = { type: 'stir' };
+const ShakeStep: SimpleInteractionStep = { type: 'shake' };
 
 export class ConstructRecipeBuilder {
   public readonly group: string;
@@ -109,15 +108,15 @@ export class ConstructRecipeBuilder {
   }
 
   public startWith(entity: EntityId): this {
-    return this.pushStep({type: 'start', entity});
+    return this.pushStep({ type: 'start', entity });
   }
 
   public endWith(entity: OneOrMoreEntities): this {
-    return this.pushStep({type: 'end', entity});
+    return this.pushStep({ type: 'end', entity });
   }
 
   public mix(reagents: Readonly<Record<ReagentId, ReagentIngredient>>): this {
-    return this.pushStep({type: 'mix', reagents});
+    return this.pushStep({ type: 'mix', reagents });
   }
 
   public addSolid(
@@ -125,7 +124,7 @@ export class ConstructRecipeBuilder {
     minCount?: number,
     maxCount?: number
   ): this {
-    return this.pushStep({type: 'add', entity, minCount, maxCount});
+    return this.pushStep({ type: 'add', entity, minCount, maxCount });
   }
 
   public addReagent(
@@ -133,15 +132,15 @@ export class ConstructRecipeBuilder {
     minCount: number,
     maxCount: number
   ): this {
-    return this.pushStep({type: 'addReagent', reagent, minCount, maxCount});
+    return this.pushStep({ type: 'addReagent', reagent, minCount, maxCount });
   }
 
   public heat(minTemp: number): this {
-    return this.pushStep({type: 'heat', minTemp});
+    return this.pushStep({ type: 'heat', minTemp });
   }
 
   public heatMixture(minTemp: number, maxTemp: number | null = null): this {
-    return this.pushStep({type: 'heatMixture', minTemp, maxTemp});
+    return this.pushStep({ type: 'heatMixture', minTemp, maxTemp });
   }
 
   public cut(): this {
@@ -161,7 +160,7 @@ export class ConstructRecipeBuilder {
   }
 
   public alsoMakes(entity: OneOrMoreEntities): this {
-    return this.pushStep({type: 'alsoMakes', entity});
+    return this.pushStep({ type: 'alsoMakes', entity });
   }
 
   private collectIngredients(step: ConstructionStep): void {

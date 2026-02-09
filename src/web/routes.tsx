@@ -1,8 +1,8 @@
-import {Cookbook} from './main';
-import {RecipeList} from './recipe-list';
-import {FoodSequences} from './food-sequence';
-import {MenuPlanner, MenuPlannerRoutes} from './menu-planner';
-import {MigratePage} from './migration';
+import { FoodSequences } from './food-sequence';
+import { Cookbook } from './main';
+import { MenuPlanner, MenuPlannerRoutes } from './menu-planner';
+import { MigratePage } from './migration';
+import { RecipeList } from './recipe-list';
 
 export interface RouteHandle {
   readonly name: string;
@@ -15,23 +15,23 @@ export const AppRoutes = [
       {
         path: '/',
         element: <RecipeList/>,
-        handle: {name: 'recipe-list'} satisfies RouteHandle,
+        handle: { name: 'recipe-list' } satisfies RouteHandle,
       },
       {
         path: '/combinations',
         element: <FoodSequences/>,
-        handle: {name: 'food-sequence'} satisfies RouteHandle,
+        handle: { name: 'food-sequence' } satisfies RouteHandle,
       },
       {
         path: '/menu',
         element: <MenuPlanner/>,
         children: MenuPlannerRoutes,
-        handle: {name: 'menu-planner'} satisfies RouteHandle,
+        handle: { name: 'menu-planner' } satisfies RouteHandle,
       },
       {
         path: '/migrate',
         element: <MigratePage/>,
-        handle: {name: 'migrate'} satisfies RouteHandle,
+        handle: { name: 'migrate' } satisfies RouteHandle,
       },
     ],
   },

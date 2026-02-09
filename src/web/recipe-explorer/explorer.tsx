@@ -11,16 +11,14 @@ import {
   useRef,
   useState,
 } from 'react';
-import {useBlocker} from 'react-router';
-
-import {useGameData} from '../context';
-import {CloseIcon} from '../icons';
-import {Tooltip} from '../tooltip';
-import {FocusTrap} from '../focus';
-import {Recipe} from '../recipe';
-import {compareByName} from '../sort';
-
-import {ExploreFnContext, ExploreRecipeFn} from './context';
+import { useBlocker } from 'react-router';
+import { useGameData } from '../context';
+import { FocusTrap } from '../focus';
+import { CloseIcon } from '../icons';
+import { Recipe } from '../recipe';
+import { compareByName } from '../sort';
+import { Tooltip } from '../tooltip';
+import { ExploreFnContext, ExploreRecipeFn } from './context';
 
 export interface Props {
   id: string;
@@ -34,9 +32,10 @@ const RecipeMargin = 8;
  */
 const RelatedRecipeMargin = 4;
 
-export const RecipeExplorer = memo((props: Props): ReactElement => {
-  const {id, setRecipe} = props;
-
+export const RecipeExplorer = memo(({
+  id,
+  setRecipe,
+}: Props): ReactElement => {
   const exploreFn = useCallback<ExploreRecipeFn>((id: string) => {
     setRecipe(prevId => id === prevId ? null : id);
   }, [setRecipe]);
@@ -56,7 +55,7 @@ export const RecipeExplorer = memo((props: Props): ReactElement => {
 
       const viewportWidth = document.documentElement.clientWidth;
       const viewportCenterX = viewportWidth / 2;
-      const {totalWidth, centerOffset} = recipe.getDimensions();
+      const { totalWidth, centerOffset } = recipe.getDimensions();
 
       const availableSpace = viewportWidth - 2 * RecipeMargin - totalWidth;
 
@@ -126,10 +125,10 @@ interface ExploredRecipeDimensions {
 
 type ActiveSection = 'madeWith' | 'usedIn' | null;
 
-const ExploredRecipe = memo((props: ExploredRecipeProps): ReactElement => {
-
-  const {id, ref} = props;
-
+const ExploredRecipe = memo(({
+  id,
+  ref,
+}: ExploredRecipeProps): ReactElement => {
   const {
     recipeMap,
     recipesBySolidResult,
@@ -344,7 +343,7 @@ const resizeRelatedRecipesList = (elem: HTMLDivElement): void => {
   const columnCount = new Set(rects.map(r => r.left)).size;
 
   const [top, bottom] = rects.reduce(
-    ([tMin, bMax], {top, bottom}) => [
+    ([tMin, bMax], { top, bottom }) => [
       Math.min(tMin, top),
       Math.max(bMax, bottom)
     ],
@@ -428,7 +427,7 @@ const tryBalanceColumns = (
     const avgHeight = columnHeights.reduce((a, b) => a + b) / colCount;
     const avgGap = highestColumn - avgHeight;
     if (bestCandidate === null || avgGap < bestCandidate.avgGap) {
-      bestCandidate = {height: highestColumn, avgGap};
+      bestCandidate = { height: highestColumn, avgGap };
     }
 
     // Try again with a lower maxHeight

@@ -1,9 +1,7 @@
-import {Ref, RefObject, MutableRefObject, useMemo} from 'react';
-import {customAlphabet} from 'nanoid';
-
-import {Recipe} from '../types';
-
-import {DisplayMethod} from './types';
+import { customAlphabet } from 'nanoid';
+import { Ref, RefObject, useMemo } from 'react';
+import { Recipe } from '../types';
+import { DisplayMethod } from './types';
 
 export const NeutralCollator = new Intl.Collator('en-US');
 
@@ -201,7 +199,7 @@ export const combineRefs = <T>(
           if (typeof ref === 'function') {
             ref(elem);
           } else {
-            (ref as MutableRefObject<T | null>).current = elem;
+            ref.current = elem as T;
           }
         });
       };

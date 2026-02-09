@@ -1,13 +1,11 @@
-import {ReactElement, memo, useEffect, useMemo, useRef} from 'react';
-import {useLocation} from 'react-router';
-
-import {useGameData} from '../context';
-import {NeutralCollator} from '../helpers';
-
-import {SeqStartPoint} from './start-point';
+import { ReactElement, memo, useEffect, useMemo, useRef } from 'react';
+import { useLocation } from 'react-router';
+import { useGameData } from '../context';
+import { NeutralCollator } from '../helpers';
+import { SeqStartPoint } from './start-point';
 
 export const FoodSequences = memo((): ReactElement => {
-  const {entityList, entityMap, reagentMap} = useGameData();
+  const { entityList, entityMap, reagentMap } = useGameData();
 
   const startPoints = useMemo(() => {
     return entityList
@@ -15,7 +13,7 @@ export const FoodSequences = memo((): ReactElement => {
       .sort((a, b) => NeutralCollator.compare(a.name, b.name));
   }, [entityList, entityMap, reagentMap]);
 
-  const {state} = useLocation();
+  const { state } = useLocation();
 
   const startPointRefs = useRef(new Map<string, HTMLLIElement>());
   useEffect(() => {

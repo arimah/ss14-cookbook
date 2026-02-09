@@ -1,6 +1,5 @@
-import {readFileSync} from 'fs';
-
-import {EntityId, EntityMap, EntityPrototype} from './prototypes';
+import { readFileSync } from 'node:fs';
+import { EntityId, EntityMap, EntityPrototype } from './prototypes';
 
 /**
  * Synchronously reads a file as a string, assuming its contents are UTF-8,
@@ -32,7 +31,7 @@ export function* entityAndAncestors(
 function* parents(
   entity: EntityPrototype
 ): Generator<EntityId, void, undefined> {
-  const {parent} = entity;
+  const { parent } = entity;
   if (typeof parent === 'string') {
     yield parent;
   } else if (Array.isArray(parent)) {

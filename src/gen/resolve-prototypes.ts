@@ -1,18 +1,15 @@
-import {resolve} from 'path';
-
-import {FluentBundle, FluentResource} from '@fluent/bundle';
-import {globSync} from 'glob';
-
-import {CookingMethod} from '../types';
-
-import {PrunedGameData} from './filter-relevant';
+import { FluentBundle, FluentResource } from '@fluent/bundle';
+import { globSync } from 'glob';
+import { resolve } from 'node:path';
+import { CookingMethod } from '../types';
 import {
   DefaultCookTime,
   DefaultRecipeGroup,
   MixerCategoryToStepType,
 } from './constants';
-import {ConstructRecipeBuilder} from './construct-recipe-builder';
-import {getReagentResult, getSolidResult} from './reaction-helpers';
+import { ConstructRecipeBuilder } from './construct-recipe-builder';
+import { PrunedGameData } from './filter-relevant';
+import { readFileTextWithoutTheStupidBOM } from './helpers';
 import {
   EntityId,
   MicrowaveMealRecipe,
@@ -20,7 +17,7 @@ import {
   ReactionPrototype,
   ReagentId,
 } from './prototypes';
-import {readFileTextWithoutTheStupidBOM} from './helpers';
+import { getReagentResult, getSolidResult } from './reaction-helpers';
 import {
   MethodEntities,
   MicrowaveRecipeTypes,
@@ -146,7 +143,7 @@ const resolveRecipeSubtype = (
 
 const createFluentBundle = (localeDir: string): FluentBundle => {
   const ftlPaths =
-    globSync('*/**/*.ftl', {cwd: localeDir})
+    globSync('*/**/*.ftl', { cwd: localeDir })
       .map(filePath => resolve(localeDir, filePath))
 
   const bundle = new FluentBundle('en-US', {
@@ -167,7 +164,7 @@ const convertMicrowaveReagents = (
 ): Record<string, Reactant> => {
   const result: Record<string, Reactant> = {};
   for (const [id, amount] of Object.entries(reagents)) {
-    result[id] = {amount};
+    result[id] = { amount };
   }
   return result;
 };
@@ -204,7 +201,7 @@ function* reactionRecipes(
         if (reaction.minTemp) {
           recipe.heatMixture(reaction.minTemp, reaction.maxTemp);
         }
-        recipe.pushStep({type});
+        recipe.pushStep({ type });
 
         yield [`${id}:${type}`, recipe.toRecipe()];
       }

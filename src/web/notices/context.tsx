@@ -1,8 +1,13 @@
-import {ReactElement, ReactNode, createContext, useMemo, useState} from 'react';
-import {produce} from 'immer';
-
-import {NoticesKey, useStorage} from '../storage';
-import {NoticeData} from '../types';
+import { produce } from 'immer';
+import {
+  ReactElement,
+  ReactNode,
+  createContext,
+  useMemo,
+  useState,
+} from 'react';
+import { NoticesKey, useStorage } from '../storage';
+import { NoticeData } from '../types';
 
 export interface Notices {
   all: readonly NoticeData[];
@@ -29,11 +34,10 @@ export interface NoticesProviderProps {
   children: ReactNode;
 }
 
-export const NoticesProvider = (
-  props: NoticesProviderProps
-): ReactElement => {
-  const {all, children} = props;
-
+export const NoticesProvider = ({
+  all,
+  children,
+}: NoticesProviderProps): ReactElement => {
   const storage = useStorage<NoticesData>(NoticesKey);
   const [dismissed, setDismissed] = useState(() => {
     const stored = storage.read(EmptyData);

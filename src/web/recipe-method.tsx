@@ -1,22 +1,18 @@
-import {ReactElement, memo} from 'react';
-
-import {Recipe, SpritePoint} from '../types';
-
-import {useGameData} from './context';
-import {displayMethod} from './helpers';
-import {Temperature} from './temperature';
-import {RawSprite} from './sprites';
+import { ReactElement, memo } from 'react';
+import { Recipe, SpritePoint } from '../types';
+import { useGameData } from './context';
+import { displayMethod } from './helpers';
+import { RawSprite } from './sprites';
+import { Temperature } from './temperature';
 
 export interface RecipeMethodProps {
   recipe: Recipe;
 }
 
-export const RecipeMethod = memo((
-  props: RecipeMethodProps
-): ReactElement | null => {
-  const {recipe} = props;
-
-  const {methodSprites, microwaveRecipeTypes} = useGameData();
+export const RecipeMethod = memo(({
+  recipe,
+}: RecipeMethodProps): ReactElement | null => {
+  const { methodSprites, microwaveRecipeTypes } = useGameData();
 
   const method = displayMethod(recipe);
   if (method === null) {

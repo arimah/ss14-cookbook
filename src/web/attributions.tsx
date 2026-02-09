@@ -8,18 +8,16 @@ import {
   useRef,
   useState,
 } from 'react';
-import {createPortal} from 'react-dom';
-import {useBlocker} from 'react-router';
-
-import {MetaData, SpriteAttribution} from '../types';
-
-import {getPopupRoot} from './popup-impl';
-import {RawSprite} from './sprites';
-import {CloseIcon} from './icons';
-import {Tooltip} from './tooltip';
-import {Overlay} from './overlay';
-import {FocusTrap} from './focus';
-import {GitHubFolderUrl} from './helpers';
+import { createPortal } from 'react-dom';
+import { useBlocker } from 'react-router';
+import { MetaData, SpriteAttribution } from '../types';
+import { FocusTrap } from './focus';
+import { GitHubFolderUrl } from './helpers';
+import { CloseIcon } from './icons';
+import { Overlay } from './overlay';
+import { getPopupRoot } from './popup-impl';
+import { RawSprite } from './sprites';
+import { Tooltip } from './tooltip';
 
 // TODO: Move this somewhere else probably
 const TexturesSubPath = 'Resources/Textures';
@@ -29,9 +27,7 @@ export interface Props {
   meta: MetaData,
 }
 
-export const AttributionsLink = memo((props: Props): ReactElement => {
-  const {value, meta} = props;
-
+export const AttributionsLink = memo(({ value, meta }: Props): ReactElement => {
   const [open, setOpen] = useState(false);
 
   const handleClick = useCallback((e: MouseEvent) => {
@@ -58,11 +54,11 @@ interface AttributionsDialogProps {
   onClose: () => void;
 }
 
-const AttributionsDialog = memo((
-  props: AttributionsDialogProps
-): ReactElement => {
-  const {value, meta, onClose} = props;
-
+const AttributionsDialog = memo(({
+  value,
+  meta,
+  onClose,
+}: AttributionsDialogProps): ReactElement => {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
     ref.current?.focus();
@@ -101,9 +97,7 @@ interface AttributionItemProps {
   meta: MetaData;
 }
 
-const AttributionItem = (props: AttributionItemProps) => {
-  const {attr, meta} = props;
-
+const AttributionItem = ({ attr, meta }: AttributionItemProps) => {
   const pathUrl = GitHubFolderUrl(
     meta.repo,
     meta.commit,
@@ -139,9 +133,7 @@ interface LicenceTextProps {
   license: string;
 }
 
-const LicenseText = (props: LicenceTextProps): ReactElement => {
-  const {license} = props;
-
+const LicenseText = ({ license }: LicenceTextProps): ReactElement => {
   let url: string | null = null;
   const m = license.match(CreativeCommonsRegex);
   if (m) {
@@ -165,9 +157,7 @@ interface CopyrightTextProps {
   copyright: string;
 }
 
-const CopyrightText = memo((props: CopyrightTextProps): ReactNode => {
-  const {copyright} = props;
-
+const CopyrightText = memo(({ copyright }: CopyrightTextProps): ReactNode => {
   // This regex is intentionally quite limited, to URLs of the following forms:
   //    https?://github.com/USER/REPO
   //    https?://github.com/USER/REPO/commit/HASH

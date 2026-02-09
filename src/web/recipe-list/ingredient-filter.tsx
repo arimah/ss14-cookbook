@@ -1,3 +1,4 @@
+import { produce } from 'immer';
 import {
   Dispatch,
   MouseEvent,
@@ -8,14 +9,10 @@ import {
   useCallback,
   useMemo,
 } from 'react';
-import {produce} from 'immer';
-
-import {Entity, Reagent} from '../../types';
-
-import {useGameData} from '../context';
-
-import {RecipeFilter, prepareSearchQuery} from './filter';
-import {EntitySprite, ReagentSprite} from '../sprites';
+import { Entity, Reagent } from '../../types';
+import { useGameData } from '../context';
+import { EntitySprite, ReagentSprite } from '../sprites';
+import { RecipeFilter, prepareSearchQuery } from './filter';
 
 export interface Props {
   search: string;
@@ -28,12 +25,13 @@ type SearchResult =
   | ['solid', Entity]
   | ['reagent', Reagent];
 
-export const IngredientSuggestions = memo((
-  props: Props
-): ReactElement | null => {
-  const {search, filter, setFilter, clearSearch} = props;
-
-  const {entityMap, ingredients, reagentList} = useGameData();
+export const IngredientSuggestions = memo(({
+  search,
+  filter,
+  setFilter,
+  clearSearch,
+}: Props): ReactElement | null => {
+  const { entityMap, ingredients, reagentList } = useGameData();
 
   const results = useMemo(() => {
     const results: SearchResult[] = [];
@@ -104,9 +102,11 @@ interface SuggestionProps {
   onClick: (value: SearchResult) => void;
 }
 
-const Suggestion = memo((props: SuggestionProps): ReactElement => {
-  const {value, selected, onClick} = props;
-
+const Suggestion = memo(({
+  value,
+  selected,
+  onClick,
+}: SuggestionProps): ReactElement => {
   let icon: ReactNode;
   switch (value[0]) {
     case 'solid':

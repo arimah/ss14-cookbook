@@ -1,7 +1,6 @@
-import {ReactElement, memo} from 'react';
-
-import {Tooltip} from './tooltip';
-import {useSettings} from './settings';
+import { ReactElement, memo } from 'react';
+import { useSettings } from './settings';
+import { Tooltip } from './tooltip';
 
 export interface Props {
   k: number;
@@ -13,10 +12,10 @@ interface Temps {
   fahrenheit: string;
 }
 
-export const Temperature = memo((props: Props): ReactElement => {
+export const Temperature = memo(({ k }: Props): ReactElement => {
   const [settings] = useSettings();
 
-  const temps = format(props.k);
+  const temps = format(k);
 
   let tooltip: string;
   switch (settings.temperatureUnit) {

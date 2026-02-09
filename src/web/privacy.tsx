@@ -7,13 +7,12 @@ import {
   useRef,
   useState,
 } from 'react';
-import {createPortal} from 'react-dom';
-
-import {getPopupRoot} from './popup-impl';
-import {FocusTrap} from './focus';
-import {Overlay} from './overlay';
-import {Tooltip} from './tooltip';
-import {CloseIcon} from './icons';
+import { createPortal } from 'react-dom';
+import { FocusTrap } from './focus';
+import { CloseIcon } from './icons';
+import { Overlay } from './overlay';
+import { getPopupRoot } from './popup-impl';
+import { Tooltip } from './tooltip';
 
 export const PrivacyPolicyLink = memo((): ReactElement => {
   const [open, setOpen] = useState(false);
@@ -40,11 +39,9 @@ interface PrivacyPolicyDialogProps {
   onClose: () => void;
 }
 
-const PrivacyPolicyDialog = memo((
-  props: PrivacyPolicyDialogProps
-): ReactElement => {
-  const {onClose} = props;
-
+const PrivacyPolicyDialog = memo(({
+  onClose,
+}: PrivacyPolicyDialogProps): ReactElement => {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
     ref.current?.focus();

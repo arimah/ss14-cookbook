@@ -1,17 +1,17 @@
-import {ReactElement} from 'react';
-
-import {Notice} from '../notices';
-import {useFork} from '../fork-context';
+import { ReactElement } from 'react';
+import { useFork } from '../fork-context';
+import { Notice } from '../notices';
 
 export interface MenuWarningProps {
   menuFork: string;
   unavailableRecipeCount: number;
 }
 
-export const MenuWarning = (props: MenuWarningProps): ReactElement | null => {
-  const {menuFork, unavailableRecipeCount} = props;
-
-  const {fork: currentFork, allForks} = useFork();
+export const MenuWarning = ({
+  menuFork,
+  unavailableRecipeCount,
+}: MenuWarningProps): ReactElement | null => {
+  const { fork: currentFork, allForks } = useFork();
 
   if (menuFork === currentFork && unavailableRecipeCount === 0) {
     return null;

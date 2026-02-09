@@ -6,14 +6,12 @@ import {
   useEffect,
   useMemo,
 } from 'react';
-
-import {RecipePopup} from '../recipe-popup';
-import {NoticeData, NoticeIcon} from '../types';
-
-import {NoticesContext} from './context';
-import {ErrorIcon, InformationIcon, StarOnIcon, WarningIcon} from '../icons';
-import {Notice} from './notice';
-import {FirstVisitKey, useStorage} from '../storage';
+import { ErrorIcon, InformationIcon, StarOnIcon, WarningIcon } from '../icons';
+import { RecipePopup } from '../recipe-popup';
+import { FirstVisitKey, useStorage } from '../storage';
+import { NoticeData, NoticeIcon } from '../types';
+import { NoticesContext } from './context';
+import { Notice } from './notice';
 
 export interface NoticeListProps {
   currentFork: string;
@@ -26,9 +24,7 @@ const Icons: Record<NoticeIcon, ReactElement> = {
   star: <StarOnIcon/>,
 };
 
-export const NoticeList = (props: NoticeListProps): ReactElement => {
-  const {currentFork} = props;
-
+export const NoticeList = ({ currentFork }: NoticeListProps): ReactElement => {
   // We need the context here so we can skip rendering dismissed notices
   // altogether. Otherwise the `<Notice>` would take care of that.
   const context = useContext(NoticesContext);

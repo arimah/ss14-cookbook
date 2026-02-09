@@ -1,16 +1,14 @@
-import {ReactElement, ReactNode, memo, useEffect, useMemo} from 'react';
-import {Link, useNavigate, useSearchParams} from 'react-router';
-
-import {useGameData} from '../context';
-import {useUrl} from '../url';
-import {AddIcon, EditIcon} from '../icons';
-import {Notice} from '../notices';
-import {Tooltip} from '../tooltip';
-
-import {useStoredMenus} from './storage';
-import {importMenu} from './transfer';
-import {ImportMenuDialog} from './dialogs';
-import {CookingMenu} from './types';
+import { ReactElement, ReactNode, memo, useEffect, useMemo } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router';
+import { useGameData } from '../context';
+import { AddIcon, EditIcon } from '../icons';
+import { Notice } from '../notices';
+import { Tooltip } from '../tooltip';
+import { useUrl } from '../url';
+import { ImportMenuDialog } from './import-menu-dialog';
+import { useStoredMenus } from './storage';
+import { importMenu } from './transfer';
+import { CookingMenu } from './types';
 
 type ImportState =
   | ImmediateImportState
@@ -20,21 +18,21 @@ type ImportState =
   ;
 
 interface ImmediateImportState {
-  readonly kind: 'immediate';
+  readonly type: 'immediate';
   readonly menu: CookingMenu;
 }
 
 interface ConfirmImportState {
-  readonly kind: 'confirm';
+  readonly type: 'confirm';
   readonly menu: CookingMenu;
 }
 
 interface ErrorImportState {
-  readonly kind: 'error';
+  readonly type: 'error';
 }
 
 interface NoImportState {
-  readonly kind: 'none';
+  readonly type: 'none';
 }
 
 export const MenuList = memo((): ReactElement => {
@@ -47,19 +45,19 @@ export const MenuList = memo((): ReactElement => {
   const importParam = query.get('import');
   const importState = useMemo((): ImportState => {
     if (!importParam) {
-      return {kind: 'none'};
+      return { type: 'none' };
     }
 
     const menu = importMenu(importParam);
     if (!menu) {
-      return {kind: 'error'};
+      return { type: 'error' };
     }
 
     const existingMenu = storage.get(menu.id);
     if (existingMenu) {
-      return {kind: 'confirm', menu};
+      return { type: 'confirm', menu };
     }
-    return {kind: 'immediate', menu};
+    return { type: 'immediate', menu };
   }, [importParam, storage]);
 
   const handleImport = (menu: CookingMenu) => {
@@ -70,7 +68,7 @@ export const MenuList = memo((): ReactElement => {
     setQuery(q => {
       q.delete('import');
       return q;
-    }, {replace: true});
+    }, { replace: true });
 
     navigate(url.menuView(menu.id));
   };
@@ -79,11 +77,11 @@ export const MenuList = memo((): ReactElement => {
     setQuery(q => {
       q.delete('import');
       return q;
-    }, {replace: true});
+    }, { replace: true });
   };
 
   useEffect(() => {
-    if (importState?.kind === 'immediate') {
+    if (importState.type === 'immediate') {
       handleImport(importState.menu);
     }
   }, [importState]);
@@ -121,7 +119,7 @@ export const MenuList = memo((): ReactElement => {
 
   return (
     <div className='planner'>
-      {importState.kind === 'error' && (
+      {importState.type === 'error' && (
         <Notice kind='error'>
           The page address contains a menu to import, but something went wrong when reading it.
           {' '}
@@ -131,7 +129,7 @@ export const MenuList = memo((): ReactElement => {
         </Notice>
       )}
       {menuList}
-      {importState.kind === 'confirm' && (
+      {importState.type === 'confirm' && (
         <ImportMenuDialog
           menu={importState.menu}
           onImport={handleImport}
@@ -148,10 +146,8 @@ interface ItemProps {
   menu: CookingMenu;
 }
 
-const Item = memo((props: ItemProps): ReactElement => {
-  const {menu} = props;
-
-  const {recipeMap, entityMap, reagentMap} = useGameData();
+const Item = memo(({ menu }: ItemProps): ReactElement => {
+  const { recipeMap, entityMap, reagentMap } = useGameData();
   const url = useUrl();
 
   const recipeSummary = useMemo(() => {

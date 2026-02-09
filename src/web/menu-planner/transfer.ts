@@ -1,7 +1,6 @@
-import {Base64} from 'js-base64';
-import {deflate, inflate} from 'pako';
-
-import {CookingMenu, CookingMenuVersion} from './types';
+import { Base64 } from 'js-base64';
+import { deflate, inflate } from 'pako';
+import { CookingMenu, CookingMenuVersion } from './types';
 
 interface ExportedMenu {
   readonly v: number;
@@ -21,7 +20,7 @@ export const exportMenu = (menu: CookingMenu): string => {
 export const importMenu = (data: string): CookingMenu | null => {
   try {
     const compressed = Base64.toUint8Array(data);
-    const source = inflate(compressed, {to: 'string'});
+    const source = inflate(compressed, { to: 'string' });
     const exported: ExportedMenu = parseImport(JSON.parse(source));
     return exported.m;
   } catch (e) {
@@ -43,7 +42,7 @@ const parseImport = (value: unknown): ExportedMenu => {
   const version = parseVersion(value.v);
   const menu = parseMenu(value.m);
 
-  return {v: version, m: menu};
+  return { v: version, m: menu };
 };
 
 const parseVersion = (value: unknown): number => {

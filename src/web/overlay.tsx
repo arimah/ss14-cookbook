@@ -1,12 +1,10 @@
-import {ReactElement, ReactNode, useEffect} from 'react';
+import { ReactElement, ReactNode, useEffect } from 'react';
 
 export interface Props {
   children: ReactNode;
 }
 
-export const Overlay = (props: Props): ReactElement => {
-  const {children} = props;
-
+export const Overlay = ({ children }: Props): ReactElement => {
   useEffect(() => {
     document.body.classList.add('overlay-open');
     return () => {

@@ -1,3 +1,4 @@
+import { Draft, produce } from 'immer';
 import {
   CSSProperties,
   ChangeEvent,
@@ -10,28 +11,24 @@ import {
   useMemo,
   useState,
 } from 'react';
-import {Draft, produce} from 'immer';
-
-import {Reagent} from '../../types';
-
-import {useGameData} from '../context';
-import {EntitySprite, RawSprite, ReagentSprite} from '../sprites';
+import { Reagent } from '../../types';
+import { Checkbox } from '../checkbox';
+import { useGameData } from '../context';
+import { NeutralCollator } from '../helpers';
 import {
   CollapseIcon,
   ExpandIcon,
+  InformationIcon,
   ResetIcon,
   SearchTextIcon,
-  InformationIcon,
 } from '../icons';
-import {InputGroup} from '../input-group';
-import {Checkbox} from '../checkbox';
-import {Tooltip} from '../tooltip';
-import {NeutralCollator} from '../helpers';
-import {DisplayMethod} from '../types';
-
+import { InputGroup } from '../input-group';
+import { EntitySprite, RawSprite, ReagentSprite } from '../sprites';
+import { Tooltip } from '../tooltip';
+import { DisplayMethod } from '../types';
 import {
-  RecipeFilter,
   IngredientMode,
+  RecipeFilter,
   filterIngredientsByName,
   filterReagentsByName,
 } from './filter';
@@ -47,9 +44,11 @@ export interface Props {
 
 type Updater = (draft: Draft<RecipeFilter>) => void;
 
-export const FilterEditor = memo((props: Props): ReactElement => {
-  const {open, filter, setFilter} = props;
-
+export const FilterEditor = memo(({
+  open,
+  filter,
+  setFilter,
+}: Props): ReactElement => {
   const updateFilter = useCallback((updater: Updater) => {
     setFilter(filter => produce(filter, updater));
   }, []);
@@ -101,12 +100,10 @@ interface FilterProps {
   update: (updater: Updater) => void;
 }
 
-const MethodFilter = (props: FilterProps): ReactElement => {
-  const {filter, update} = props;
+const MethodFilter = ({ filter, update }: FilterProps): ReactElement => {
+  const { methods, subtypes } = filter;
 
-  const {methods, subtypes} = filter;
-
-  const {methodSprites, microwaveRecipeTypes} = useGameData();
+  const { methodSprites, microwaveRecipeTypes } = useGameData();
 
   const microwaveSubtypes = useMemo(() => {
     if (!microwaveRecipeTypes) {
@@ -205,22 +202,24 @@ interface SecondaryMethod {
 }
 
 const SecondaryMethods: readonly SecondaryMethod[] = [
-  {method: 'heat', label: 'Heat', alt: 'grill'},
-  {method: 'deepFry', label: 'Deep fry', alt: 'deep fryer'},
-  {method: 'mix', label: 'Mix', alt: 'beaker'},
-  {method: 'cut', label: 'Cut', alt: 'knife'},
-  {method: 'roll', label: 'Roll', alt: 'rolling pin'},
-  {method: 'construct', label: 'General', alt: ''},
+  { method: 'heat', label: 'Heat', alt: 'grill' },
+  { method: 'deepFry', label: 'Deep fry', alt: 'deep fryer' },
+  { method: 'mix', label: 'Mix', alt: 'beaker' },
+  { method: 'cut', label: 'Cut', alt: 'knife' },
+  { method: 'roll', label: 'Roll', alt: 'rolling pin' },
+  { method: 'construct', label: 'General', alt: '' },
 ];
 
 interface IngredientProps {
   hideRarelyUsed: boolean;
 }
 
-const IngredientFilter = (props: FilterProps & IngredientProps): ReactElement => {
-  const {filter, hideRarelyUsed, update} = props;
-
-  const {ingredients} = filter;
+const IngredientFilter = ({
+  filter,
+  hideRarelyUsed,
+  update,
+}: FilterProps & IngredientProps): ReactElement => {
+  const { ingredients } = filter;
 
   const {
     ingredients: allIngredients,
@@ -320,12 +319,17 @@ const IngredientFilter = (props: FilterProps & IngredientProps): ReactElement =>
   </>;
 };
 
-const ReagentFilter = (props: FilterProps & IngredientProps): ReactElement => {
-  const {filter, hideRarelyUsed, update} = props;
+const ReagentFilter = ({
+  filter,
+  hideRarelyUsed,
+  update,
+}: FilterProps & IngredientProps): ReactElement => {
+  const { reagents } = filter;
 
-  const {reagents} = filter;
-
-  const {reagentList: allReagents, recipesByReagentIngredient} = useGameData();
+  const {
+    reagentList: allReagents,
+    recipesByReagentIngredient,
+  } = useGameData();
 
   const [expanded, setExpanded] = useState(false);
   const [query, setQuery] = useState('');
@@ -411,9 +415,7 @@ const ReagentFilter = (props: FilterProps & IngredientProps): ReactElement => {
   </>;
 };
 
-const ModeOption = (props: FilterProps): ReactElement => {
-  const {filter, update} = props;
-
+const ModeOption = ({ filter, update }: FilterProps): ReactElement => {
   const handleChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
     update(draft => {
       draft.ingredientMode = e.target.value as IngredientMode;
@@ -441,10 +443,8 @@ const ModeOption = (props: FilterProps): ReactElement => {
   </>;
 };
 
-const GroupFilter = (props: FilterProps): ReactElement | null => {
-  const {filter, update} = props;
-
-  const {recipeGroups} = useGameData();
+const GroupFilter = ({ filter, update }: FilterProps): ReactElement | null => {
+  const { recipeGroups } = useGameData();
 
   const toggle = useCallback((group: string, newSelected: boolean) => {
     update(draft => {
@@ -488,10 +488,8 @@ const GroupFilter = (props: FilterProps): ReactElement | null => {
   </>;
 };
 
-const TraitFilter = (props: FilterProps): ReactElement => {
-  const {filter, update} = props;
-
-  const {specialTraits} = useGameData();
+const TraitFilter = ({ filter, update }: FilterProps): ReactElement => {
+  const { specialTraits } = useGameData();
 
   const toggle = useCallback((trait: number) => {
     update(draft => {
@@ -530,8 +528,12 @@ interface FilterOptionProps<T> {
   children: ReactNode;
 }
 
-function FilterOption<T>(props: FilterOptionProps<T>): ReactElement {
-  const {selected, value, onClick, children} = props;
+function FilterOption<T>({
+  selected,
+  value,
+  onClick,
+  children,
+}: FilterOptionProps<T>): ReactElement {
   return (
     <li>
       <button
@@ -554,40 +556,36 @@ interface IngredientToolbarProps {
   reset: () => void;
 }
 
-const IngredientToolbar = (props: IngredientToolbarProps): ReactElement => {
-  const {
-    selectedCount,
-    query,
-    setQuery,
-    expanded,
-    setExpanded,
-    reset,
-  } = props;
-  return (
-    <span className='recipe-search_opt-filter'>
-      {selectedCount > 0 && <span>{selectedCount} selected</span>}
-      <InputGroup iconBefore={<SearchTextIcon/>}>
-        <input
-          type='search'
-          placeholder='Search ingredients...'
-          size={1}
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-        />
-      </InputGroup>
-      <Tooltip
-        text={expanded ? 'Collapse list' : 'Expand list'}
-        provideLabel
-      >
-        <button onClick={() => setExpanded(x => !x)}>
-          {expanded ? <CollapseIcon/> : <ExpandIcon/>}
-        </button>
-      </Tooltip>
-      <Tooltip text='Clear selected ingredients' provideLabel>
-        <button disabled={selectedCount === 0} onClick={reset}>
-          <ResetIcon/>
-        </button>
-      </Tooltip>
-    </span>
-  );
-};
+const IngredientToolbar = ({
+  selectedCount,
+  query,
+  setQuery,
+  expanded,
+  setExpanded,
+  reset,
+}: IngredientToolbarProps): ReactElement =>
+  <span className='recipe-search_opt-filter'>
+    {selectedCount > 0 && <span>{selectedCount} selected</span>}
+    <InputGroup iconBefore={<SearchTextIcon/>}>
+      <input
+        type='search'
+        placeholder='Search ingredients...'
+        size={1}
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+      />
+    </InputGroup>
+    <Tooltip
+      text={expanded ? 'Collapse list' : 'Expand list'}
+      provideLabel
+    >
+      <button onClick={() => setExpanded(x => !x)}>
+        {expanded ? <CollapseIcon/> : <ExpandIcon/>}
+      </button>
+    </Tooltip>
+    <Tooltip text='Clear selected ingredients' provideLabel>
+      <button disabled={selectedCount === 0} onClick={reset}>
+        <ResetIcon/>
+      </button>
+    </Tooltip>
+  </span>;

@@ -1,23 +1,21 @@
-import {ReactElement, ReactNode, RefObject, memo, useMemo, useRef} from 'react';
-import {createPortal} from 'react-dom';
-import {Link} from 'react-router';
-
-import {Entity, Recipe as RecipeData} from '../types';
-
-import {useGameData} from './context';
-import {CloseIcon, FoodSequenceIcon, NodeTreeIcon} from './icons';
-import {FavoriteButton, useIsFavorite} from './favorites';
-import {useExploreRecipe, useCurrentExploredRecipe} from './recipe-explorer';
-import {useRecipeVisibility} from './recipe-visibility-context';
-import {RecipeTraits} from './recipe-traits';
-import {RecipeMethod} from './recipe-method';
-import {RecipeResult} from './recipe-result';
-import {RecipeIngredients} from './recipe-ingredients';
-import {RecipeInstructions} from './recipe-instructions';
-import {EntitySprite} from './sprites';
-import {Tooltip} from './tooltip';
-import {getPopupRoot, usePopupTrigger} from './popup-impl';
-import {useUrl} from './url';
+import { ReactElement, ReactNode, RefObject, memo, useMemo, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { Link } from 'react-router';
+import { Entity, Recipe as RecipeData } from '../types';
+import { useGameData } from './context';
+import { FavoriteButton, useIsFavorite } from './favorites';
+import { CloseIcon, FoodSequenceIcon, NodeTreeIcon } from './icons';
+import { getPopupRoot, usePopupTrigger } from './popup-impl';
+import { useCurrentExploredRecipe, useExploreRecipe } from './recipe-explorer';
+import { RecipeIngredients } from './recipe-ingredients';
+import { RecipeInstructions } from './recipe-instructions';
+import { RecipeMethod } from './recipe-method';
+import { RecipeResult } from './recipe-result';
+import { RecipeTraits } from './recipe-traits';
+import { useRecipeVisibility } from './recipe-visibility-context';
+import { EntitySprite } from './sprites';
+import { Tooltip } from './tooltip';
+import { useUrl } from './url';
 
 export interface Props {
   className?: string;
@@ -28,17 +26,15 @@ export interface Props {
   skipDefaultHeaderAction?: boolean;
 }
 
-export const Recipe = memo((props: Props): ReactElement => {
-  const {
-    className,
-    id,
-    canFavorite = true,
-    canExplore = true,
-    headerAction,
-    skipDefaultHeaderAction,
-  } = props;
-
-  const {recipeMap, entityMap} = useGameData();
+export const Recipe = memo(({
+  className,
+  id,
+  canFavorite = true,
+  canExplore = true,
+  headerAction,
+  skipDefaultHeaderAction,
+}: Props): ReactElement => {
+  const { recipeMap, entityMap } = useGameData();
   const recipe = recipeMap.get(id)!;
 
   const isFav = useIsFavorite()(id);
@@ -139,18 +135,17 @@ interface SeqStartButtonProps {
   entityId: string;
 }
 
-const SeqStartButton = memo((props: SeqStartButtonProps): ReactElement => {
-  const {entityId} = props;
-
+const SeqStartButton = memo(({
+  entityId,
+}: SeqStartButtonProps): ReactElement => {
   const url = useUrl();
-
   // TODO: Maybe use different icons for starts and elements
   return (
     <Tooltip text={FoodSequenceStartTooltip} provideLabel>
       <Link
         className='btn'
         to={url.foodSequence}
-        state={{forEntity: entityId}}
+        state={{ forEntity: entityId }}
       >
         <FoodSequenceIcon/>
       </Link>
@@ -163,9 +158,10 @@ interface SeqElemIconProps {
   seqEnd: readonly string[] | undefined;
 }
 
-const SeqElemIcon = memo((props: SeqElemIconProps): ReactElement => {
-  const {seqElem, seqEnd} = props;
-
+const SeqElemIcon = memo(({
+  seqElem,
+  seqEnd,
+}: SeqElemIconProps): ReactElement => {
   const tooltipContent = useMemo(() => <>
     {seqElem && <>
       <p>You can put this food inside:</p>
@@ -177,7 +173,7 @@ const SeqElemIcon = memo((props: SeqElemIconProps): ReactElement => {
     </>}
   </>, [seqElem, seqEnd]);
 
-  const {visible, popupRef, parentRef} = usePopupTrigger<HTMLDivElement>(
+  const { visible, popupRef, parentRef } = usePopupTrigger<HTMLDivElement>(
     'above',
     tooltipContent
   );
@@ -199,10 +195,8 @@ interface SeqElemListProps {
   sequences: readonly string[];
 }
 
-const SeqElemList = (props: SeqElemListProps): ReactNode => {
-  const {sequences} = props;
-
-  const {foodSequenceStartPoints, entityMap} = useGameData();
+const SeqElemList = ({ sequences }: SeqElemListProps): ReactNode => {
+  const { foodSequenceStartPoints, entityMap } = useGameData();
   return (
     sequences
       .flatMap(k => foodSequenceStartPoints.get(k)!)
@@ -222,9 +216,7 @@ interface ExploreButtonProps {
   id: string;
 }
 
-const ExploreButton = memo((props: ExploreButtonProps): ReactElement => {
-  const {id} = props;
-
+const ExploreButton = memo(({ id }: ExploreButtonProps): ReactElement => {
   const explore = useExploreRecipe();
   const currentRecipe = useCurrentExploredRecipe();
 

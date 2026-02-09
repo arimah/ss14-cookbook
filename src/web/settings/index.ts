@@ -1,11 +1,11 @@
-export {SettingsButton} from './button';
+export { SettingsButton } from './button';
 export {
   DefaultSettings,
   Settings,
-  SettingsUpdater,
   SettingsProvider,
   SettingsProviderProps,
+  SettingsUpdater,
   TemperatureUnitSetting,
   ThemeSetting,
-  useSettings,
+  useSettings
 } from './context';

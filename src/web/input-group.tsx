@@ -7,7 +7,7 @@ import {
   useCallback,
   useRef,
 } from 'react';
-import {combineRefs} from './helpers';
+import { combineRefs } from './helpers';
 
 export interface InputGroupProps {
   className?: string;
@@ -18,9 +18,12 @@ export interface InputGroupProps {
   }>;
 }
 
-export const InputGroup = (props: InputGroupProps): ReactElement => {
-  const {className, iconBefore, iconAfter, children} = props;
-
+export const InputGroup = ({
+  className,
+  iconBefore,
+  iconAfter,
+  children,
+}: InputGroupProps): ReactElement => {
   const inputRef = useRef<HTMLInputElement>(null);
   const handleMouseDown = useCallback((e: MouseEvent): void => {
     const input = inputRef.current;
@@ -32,7 +35,7 @@ export const InputGroup = (props: InputGroupProps): ReactElement => {
 
   const ref = combineRefs(children.props.ref, inputRef);
 
-  const childrenWithRef = cloneElement(children, {ref});
+  const childrenWithRef = cloneElement(children, { ref });
 
   return (
     <label

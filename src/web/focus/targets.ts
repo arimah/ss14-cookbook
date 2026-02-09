@@ -168,7 +168,7 @@ export const getFocusable = (
   root: Element,
   options: TargetOptions = {}
 ): Element[] => {
-  const {includeRoot = true, sorted = true} = options;
+  const { includeRoot = true, sorted = true } = options;
   const candidates = getCandidates(root, includeRoot);
   const focusable = candidates.filter(isCandidateFocusable);
 
@@ -183,7 +183,7 @@ export const getTabReachable = (
   root: Element,
   options: TargetOptions = {}
 ): Element[] => {
-  const {includeRoot = true, sorted = true} = options;
+  const { includeRoot = true, sorted = true } = options;
   const candidates = getCandidates(root, includeRoot);
   const tabReachable = candidates.filter(isCandidateTabReachable);
 

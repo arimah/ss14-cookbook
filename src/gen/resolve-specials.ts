@@ -1,4 +1,4 @@
-import {ResolvedEntity, SpecialDiet, SpecialReagent} from './types';
+import { ResolvedEntity, SpecialDiet, SpecialReagent } from './types';
 
 export type ResolvedSpecials = readonly Special[];
 
@@ -36,7 +36,7 @@ export const resolveSpecials = (
 
   for (const diet of diets) {
     // If we get this far, then the we *know* the organ must exist.
-    const {stomach} = allEntities.get(diet.organ)!;
+    const { stomach } = allEntities.get(diet.organ)!;
     const digestibleTags = stomach?.tags;
     const digestibleComps = stomach?.components;
     if (!digestibleTags || !digestibleComps) {
@@ -67,14 +67,13 @@ export const resolveSpecials = (
 
   for (const reagent of reagents) {
     const mask = 1 << result.length;
-    const {id} = reagent;
     result.push({
       mask,
       hint: reagent.hint,
       color: reagent.color,
       filterName: reagent.filterName,
       filterSummary: reagent.filterSummary,
-      entityMatches: ent => ent.reagents.has(id),
+      entityMatches: ent => ent.reagents.has(reagent.id),
     });
   }
 

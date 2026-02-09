@@ -1,9 +1,7 @@
-import {ReactElement, cloneElement} from 'react';
-
-import {combineRefs} from '../helpers';
-
-import {useManagedFocus} from './manager';
-import {ElementChild, FocusScopeBehavior} from './types';
+import { ReactElement, cloneElement } from 'react';
+import { combineRefs } from '../helpers';
+import { useManagedFocus } from './manager';
+import { ElementChild, FocusScopeBehavior } from './types';
 
 export interface FocusScopeProps {
   active?: boolean;
@@ -13,12 +11,10 @@ export interface FocusScopeProps {
 const getBehavior = (active: boolean): FocusScopeBehavior =>
   active ? FocusScopeBehavior.PASSTHRU : FocusScopeBehavior.EXCLUDE;
 
-export const FocusScope = (props: FocusScopeProps): ReactElement => {
-  const {
-    active = true,
-    children,
-  } = props;
-
+export const FocusScope = ({
+  active = true,
+  children,
+}: FocusScopeProps): ReactElement => {
   const rootRef = useManagedFocus({
     behavior: getBehavior(active),
   });

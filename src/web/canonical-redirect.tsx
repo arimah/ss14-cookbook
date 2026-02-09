@@ -1,13 +1,12 @@
-import {ReactElement, useEffect, useRef, useState} from 'react';
-import {createPortal} from 'react-dom';
-import {Link} from 'react-router';
-
-import {getPopupRoot} from './popup-impl';
-import {FocusTrap} from './focus';
-import {Tooltip} from './tooltip';
-import {ArrowRightIcon, CloseIcon, InformationIcon} from './icons';
-import {hasImportantStoredData} from './storage';
-import {useUrl} from './url';
+import { ReactElement, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Link } from 'react-router';
+import { FocusTrap } from './focus';
+import { ArrowRightIcon, CloseIcon, InformationIcon } from './icons';
+import { getPopupRoot } from './popup-impl';
+import { hasImportantStoredData } from './storage';
+import { Tooltip } from './tooltip';
+import { useUrl } from './url';
 
 export const CanonicalRedirect = (): ReactElement | null => {
   if (!CANONICAL_URL) {
@@ -79,11 +78,9 @@ interface DataMigrationNoticeProps {
   onClose: () => void;
 }
 
-const DataMigrationNotice = (
-  props: DataMigrationNoticeProps
-): ReactElement | null => {
-  const {onClose} = props;
-
+const DataMigrationNotice = ({
+  onClose,
+}: DataMigrationNoticeProps): ReactElement | null => {
   const url = useUrl();
 
   if (!hasImportantStoredData()) {

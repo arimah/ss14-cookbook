@@ -1,11 +1,10 @@
-import {ReactElement} from 'react';
+import { ReactElement } from 'react';
 
 export interface FetchErrorProps {
   message: string;
 }
 
-export const FetchError = (props: FetchErrorProps): ReactElement => {
-  const {message} = props;
+export const FetchError = ({ message }: FetchErrorProps): ReactElement => {
   return <>
     <p>{message} :(</p>
     <p>

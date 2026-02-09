@@ -1,16 +1,14 @@
-import {ReactElement, cloneElement, useRef, useEffect} from 'react';
-
-import {combineRefs} from '../helpers';
-
-import {useManagedFocus, getLastPointerDownTarget} from './manager';
-import {tryFocus, getNearestFocusable} from './utils';
+import { ReactElement, cloneElement, useEffect, useRef } from 'react';
+import { combineRefs } from '../helpers';
+import { getLastPointerDownTarget, useManagedFocus } from './manager';
 import {
   ElementChild,
   ElementSource,
-  FocusableElement,
   FocusScopeBehavior,
+  FocusableElement,
   elementFromSource,
 } from './types';
+import { getNearestFocusable, tryFocus } from './utils';
 
 export type Active = boolean | 'active' | 'paused' | 'disabled';
 
@@ -29,14 +27,12 @@ const getBehavior = (active: Active): FocusScopeBehavior =>
     ? FocusScopeBehavior.PASSTHRU
     : FocusScopeBehavior.CONTAIN;
 
-export const FocusTrap = (props: FocusTrapProps): ReactElement => {
-  const {
-    active = true,
-    return: restore = true,
-    onPointerDownOutside,
-    children,
-  } = props;
-
+export const FocusTrap = ({
+  active = true,
+  return: restore = true,
+  onPointerDownOutside,
+  children,
+}: FocusTrapProps): ReactElement => {
   const previousFocus = useRef(document.activeElement);
 
   const rootRef = useManagedFocus({
@@ -69,7 +65,7 @@ export const FocusTrap = (props: FocusTrapProps): ReactElement => {
       // When the focus scope is disabled or unmounted, we may need to
       // restore focus to the previously focused element.
       return () => {
-        const {current: returnTo} = returnTarget;
+        const { current: returnTo } = returnTarget;
         if (returnTo === false) {
           return;
         }

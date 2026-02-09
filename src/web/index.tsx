@@ -1,13 +1,12 @@
-import {ReactElement, ReactNode, useEffect, useState} from 'react';
-import {createRoot} from 'react-dom/client';
-import {RouterProvider, createBrowserRouter} from 'react-router';
-import {enableMapSet} from 'immer';
-
-import {App} from './app';
-import {AppRoutes} from './routes';
-import {SettingsProvider} from './settings';
-import {FetchError} from './fetch-error';
+import { enableMapSet } from 'immer';
+import { ReactElement, ReactNode, useEffect, useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import { RouterProvider, createBrowserRouter } from 'react-router';
+import { App } from './app';
+import { FetchError } from './fetch-error';
 import './index.css';
+import { AppRoutes } from './routes';
+import { SettingsProvider } from './settings';
 
 const IndexPath = `${BASE_PATH}/data/index.json`;
 
@@ -17,7 +16,7 @@ const ForkListLoader = (): ReactElement => {
   const [children, setChildren] = useState<ReactNode>('Loading...');
 
   useEffect(() => {
-    fetch(IndexPath, {cache: 'reload'})
+    fetch(IndexPath, { cache: 'reload' })
       .then(res => res.json())
       .then(
         index => {

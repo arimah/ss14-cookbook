@@ -1,10 +1,7 @@
-import {OneOrMoreEntities} from '../types';
-
-import {DefaultRecipeGroup, MixerCategoryToStepType} from './constants';
-import {RawGameData} from './read-raw';
-import {getReagentResult, getSolidResult} from './reaction-helpers';
-import {EntitySpawnEntry, Solution} from './components';
-import {ConstructRecipeBuilder} from './construct-recipe-builder';
+import { OneOrMoreEntities } from '../types';
+import { EntitySpawnEntry, Solution } from './components';
+import { DefaultRecipeGroup, MixerCategoryToStepType } from './constants';
+import { ConstructRecipeBuilder } from './construct-recipe-builder';
 import {
   ConstructionGraphMap,
   EntityId,
@@ -23,12 +20,14 @@ import {
   StackMap,
   TagId,
 } from './prototypes';
+import { getReagentResult, getSolidResult } from './reaction-helpers';
+import { RawGameData } from './read-raw';
 import {
-  ResolvedSpecialRecipe,
-  ResolvedEntity,
   ResolvedConstruction,
   ResolvedConstructionRecipe,
+  ResolvedEntity,
   ResolvedEntityMap,
+  ResolvedSpecialRecipe,
 } from './types';
 
 export interface PrunedGameData {
@@ -407,7 +406,7 @@ const tryAddSpecialRecipes = (
   // FoodDough can be cut into FoodDoughSlice *or* rolled into FoodDoughFlat.
   let addedAnything = false;
 
-  const {sliceableFood, construction, deepFryOutput} = entity;
+  const { sliceableFood, construction, deepFryOutput } = entity;
 
   // If this entity can be sliced to something that's used as an ingredient
   // (e.g. cheese wheel to cheese slice), then add a special recipe for it
@@ -504,7 +503,7 @@ const tryAddSpecialRecipes = (
     allEntities,
     allConstructionGraphs
   )) {
-    const {mainVerb} = recipe;
+    const { mainVerb } = recipe;
     const recipeId = mainVerb
       ? `${mainVerb}!${entity.id}`
       : `construct!${entity.id}:${recipe.solidResult}`;
@@ -701,7 +700,7 @@ function* traverseConstructionGraph(
       continue;
     }
 
-    const {steps} = edge;
+    const { steps } = edge;
     if (
       steps.length !== 1 || // No support for multi-step construction
       target.entity == null ||
@@ -797,7 +796,7 @@ const findGrindableProduceReagents = (
   entity: ResolvedEntity,
   usedReagents: Set<ReagentId>
 ): ReagentId[] | null => {
-  const {isProduce, extractable, solution} = entity;
+  const { isProduce, extractable, solution } = entity;
 
   if (
     !extractable ||
@@ -844,7 +843,7 @@ const collectFoodSequences = (
 ): FoodSequences => {
   const startPoints = new Map<TagId, EntityId[]>();
   for (const id of usedEntities.values()) {
-    const {foodSequenceStart} = allEntities.get(id)!;
+    const { foodSequenceStart } = allEntities.get(id)!;
     if (foodSequenceStart?.key) {
       appendAtKey(startPoints, foodSequenceStart.key, id);
     }
@@ -870,7 +869,7 @@ const collectFoodSequences = (
       appendAtKey(elem.final ? endPoints : elements, key, entity.id);
     }
   }
-  return {startPoints, elements, endPoints};
+  return { startPoints, elements, endPoints };
 };
 
 const appendAtKey = <K, V>(map: Map<K, V[]>, key: K, value: V): void => {

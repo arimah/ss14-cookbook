@@ -1,5 +1,5 @@
-import {Component} from './components';
-import {isPlainObject, PlainObject} from './types';
+import { Component } from './components';
+import { isPlainObject, PlainObject } from './types';
 
 declare const ProtoIdSymbol: unique symbol;
 

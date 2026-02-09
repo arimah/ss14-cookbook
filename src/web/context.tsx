@@ -6,11 +6,9 @@ import {
   useContext,
   useMemo,
 } from 'react';
-
-import {GameData, Entity, Reagent, Recipe} from '../types';
-
-import {NeutralCollator} from './helpers';
-import {SearchableRecipeData} from './types';
+import { Entity, GameData, Reagent, Recipe } from '../types';
+import { NeutralCollator } from './helpers';
+import { SearchableRecipeData } from './types';
 
 export interface GameDataProviderProps {
   forkId: string;
@@ -20,11 +18,11 @@ export interface GameDataProviderProps {
 
 const GameDataContext = createContext<SearchableRecipeData | null>(null);
 
-export const GameDataProvider = memo((
-  props: GameDataProviderProps
-): ReactElement => {
-  const {forkId, raw, children} = props;
-
+export const GameDataProvider = memo(({
+  forkId,
+  raw,
+  children,
+}: GameDataProviderProps): ReactElement => {
   const value = useMemo<SearchableRecipeData>(() => {
     const entityMap = new Map<string, Entity>();
     for (const entity of raw.entities) {

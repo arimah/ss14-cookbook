@@ -1,7 +1,6 @@
-import {ReactElement} from 'react';
-
-import {Tooltip} from '../tooltip';
-import {AddIcon, RemoveRecipeIcon} from '../icons';
+import { ReactElement } from 'react';
+import { AddIcon, RemoveRecipeIcon } from '../icons';
+import { Tooltip } from '../tooltip';
 
 export interface Props {
   id: string;
@@ -10,8 +9,12 @@ export interface Props {
   onRemove?: (id: string) => void;
 }
 
-export const RecipeAction = (props: Props): ReactElement => {
-  const {id, isSelected = false, onAdd, onRemove} = props;
+export const RecipeAction = ({
+  id,
+  isSelected = false,
+  onAdd,
+  onRemove,
+}: Props): ReactElement => {
   return isSelected ? (
     <Tooltip text='Remove recipe from menu' provideLabel>
       <button onClick={() => onRemove?.(id)}>

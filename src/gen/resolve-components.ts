@@ -1,12 +1,4 @@
-import {createDraft, Draft, finishDraft} from 'immer';
-import {RawGameData} from './read-raw';
-import {
-  EntityId,
-  EntityMap,
-  EntityPrototype,
-  FoodSequenceElementMap,
-  TagId,
-} from './prototypes';
+import { createDraft, Draft, finishDraft } from 'immer';
 import {
   ButcherableComponent,
   Component,
@@ -26,7 +18,15 @@ import {
   DefaultTotalSliceCount,
   FoodSolutionName,
 } from './constants';
-import {entityAndAncestors} from './helpers';
+import { entityAndAncestors } from './helpers';
+import {
+  EntityId,
+  EntityMap,
+  EntityPrototype,
+  FoodSequenceElementMap,
+  TagId,
+} from './prototypes';
+import { RawGameData } from './read-raw';
 import {
   ResolvedEntity,
   ResolvedEntityMap,

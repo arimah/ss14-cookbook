@@ -1,3 +1,4 @@
+import { produce } from 'immer';
 import {
   MouseEvent,
   ReactElement,
@@ -8,11 +9,9 @@ import {
   useMemo,
   useState,
 } from 'react';
-import {produce} from 'immer';
-
-import {StarOffIcon, StarOnIcon} from './icons';
-import {Tooltip} from './tooltip';
-import {FavoritesKey, useStorage} from './storage';
+import { StarOffIcon, StarOnIcon } from './icons';
+import { FavoritesKey, useStorage } from './storage';
+import { Tooltip } from './tooltip';
 
 interface FavoriteContext {
   readonly isFavorite: (id: string) => boolean;
@@ -28,11 +27,9 @@ interface FavoritesProviderProps {
   children?: ReactNode;
 }
 
-export const FavoritesProvider = (
-  props: FavoritesProviderProps
-): ReactElement => {
-  const {children} = props;
-
+export const FavoritesProvider = ({
+  children,
+}: FavoritesProviderProps): ReactElement => {
   const storage = useStorage<string[]>(FavoritesKey);
   const [favorites, setFavorites] = useState(() => {
     const favs = storage.read([]);
@@ -71,11 +68,9 @@ export interface FavoriteButtonProps {
   id: string;
 }
 
-export const FavoriteButton = memo((
-  props: FavoriteButtonProps
-): ReactElement => {
-  const {id} = props;
-
+export const FavoriteButton = memo(({
+  id,
+}: FavoriteButtonProps): ReactElement => {
   const {isFavorite, toggleFavorite} = useContext(Context);
 
   const isFav = isFavorite(id);

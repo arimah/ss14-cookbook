@@ -1,14 +1,11 @@
-import {existsSync, readFileSync} from 'fs';
-import {resolve, join as joinPath} from 'path';
-
-import {Jimp, JimpInstance, cssColorToHex} from 'jimp';
-
-import {SpritePoint, SpriteAttribution, CookingMethod} from '../types';
-
-import {ResolvedGameData} from './resolve-prototypes';
-import {ColorWhite} from './constants';
-import {readFileTextWithoutTheStupidBOM} from './helpers';
-import {ParsedColor, ResolvedEntity} from './types';
+import { Jimp, JimpInstance, cssColorToHex } from 'jimp';
+import { existsSync, readFileSync } from 'node:fs';
+import { join as joinPath, resolve } from 'node:path';
+import { CookingMethod, SpriteAttribution, SpritePoint } from '../types';
+import { ColorWhite } from './constants';
+import { readFileTextWithoutTheStupidBOM } from './helpers';
+import { ResolvedGameData } from './resolve-prototypes';
+import { ParsedColor, ResolvedEntity } from './types';
 
 export interface SpriteSheetData {
   /** Informative. */
@@ -67,7 +64,7 @@ export const buildSpriteSheet = async (
 
   const width = SpriteSize * SheetWidth;
   const height = SpriteSize * Math.ceil(spriteCount / SheetWidth);
-  const sheet = new Jimp({width, height});
+  const sheet = new Jimp({ width, height });
 
   const spriteCache = new SpriteCache(textureDir);
 
@@ -89,7 +86,7 @@ export const buildSpriteSheet = async (
   );
 
   const methods = new Map<CookingMethod, SpritePoint>(
-    Array.from(resolved.methodEntities, ([method, {id}]) =>
+    Array.from(resolved.methodEntities, ([method, { id }]) =>
       [method, spritePoints.get(entityToSpriteKey.get(id)!)!] as const
     )
   );
@@ -97,7 +94,7 @@ export const buildSpriteSheet = async (
   let microwaveRecipeTypes: Map<string, SpritePoint> | undefined;
   if (resolved.microwaveRecipeTypeEntities) {
     microwaveRecipeTypes = new Map<string, SpritePoint>(
-      Array.from(resolved.microwaveRecipeTypeEntities, ([subtype, {id}]) =>
+      Array.from(resolved.microwaveRecipeTypeEntities, ([subtype, { id }]) =>
         [subtype, spritePoints.get(entityToSpriteKey.get(id)!)!] as const
       )
     );
@@ -186,7 +183,7 @@ const toDrawableSprite = (
   entity: ResolvedEntity,
   spriteOffsets: SpriteOffsets
 ): DrawableSprite => {
-  const {sprite} = entity;
+  const { sprite } = entity;
   const basePath = sprite.path;
   const baseColor = sprite.color
     ? cssColorToHex(sprite.color)
@@ -365,7 +362,7 @@ class SpriteCache {
           }'`
         );
         // Return an empty image...
-        image = new Jimp({width: SpriteSize, height: SpriteSize});
+        image = new Jimp({ width: SpriteSize, height: SpriteSize });
       }
 
       this.data.set(key, image);

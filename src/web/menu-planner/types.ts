@@ -1,4 +1,4 @@
-import {customAlphabet} from 'nanoid';
+import { customAlphabet } from 'nanoid';
 
 export const CookingMenuVersion = 1;
 

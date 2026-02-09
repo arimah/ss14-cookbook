@@ -7,8 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
-
-import {FocusTrap} from './focus';
+import { FocusTrap } from './focus';
 
 export interface Props {
   className?: string;
@@ -31,14 +30,12 @@ export interface Separator {
   readonly separator: true;
 }
 
-export const DropdownList = memo((props: Props): ReactElement => {
-  const {
-    className,
-    initialIndex,
-    items,
-    onClose,
-  } = props;
-
+export const DropdownList = memo(({
+  className,
+  initialIndex,
+  items,
+  onClose,
+}: Props): ReactElement => {
   const [index, setIndex] = useState(initialIndex);
 
   const ref = useRef<HTMLDivElement>(null);

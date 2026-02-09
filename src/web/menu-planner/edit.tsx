@@ -1,3 +1,4 @@
+import { produce } from 'immer';
 import {
   ChangeEvent,
   ReactElement,
@@ -7,30 +8,27 @@ import {
   useRef,
   useState,
 } from 'react';
-import {createPortal} from 'react-dom';
-import {Link, useBlocker, useNavigate, useParams} from 'react-router';
-import {produce} from 'immer';
-
-import {useGameData} from '../context';
-import {ConfirmButton} from '../confirm-button';
-import {ArrowLeftIcon, SaveIcon} from '../icons';
-import {getPopupRoot} from '../popup-impl';
-import {Tooltip} from '../tooltip';
-import {useUrl} from '../url';
-import {useUniqueId} from '../helpers';
-
-import {useStoredMenus} from './storage';
-import {SelectedRecipes} from './edit-selected-recipes';
-import {IngredientList} from './edit-ingredients';
-import {findIngredients} from './ingredients';
-import {DiscardChangesDialog} from './discard-changes-dialog';
-import {MenuWarning} from './warning';
+import { createPortal } from 'react-dom';
+import { Link, useBlocker, useNavigate, useParams } from 'react-router';
+import { ConfirmButton } from '../confirm-button';
+import { useGameData } from '../context';
+import { useUniqueId } from '../helpers';
+import { ArrowLeftIcon, SaveIcon } from '../icons';
+import { getPopupRoot } from '../popup-impl';
+import { Tooltip } from '../tooltip';
+import { useUrl } from '../url';
+import { DiscardChangesDialog } from './discard-changes-dialog';
+import { IngredientList } from './edit-ingredients';
+import { SelectedRecipes } from './edit-selected-recipes';
+import { findIngredients } from './ingredients';
+import { useStoredMenus } from './storage';
 import {
   CookingMenu,
   genId,
   isReagentIngredient,
   isSolidIngredient,
 } from './types';
+import { MenuWarning } from './warning';
 
 export const MenuEditor = (): ReactElement => {
   const params = useParams();
@@ -324,39 +322,35 @@ interface ActionsProps {
   onDelete: () => void;
 }
 
-const Actions = (props: ActionsProps): ReactElement => {
-  const {isNew, isDirty, onSave, onDiscard, onDelete} = props;
-  return (
-    <div className='planner_editor-actions'>
-      <Tooltip text='Save the menu and close the editor'>
-        <button onClick={onSave}>
-          <SaveIcon/>
-          <span>Save</span>
-        </button>
-      </Tooltip>
+const Actions = ({
+  isNew,
+  isDirty,
+  onSave,
+  onDiscard,
+  onDelete,
+}: ActionsProps): ReactElement =>
+  <div className='planner_editor-actions'>
+    <Tooltip text='Save the menu and close the editor'>
+      <button onClick={onSave}>
+        <SaveIcon/>
+        <span>Save</span>
+      </button>
+    </Tooltip>
 
-      <ConfirmButton
-        tooltip={isNew
-          ? 'Discard everything and return to the list'
-          : 'Discard all changes and close the editor'
-        }
-        timeout={isDirty ? 400 : 150}
-        onClick={onDiscard}
-      >
-        Discard
+    <ConfirmButton
+      tooltip={isNew
+        ? 'Discard everything and return to the list'
+        : 'Discard all changes and close the editor'
+      }
+      timeout={isDirty ? 400 : 150}
+      onClick={onDiscard}
+    >
+      Discard
+    </ConfirmButton>
+
+    {!isNew && (
+      <ConfirmButton tooltip='Delete the menu' onClick={onDelete}>
+        Delete
       </ConfirmButton>
-
-      {!isNew && (
-        <ConfirmButton tooltip='Delete the menu' onClick={onDelete}>
-          Delete
-        </ConfirmButton>
-      )}
-    </div>
-  );
-};
-
-const unavailableRecipeWarning = (count: number) =>
-  `${count} recipe${count > 1 ? 's are' : ' is'} unavailable. ` +
-  `If you re-save the menu, the ${
-    count > 1 ? `${count} unavailable recipes` : 'unavailable recipe'
-  } will be removed.`;
+    )}
+  </div>;

@@ -1,8 +1,6 @@
-import {Draft} from 'immer';
-
-import {Entity, Reagent, Recipe} from '../../types';
-
-import {BaseIngredient, Ingredient} from './types';
+import { Draft } from 'immer';
+import { Entity, Reagent, Recipe } from '../../types';
+import { BaseIngredient, Ingredient } from './types';
 
 export const findIngredients = (
   selectedRecipes: readonly string[],
@@ -88,8 +86,8 @@ const resolveIngredient = (
       sourceOfReagent: new Set(),
     };
     ingredient = type === 'solid'
-      ? {type, entityId: id, ...baseIngredient}
-      : {type, reagentId: id, ...baseIngredient};
+      ? { type, entityId: id, ...baseIngredient }
+      : { type, reagentId: id, ...baseIngredient };
     ingredients.set(ingredientId, ingredient);
   }
   return ingredient;

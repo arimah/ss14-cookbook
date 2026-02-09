@@ -1,3 +1,4 @@
+import { Draft, produce } from 'immer';
 import {
   ReactElement,
   ReactNode,
@@ -7,11 +8,8 @@ import {
   useMemo,
   useState,
 } from 'react';
-import {Draft, produce} from 'immer';
-
-import {SavedMenusKey, useStorage} from '../storage';
-
-import {CookingMenu, SavedMenus} from './types';
+import { SavedMenusKey, useStorage } from '../storage';
+import { CookingMenu, SavedMenus } from './types';
 
 export interface StoredMenuContext {
   getAll(): readonly CookingMenu[];
@@ -35,11 +33,9 @@ export interface StoredMenuProviderProps {
   children: ReactNode;
 }
 
-export const StoredMenuProvider = memo((
-  props: StoredMenuProviderProps
-): ReactElement => {
-  const {children} = props;
-
+export const StoredMenuProvider = memo(({
+  children,
+}: StoredMenuProviderProps): ReactElement => {
   const storage = useStorage<SavedMenus>(SavedMenusKey);
   const [menus, setMenus] = useState<readonly CookingMenu[]>(() => {
     const stored = storage.read(EmptyMenus);
@@ -48,7 +44,7 @@ export const StoredMenuProvider = memo((
 
   const value = useMemo<StoredMenuContext>(() => {
     const update = (nextMenus: readonly CookingMenu[]) => {
-      storage.write({menus: nextMenus});
+      storage.write({ menus: nextMenus });
       setMenus(nextMenus);
     };
     return {

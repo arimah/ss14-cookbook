@@ -1,11 +1,10 @@
-import {ReactElement, ReactNode, useEffect, useState} from 'react';
-import {Link, useSearchParams} from 'react-router';
-
-import {Notice} from '../notices';
-import {ArrowRightIcon} from '../icons';
-import {useUrl} from '../url';
-import {intersperse, joinListNatural} from '../helpers';
-import {AllStorageKeys} from '../storage';
+import { ReactElement, ReactNode, useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router';
+import { intersperse, joinListNatural } from '../helpers';
+import { ArrowRightIcon } from '../icons';
+import { Notice } from '../notices';
+import { AllStorageKeys } from '../storage';
+import { useUrl } from '../url';
 
 type ImportState =
   | LoadingState
@@ -18,17 +17,17 @@ type ImportState =
 interface LoadingState {
   readonly type: 'loading';
 }
-const LoadingState: LoadingState = {type: 'loading'};
+const LoadingState: LoadingState = { type: 'loading' };
 
 interface MissingDataState {
   readonly type: 'missingData';
 }
-const MissingDataState: MissingDataState = {type: 'missingData'};
+const MissingDataState: MissingDataState = { type: 'missingData' };
 
 interface SuccessState {
   readonly type: 'success';
 }
-const SuccessState: SuccessState = {type: 'success'};
+const SuccessState: SuccessState = { type: 'success' };
 
 interface UntrustedDataState {
   readonly type: 'untrustedData';
@@ -82,7 +81,7 @@ export const ImportSection = (): ReactElement => {
       </>;
       break;
     case 'untrustedData': {
-      const {data} = state;
+      const { data } = state;
       children = <>
         <Notice kind='warning'>
           Couldn’t verify this data came from a trusted source.
@@ -194,7 +193,7 @@ const prepareImport = (query: URLSearchParams): ImportState => {
   if (isTrustedReferrer()) {
     return performImport(data) ?? SuccessState;
   }
-  return {type: 'untrustedData', data};
+  return { type: 'untrustedData', data };
 };
 
 const performImport = (data: Record<string, unknown>): SuccessState | ErrorState => {

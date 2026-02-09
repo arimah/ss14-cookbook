@@ -1,10 +1,8 @@
-import {RefObject, useMemo, useEffect} from 'react';
-
-import {useUniqueId} from '../helpers';
-
-import {getTabReachable} from './targets';
-import {tryFocus, getNearestFocusable} from './utils';
-import {FocusScopeProps, FocusScopeBehavior} from './types';
+import { RefObject, useEffect, useMemo } from 'react';
+import { useUniqueId } from '../helpers';
+import { getTabReachable } from './targets';
+import { FocusScopeBehavior, FocusScopeProps } from './types';
+import { getNearestFocusable, tryFocus } from './utils';
 
 // Some notes on the tab handling.
 //
@@ -139,7 +137,7 @@ const manager = (() => {
         }
       }
 
-      scopeGroups = {contain, exclude};
+      scopeGroups = { contain, exclude };
     }
     return scopeGroups;
   };
@@ -161,7 +159,7 @@ const manager = (() => {
   const classifyElement = (
     element: Element
   ): 'valid' | 'outside-contain' | 'inside-exclude' => {
-    const {contain, exclude} = getScopeGroups();
+    const { contain, exclude } = getScopeGroups();
     if (
       contain.length > 0 &&
       !contain.some(e => e.root && e.root.contains(element))
@@ -180,7 +178,7 @@ const manager = (() => {
   };
 
   const getCurrentTabGroups = (): TabGroup[] => {
-    const {contain, exclude} = getScopeGroups();
+    const { contain, exclude } = getScopeGroups();
 
     const containRoots = getScopeRoots(contain);
     const excludeRoots = getScopeRoots(exclude);
@@ -256,8 +254,8 @@ const manager = (() => {
   };
 
   const emitPointerDownOutside = (target: Element) => {
-    const {contain} = getScopeGroups();
-    contain.forEach(({onPointerDownOutside}) => {
+    const { contain } = getScopeGroups();
+    contain.forEach(({ onPointerDownOutside }) => {
       if (onPointerDownOutside) {
         onPointerDownOutside(target);
       }
@@ -285,7 +283,7 @@ const manager = (() => {
     // be inside one of those scopes, it must also be focusable. Otherwise
     // we will end up focusing the body, which means keyboard shortcuts
     // attached to the scope will cease to work.
-    const {contain} = getScopeGroups();
+    const { contain } = getScopeGroups();
     let isValidTarget: boolean;
     if (contain.length > 0) {
       const nearestFocusable = getNearestFocusable(target);

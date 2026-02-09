@@ -7,16 +7,12 @@ import {
   useRef,
   useState,
 } from 'react';
-import {useLocation, useNavigate} from 'react-router';
-
-import {MicrowaveRecipeType, Recipe as RecipeData} from '../../types';
-
-import {useGameData} from '../context';
-import {Recipe} from '../recipe';
-import {RecipeVisibilityProvider} from '../recipe-visibility-context';
-import {InputGroup} from '../input-group';
-import {Dropdown, DropdownExtraItem, DropdownOption} from '../dropdown';
-import {Tooltip} from '../tooltip';
+import { useLocation, useNavigate } from 'react-router';
+import { MicrowaveRecipeType, Recipe as RecipeData } from '../../types';
+import { useGameData } from '../context';
+import { Dropdown, DropdownExtraItem, DropdownOption } from '../dropdown';
+import { useIsFavorite } from '../favorites';
+import { joinListNatural } from '../helpers';
 import {
   ClearFilterIcon,
   FilterActiveIcon,
@@ -24,34 +20,35 @@ import {
   SearchIcon,
   SortIcon,
 } from '../icons';
+import { InputGroup } from '../input-group';
+import { Recipe } from '../recipe';
+import { RecipeVisibilityProvider } from '../recipe-visibility-context';
 import {
-  compareDefault,
-  compareByName,
-  compareByMethod,
-  compareByFav,
   chainCompare,
+  compareByFav,
+  compareByMethod,
+  compareByName,
+  compareDefault,
 } from '../sort';
-import {useIsFavorite} from '../favorites';
-import {joinListNatural} from '../helpers';
-import {DisplayMethod} from '../types';
-
+import { Tooltip } from '../tooltip';
+import { DisplayMethod } from '../types';
 import {
-  RecipeFilter,
   InitialFilter,
-  isFilterActive,
+  RecipeFilter,
   applyFilter,
+  isFilterActive,
   searchByName,
 } from './filter';
-import {FilterEditor} from './filter-editor';
-import {IngredientSuggestions} from './ingredient-filter';
+import { FilterEditor } from './filter-editor';
+import { IngredientSuggestions } from './ingredient-filter';
 
-export {searchByName};
+export { searchByName };
 
 type SortOrder = 'default' | 'alpha';
 
 const SortOptions: DropdownOption[] = [
-  {value: 'default', name: 'Default order'},
-  {value: 'alpha', name: 'Alphabetic'},
+  { value: 'default', name: 'Default order' },
+  { value: 'alpha', name: 'Alphabetic' },
 ];
 
 export const RecipeList = memo((): ReactElement => {
@@ -245,10 +242,13 @@ interface ResultCountProps {
   totalCount: number;
 }
 
-const ResultCount = (props: ResultCountProps): ReactElement => {
-  const {search, filter, resultCount, totalCount} = props;
-
-  const {microwaveRecipeTypes, specialTraits} = useGameData();
+const ResultCount = ({
+  search,
+  filter,
+  resultCount,
+  totalCount,
+}: ResultCountProps): ReactElement => {
+  const { microwaveRecipeTypes, specialTraits } = useGameData();
 
   const isFiltered = isFilterActive(filter) || resultCount !== totalCount;
 

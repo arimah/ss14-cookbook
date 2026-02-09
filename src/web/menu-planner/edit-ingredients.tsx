@@ -1,17 +1,15 @@
-import {ReactElement, memo, useMemo} from 'react';
-
-import {useGameData} from '../context';
-import {Recipe} from '../recipe';
-import {Tooltip} from '../tooltip';
-import {getPopupRoot, usePopupTrigger} from '../popup-impl';
-import {getRecipeName} from '../sort';
-import {AddIcon, EyeIcon, EyeOffIcon, InformationIcon} from '../icons';
-import {EntitySprite, ReagentSprite} from '../sprites';
-import {NeutralCollator, dedupe} from '../helpers';
-
-import {ingredientName} from './ingredients';
-import {Ingredient} from './types';
-import {createPortal} from 'react-dom';
+import { ReactElement, memo, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { useGameData } from '../context';
+import { NeutralCollator, dedupe } from '../helpers';
+import { AddIcon, EyeIcon, EyeOffIcon, InformationIcon } from '../icons';
+import { getPopupRoot, usePopupTrigger } from '../popup-impl';
+import { Recipe } from '../recipe';
+import { getRecipeName } from '../sort';
+import { EntitySprite, ReagentSprite } from '../sprites';
+import { Tooltip } from '../tooltip';
+import { ingredientName } from './ingredients';
+import { Ingredient } from './types';
 
 export interface Props {
   availableIngredients: readonly Ingredient[];
@@ -20,15 +18,13 @@ export interface Props {
   onAddRecipe: (id: string) => void;
 }
 
-export const IngredientList = memo((props: Props): ReactElement => {
-  const {
-    availableIngredients,
-    hiddenIngredients,
-    onToggleVisible,
-    onAddRecipe,
-  } = props;
-
-  const {entityMap, reagentMap} = useGameData();
+export const IngredientList = memo(({
+  availableIngredients,
+  hiddenIngredients,
+  onToggleVisible,
+  onAddRecipe,
+}: Props): ReactElement => {
+  const { entityMap, reagentMap } = useGameData();
 
   const sortedIngredients = useMemo(() => {
     return availableIngredients.slice(0).sort((a, b) => {
@@ -66,10 +62,13 @@ interface IngredientProps {
   onAddRecipe: (id: string) => void;
 }
 
-const Ingredient = memo((props: IngredientProps): ReactElement => {
-  const {ingredient, visible, onToggleVisible, onAddRecipe} = props;
-
-  const {recipeMap, entityMap, reagentMap} = useGameData();
+const Ingredient = memo(({
+  ingredient,
+  visible,
+  onToggleVisible,
+  onAddRecipe,
+}: IngredientProps): ReactElement => {
+  const { recipeMap, entityMap, reagentMap } = useGameData();
 
   const sourceOfText = useMemo(() => {
     if (ingredient.sourceOfReagent.size === 0) {
@@ -149,10 +148,13 @@ interface AddRecipeButtonProps {
   onAdd: (id: string) => void;
 }
 
-const AddRecipeButton = memo((props: AddRecipeButtonProps): ReactElement => {
-  const {recipeId, index, totalCount, onAdd} = props;
-
-  const {parentRef, popupRef, visible} = usePopupTrigger<
+const AddRecipeButton = memo(({
+  recipeId,
+  index,
+  totalCount,
+  onAdd,
+}: AddRecipeButtonProps): ReactElement => {
+  const { parentRef, popupRef, visible } = usePopupTrigger<
     HTMLDivElement,
     HTMLButtonElement
   >('above');

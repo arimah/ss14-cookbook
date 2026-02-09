@@ -1,14 +1,12 @@
-import {MouseEvent, ReactElement, ReactNode, memo, useMemo} from 'react';
-import {Link, Outlet, useMatches} from 'react-router';
-
-import {ForkData} from '../types';
-
-import {useFork} from './fork-context';
-import {UrlGenerator, useUrl} from './url';
-import {Dropdown, DropdownOption} from './dropdown';
-import {SettingsButton} from './settings';
-import {NoticeList} from './notices';
-import {RouteHandle} from './routes';
+import { MouseEvent, ReactElement, ReactNode, memo, useMemo } from 'react';
+import { Link, Outlet, useMatches } from 'react-router';
+import { ForkData } from '../types';
+import { Dropdown, DropdownOption } from './dropdown';
+import { useFork } from './fork-context';
+import { NoticeList } from './notices';
+import { RouteHandle } from './routes';
+import { SettingsButton } from './settings';
+import { UrlGenerator, useUrl } from './url';
 
 interface HeaderTab {
   readonly id: string;
@@ -35,7 +33,7 @@ const HeaderTabs: readonly HeaderTab[] = [
 ];
 
 export const Cookbook = (): ReactElement => {
-  const {fork, allForks, setFork} = useFork();
+  const { fork, allForks, setFork } = useFork();
 
   const routes = useMatches();
   const url = useUrl();
@@ -69,8 +67,11 @@ interface TabProps {
   children: ReactNode;
 }
 
-const Tab = memo((props: TabProps): ReactElement => {
-  const {target, selected, children} = props;
+const Tab = memo(({
+  target,
+  selected,
+  children,
+}: TabProps): ReactElement => {
   return (
     <Link
       to={target}
@@ -100,9 +101,11 @@ interface ForkSwitcherProps {
   onSetFork: (value: string) => void;
 }
 
-const ForkSwitcher = memo((props: ForkSwitcherProps): ReactElement => {
-  const {value, allForks, onSetFork} = props;
-
+const ForkSwitcher = memo(({
+  value,
+  allForks,
+  onSetFork,
+}: ForkSwitcherProps): ReactElement => {
   const options = useMemo<DropdownOption[]>(() => {
     return allForks
       .filter(data => !data.hidden || data.id === value)

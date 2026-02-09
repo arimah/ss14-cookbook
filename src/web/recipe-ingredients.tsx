@@ -1,11 +1,9 @@
-import {ReactElement, memo} from 'react';
-
-import {ReagentIngredient as ReagentIngredientData} from '../types';
-
-import {useGameData} from './context';
-import {EntitySprite, ReagentSprite} from './sprites';
-import {RecipePopup} from './recipe-popup';
-import {Tooltip} from './tooltip';
+import { ReactElement, memo } from 'react';
+import { ReagentIngredient as ReagentIngredientData } from '../types';
+import { useGameData } from './context';
+import { RecipePopup } from './recipe-popup';
+import { EntitySprite, ReagentSprite } from './sprites';
+import { Tooltip } from './tooltip';
 
 export interface RecipeIngredientsProps {
   visible: boolean;
@@ -15,11 +13,11 @@ export interface RecipeIngredientsProps {
 
 const IngredientSpriteHeight = 32;
 
-export const RecipeIngredients = memo((
-  props: RecipeIngredientsProps
-): ReactElement => {
-  const {visible, solids, reagents} = props;
-
+export const RecipeIngredients = memo(({
+  visible,
+  solids,
+  reagents,
+}: RecipeIngredientsProps): ReactElement => {
   if (!visible) {
     const ingredientCount =
       Object.keys(solids).length +
@@ -56,10 +54,11 @@ export interface SolidIngredientProps {
   qty?: number;
 }
 
-export const SolidIngredient = (props: SolidIngredientProps): ReactElement => {
-  const {id, qty} = props;
-
-  const {entityMap, recipesBySolidResult} = useGameData();
+export const SolidIngredient = ({
+  id,
+  qty,
+}: SolidIngredientProps): ReactElement => {
+  const { entityMap, recipesBySolidResult } = useGameData();
   const entity = entityMap.get(id)!;
   const relatedRecipes = recipesBySolidResult.get(id);
 
@@ -87,12 +86,12 @@ export interface ReagentIngredientProps {
   catalyst?: boolean;
 }
 
-export const ReagentIngredient = (
-  props: ReagentIngredientProps
-): ReactElement => {
-  const {id, amount, catalyst = false} = props;
-
-  const {reagentMap, recipesByReagentResult} = useGameData();
+export const ReagentIngredient = ({
+  id,
+  amount,
+  catalyst = false,
+}: ReagentIngredientProps): ReactElement => {
+  const { reagentMap, recipesByReagentResult } = useGameData();
   const reagent = reagentMap.get(id)!;
   const relatedRecipes = recipesByReagentResult.get(id);
 

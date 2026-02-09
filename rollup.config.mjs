@@ -1,14 +1,13 @@
-import fs, {readFileSync} from 'fs';
-
 import commonjs from '@rollup/plugin-commonjs';
+import html from '@rollup/plugin-html';
 import json from '@rollup/plugin-json';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
-import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
-import postcss from 'rollup-plugin-postcss';
-import html from '@rollup/plugin-html';
+import typescript from '@rollup/plugin-typescript';
+import fs, { readFileSync } from 'node:fs';
 import postcssNested from 'postcss-nested';
+import postcss from 'rollup-plugin-postcss';
 
 const dir = import.meta.dirname;
 const pkg = JSON.parse(fs.readFileSync(`${dir}/package.json`, {
@@ -150,7 +149,7 @@ export default [
       html({
         publicPath: basePath,
         fileName: 'index.html',
-        template: ({files}) => {
+        template: ({ files }) => {
           let entries = [];
           let assets = [];
           for (const [kind, chunks] of Object.entries(files)) {
@@ -164,7 +163,7 @@ export default [
             }
           }
 
-          const src = readFileSync('./src/index.html', {encoding: 'utf-8'});
+          const src = readFileSync('./src/index.html', { encoding: 'utf-8' });
           const varPattern = /(^[ \t]*)?__([A-Z0-9_]+)__/gi;
           return src.replace(varPattern, (_m, indent, name) => {
             indent = indent || '';

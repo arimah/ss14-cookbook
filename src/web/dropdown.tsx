@@ -6,9 +6,8 @@ import {
   useMemo,
   useState,
 } from 'react';
-
-import {DropdownIcon} from './icons';
-import {DropdownList, DropdownListItem} from './dropdown-list';
+import { DropdownList, DropdownListItem } from './dropdown-list';
+import { DropdownIcon } from './icons';
 
 export interface Props {
   className?: string;
@@ -33,17 +32,15 @@ export interface DropdownExtraItem {
   readonly activate: (close: () => void) => void;
 }
 
-export const Dropdown = (props: Props): ReactElement => {
-  const {
-    className,
-    icon,
-    value,
-    options,
-    prefix,
-    extraItems,
-    onChange,
-  } = props;
-
+export const Dropdown = ({
+  className,
+  icon,
+  value,
+  options,
+  prefix,
+  extraItems,
+  onChange,
+}: Props): ReactElement => {
   const [open, setOpen] = useState(false);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -88,7 +85,7 @@ export const Dropdown = (props: Props): ReactElement => {
       },
     }));
     if (extraItems && extraItems.length > 0) {
-      items.push({separator: true});
+      items.push({ separator: true });
       items = items.concat(extraItems);
     }
     return items;

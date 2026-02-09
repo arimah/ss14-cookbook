@@ -1,9 +1,7 @@
-import {resolve} from 'path';
-
-import {CollectionTag, YAMLMap, Scalar, parse} from 'yaml';
-import {globSync} from 'glob';
-
-import {readFileTextWithoutTheStupidBOM} from './helpers';
+import { globSync } from 'glob';
+import { resolve } from 'node:path';
+import { CollectionTag, Scalar, YAMLMap, parse } from 'yaml';
+import { readFileTextWithoutTheStupidBOM } from './helpers';
 import {
   ConstructionGraphId,
   ConstructionGraphMap,
@@ -72,7 +70,7 @@ const customTags: CollectionTag[] = [
 ];
 
 export const findResourceFiles = (prototypeDir: string): string[] =>
-  globSync('**/*.yml', {cwd: prototypeDir})
+  globSync('**/*.yml', { cwd: prototypeDir })
     .map(filePath => resolve(prototypeDir, filePath))
 
 export const readRawGameData = (yamlPaths: string[]): RawGameData => {

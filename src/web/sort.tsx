@@ -1,7 +1,6 @@
-import {Entity, Reagent, Recipe} from '../types';
-
-import {displayMethod, NeutralCollator} from './helpers';
-import {DisplayMethod} from './types';
+import { Entity, Reagent, Recipe } from '../types';
+import { displayMethod, NeutralCollator } from './helpers';
+import { DisplayMethod } from './types';
 
 export type CompareFn = (a: Recipe, b: Recipe) => number;
 

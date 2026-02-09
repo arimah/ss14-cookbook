@@ -1,10 +1,9 @@
-import {ReactElement, ReactNode, useEffect, useState} from 'react';
-
-import {ArrowRightIcon} from '../icons';
-import {Notice} from '../notices';
-import {UrlGenerator, useUrl} from '../url';
-import {AllStorageKeys} from '../storage';
-import {intersperse} from '../helpers';
+import { ReactElement, ReactNode, useEffect, useState } from 'react';
+import { intersperse } from '../helpers';
+import { ArrowRightIcon } from '../icons';
+import { Notice } from '../notices';
+import { AllStorageKeys } from '../storage';
+import { UrlGenerator, useUrl } from '../url';
 
 type ExportState =
   | NotAvailableState
@@ -18,22 +17,22 @@ type ExportState =
 interface NotAvailableState {
   readonly type: 'notAvailable';
 }
-const NotAvailableState: NotAvailableState = {type: 'notAvailable'};
+const NotAvailableState: NotAvailableState = { type: 'notAvailable' };
 
 interface AlreadyCanonicalState {
   readonly type: 'alreadyCanonical';
 }
-const AlreadyCanonicalState: AlreadyCanonicalState = {type: 'alreadyCanonical'};
+const AlreadyCanonicalState: AlreadyCanonicalState = { type: 'alreadyCanonical' };
 
 interface LoadingState {
   readonly type: 'loading';
 }
-const LoadingState: LoadingState = {type: 'loading'};
+const LoadingState: LoadingState = { type: 'loading' };
 
 interface NoDataState {
   readonly type: 'noData';
 }
-const NoDataState: NoDataState = {type: 'noData'};
+const NoDataState: NoDataState = { type: 'noData' };
 
 interface ReadyState {
   readonly type: 'ready';
@@ -180,10 +179,10 @@ const prepareExport = (url: UrlGenerator): ExportState => {
     : null;
 
   if (failedKeys.length > 0) {
-    return {type: 'error', failedKeys, targetUrl};
+    return { type: 'error', failedKeys, targetUrl };
   }
   if (!targetUrl) {
     return NoDataState;
   }
-  return {type: 'ready', targetUrl};
+  return { type: 'ready', targetUrl };
 };

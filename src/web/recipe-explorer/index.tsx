@@ -1,19 +1,22 @@
-import {ReactElement, ReactNode, useContext, useEffect, useState} from 'react';
-
 import {
-  ExploreRecipeFn,
+  ReactElement,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
+import {
   ExploreFnContext,
+  ExploreRecipeFn,
   ExploredRecipeContext,
 } from './context';
-import {RecipeExplorer} from './explorer';
+import { RecipeExplorer } from './explorer';
 
 export interface Props {
   children: ReactNode;
 }
 
-export const RecipeExplorerProvider = (props: Props): ReactElement => {
-  const {children} = props;
-
+export const RecipeExplorerProvider = ({ children }: Props): ReactElement => {
   const [currentRecipe, setCurrentRecipe] = useState<string | null>(null);
 
   useEffect(() => {

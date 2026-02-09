@@ -1,5 +1,5 @@
-import {isFocusableElement} from './types';
-import {isFocusable} from './targets';
+import { isFocusable } from './targets';
+import { isFocusableElement } from './types';
 
 export const tryFocus = (...elements: (Element | null)[]): void => {
   for (const element of elements) {
@@ -33,7 +33,7 @@ export const getNearestFocusable = (
     return element;
   }
   if (element.tagName === 'LABEL') {
-    const {control} = element as HTMLLabelElement;
+    const { control } = element as HTMLLabelElement;
     // The associated control may be disabled.
     if (control && isFocusable(control)) {
       return control;

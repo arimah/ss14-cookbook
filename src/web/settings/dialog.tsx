@@ -1,17 +1,15 @@
-import {KeyboardEvent, ReactElement, useCallback} from 'react';
-
-import {FocusTrap} from '../focus';
-
-import {Option, OptionGroup} from './option-group';
-import {TemperatureUnitSetting, ThemeSetting, useSettings} from './context';
+import { KeyboardEvent, ReactElement, useCallback } from 'react';
+import { FocusTrap } from '../focus';
+import { TemperatureUnitSetting, ThemeSetting, useSettings } from './context';
+import { Option, OptionGroup } from './option-group';
 
 export interface SettingsDialogProps {
   onClose: () => void;
 }
 
-export const SettingsDialog = (props: SettingsDialogProps): ReactElement => {
-  const {onClose} = props;
-
+export const SettingsDialog = ({
+  onClose,
+}: SettingsDialogProps): ReactElement => {
   const [settings, update] = useSettings();
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {

@@ -5,7 +5,7 @@ import {
   useContext,
   useMemo,
 } from 'react';
-import {useSearchParams} from 'react-router';
+import { useSearchParams } from 'react-router';
 
 export interface UrlGenerator {
   readonly recipes: string;
@@ -28,9 +28,7 @@ export interface UrlProviderProps {
   children: ReactNode;
 }
 
-export const UrlProvider = (props: UrlProviderProps): ReactElement => {
-  const {children} = props;
-
+export const UrlProvider = ({ children }: UrlProviderProps): ReactElement => {
   const [query] = useSearchParams();
   const urlGenerator = useMemo<UrlGenerator>(() => ({
     recipes: withFork('/', query),

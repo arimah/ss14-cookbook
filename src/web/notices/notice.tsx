@@ -1,9 +1,7 @@
-import {ReactElement, ReactNode, memo, useContext} from 'react';
-
-import {Tooltip} from '../tooltip';
-import {InformationIcon, WarningIcon, ErrorIcon, CloseIcon} from '../icons';
-
-import {NoticesContext} from './context';
+import { ReactElement, ReactNode, memo, useContext } from 'react';
+import { CloseIcon, ErrorIcon, InformationIcon, WarningIcon } from '../icons';
+import { Tooltip } from '../tooltip';
+import { NoticesContext } from './context';
 
 export interface Props {
   id?: string;
@@ -18,9 +16,12 @@ const Icons = {
   error: <ErrorIcon/>,
 } as const;
 
-export const Notice = memo((props: Props): ReactElement | null => {
-  const {id, kind = 'info', icon, children} = props;
-
+export const Notice = memo(({
+  id,
+  kind = 'info',
+  icon,
+  children,
+}: Props): ReactElement | null => {
   const context = useContext(NoticesContext);
   if (id != null && context.isDismissed(id)) {
     return null;

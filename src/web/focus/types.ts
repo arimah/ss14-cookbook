@@ -1,4 +1,4 @@
-import {ReactElement, Ref, RefObject} from 'react';
+import { ReactElement, Ref, RefObject } from 'react';
 
 export type ElementChild = ReactElement<{
   ref?: Ref<Element>;

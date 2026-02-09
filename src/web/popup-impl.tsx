@@ -1,10 +1,10 @@
 import {
   Dispatch,
-  SetStateAction,
   Ref,
-  useState,
-  useRef,
+  SetStateAction,
   useEffect,
+  useRef,
+  useState,
 } from 'react';
 
 export type PopupPlacement =
@@ -72,7 +72,7 @@ export function usePopupTrigger<
       return;
     }
 
-    const {x, y} = placePopup(
+    const { x, y } = placePopup(
       placement,
       parent.getBoundingClientRect(),
       popup.getBoundingClientRect()
@@ -82,7 +82,7 @@ export function usePopupTrigger<
     popup.style.top = `${Math.round(y)}px`;
   }, [open, placement, parent, content]);
 
-  return {visible: open, popupRef, parentRef: setParent};
+  return { visible: open, popupRef, parentRef: setParent };
 }
 
 type TriggerElement = HTMLElement | SVGElement;
@@ -239,7 +239,7 @@ export function placePopup(
     window.innerHeight - popupRect.height - screenMargin
   );
 
-  return {x, y};
+  return { x, y };
 }
 
 function clamp(value: number, min: number, max: number): number {

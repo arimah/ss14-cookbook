@@ -1,19 +1,17 @@
-import {ReactElement, memo} from 'react';
-
-import {useGameData} from '../context';
-
-import {RawSprite} from './raw';
+import { ReactElement, memo } from 'react';
+import { useGameData } from '../context';
+import { RawSprite } from './raw';
 
 export interface ReagentSpriteProps {
   id: string;
 }
 
-export const ReagentSprite = memo((props: ReagentSpriteProps): ReactElement => {
-  const {id} = props;
-
+export const ReagentSprite = memo(({
+  id,
+}: ReagentSpriteProps): ReactElement => {
   const {
     reagentMap,
-    methodSprites: {mix: beakerPosition},
+    methodSprites: { mix: beakerPosition },
     beakerFill,
   } = useGameData();
 

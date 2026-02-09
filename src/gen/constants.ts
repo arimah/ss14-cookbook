@@ -1,5 +1,5 @@
-import {SimpleInteractionStep, SpritePoint} from '../types';
-import {ParsedColor} from './types';
+import { SimpleInteractionStep } from '../types';
+import { ParsedColor } from './types';
 
 /**
  * MUST MIRROR C#! This matches the default value of the field

@@ -1,19 +1,17 @@
-import {ReactElement, memo, useMemo} from 'react';
-
-import {Entity} from '../../types';
-
-import {EntitySprite} from '../sprites';
-import {useGameData} from '../context';
-import {RecipePopup} from '../recipe-popup';
-import {NeutralCollator} from '../helpers';
+import { ReactElement, memo, useMemo } from 'react';
+import { Entity } from '../../types';
+import { useGameData } from '../context';
+import { NeutralCollator } from '../helpers';
+import { RecipePopup } from '../recipe-popup';
+import { EntitySprite } from '../sprites';
 
 export interface SeqStartPointProps {
   entity: Entity;
 }
 
-export const SeqStartPoint = memo((props: SeqStartPointProps): ReactElement => {
-  const {entity} = props;
-
+export const SeqStartPoint = memo(({
+  entity,
+}: SeqStartPointProps): ReactElement => {
   const {
     recipesBySolidResult,
     foodSequenceElements,
@@ -72,10 +70,8 @@ interface SeqElementProps {
   id: string;
 }
 
-const SeqElement = (props: SeqElementProps): ReactElement => {
-  const {id} = props;
-
-  const {recipesBySolidResult, entityMap} = useGameData();
+const SeqElement = ({ id }: SeqElementProps): ReactElement => {
+  const { recipesBySolidResult, entityMap } = useGameData();
 
   const entity = entityMap.get(id)!;
   const recipe = recipesBySolidResult.get(entity.id);

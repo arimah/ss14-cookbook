@@ -4,8 +4,7 @@ import {
   ReagentIngredient,
   Recipe,
 } from '../types';
-
-import {EntitySpawnEntry, Solution} from './components';
+import { EntitySpawnEntry, Solution } from './components';
 import {
   ConstructionGraphId,
   EntityId,

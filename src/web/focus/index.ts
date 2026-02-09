@@ -1,9 +1,9 @@
-export {FocusScope, FocusScopeProps} from './focus-scope';
-export {FocusTrap, FocusTrapProps, Active} from './focus-trap';
+export { FocusScope, FocusScopeProps } from './focus-scope';
+export { Active, FocusTrap, FocusTrapProps } from './focus-trap';
+export { disableFocusManager, enableFocusManager } from './manager';
 export {
-  TargetOptions,
-  sortByTabOrder,
   getFocusable,
   getTabReachable,
+  sortByTabOrder,
+  TargetOptions,
 } from './targets';
-export {disableFocusManager, enableFocusManager} from './manager';

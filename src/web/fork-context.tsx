@@ -5,8 +5,7 @@ import {
   useContext,
   useMemo,
 } from 'react';
-
-import {ForkData} from '../types';
+import { ForkData } from '../types';
 
 export interface ForkContextType {
   readonly fork: string;
@@ -27,8 +26,12 @@ export interface ForkProviderProps {
   children: ReactNode;
 }
 
-export const ForkProvider = (props: ForkProviderProps): ReactElement => {
-  const {fork, allForks, setFork, children} = props;
+export const ForkProvider = ({
+  fork,
+  allForks,
+  setFork,
+  children,
+}: ForkProviderProps): ReactElement => {
   const value = useMemo(() => ({
     fork,
     allForks,

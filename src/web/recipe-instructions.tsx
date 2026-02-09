@@ -1,5 +1,4 @@
-import {ReactElement, memo} from 'react';
-
+import { ReactElement, memo } from 'react';
 import {
   AddReagentStep,
   AddStep,
@@ -12,25 +11,24 @@ import {
   SimpleInteractionStep,
   StartStep,
 } from '../types';
-
-import {useGameData} from './context';
-import {RawSprite} from './sprites';
+import { useGameData } from './context';
 import {
   ReagentIngredient,
   RecipeIngredients,
   SolidIngredient,
 } from './recipe-ingredients';
-import {Temperature} from './temperature';
+import { RawSprite } from './sprites';
+import { Temperature } from './temperature';
 
 export interface RecipeInstructionsProps {
   steps: readonly ConstructionStep[];
   visible: boolean;
 }
 
-export const RecipeInstructions = memo((
-  props: RecipeInstructionsProps
-): ReactElement => {
-  const {visible, steps} = props;
+export const RecipeInstructions = memo(({
+  steps,
+  visible,
+}: RecipeInstructionsProps): ReactElement => {
   return (
     <ol className='recipe_instructions'>
       {steps.map((step, i) =>
@@ -45,8 +43,7 @@ interface StepProps {
   visible: boolean;
 }
 
-const Step = (props: StepProps): ReactElement => {
-  const {step, visible} = props;
+const Step = ({ step, visible }: StepProps): ReactElement => {
   switch (step.type) {
     case 'start':
       return <StartStep step={step}/>;
@@ -76,21 +73,16 @@ interface StartStepProps {
   step: StartStep;
 }
 
-const StartStep = (props: StartStepProps): ReactElement => {
-  const {step} = props;
-  return (
-    <li className='recipe_step recipe_step--compact'>
-      Take <SolidIngredient id={step.entity}/>
-    </li>
-  );
-};
+const StartStep = ({ step }: StartStepProps): ReactElement =>
+  <li className='recipe_step recipe_step--compact'>
+    Take <SolidIngredient id={step.entity}/>
+  </li>;
 
 interface EndStepProps {
   step: EndStep;
 }
 
-const EndStep = (props: EndStepProps): ReactElement => {
-  const {step} = props;
+const EndStep = ({ step }: EndStepProps): ReactElement => {
   if (typeof step.entity === 'string') {
     return (
       <li className='recipe_step recipe_step--compact'>
@@ -112,9 +104,7 @@ interface MixStepProps {
   visible: boolean;
 }
 
-const MixStep = (props: MixStepProps): ReactElement => {
-  const {step, visible} = props;
-
+const MixStep = ({ step, visible }: MixStepProps): ReactElement => {
   // Slightly more compact view if there's only one ingredient.
   // I really wish JS had a better way of traversing objects.
   const keys = Object.keys(step.reagents);
@@ -149,9 +139,7 @@ interface AddStepProps {
   step: AddStep;
 }
 
-const AddStep = (props: AddStepProps): ReactElement => {
-  const {step} = props;
-
+const AddStep = ({ step }: AddStepProps): ReactElement => {
   let text: string;
   if (step.minCount) {
     if (step.maxCount) {
@@ -191,9 +179,7 @@ interface AddReagentStepProps {
   step: AddReagentStep;
 }
 
-const AddReagentStep = (props: AddReagentStepProps): ReactElement => {
-  const {step} = props;
-
+const AddReagentStep = ({ step }: AddReagentStepProps): ReactElement => {
   const amount = step.minCount !== step.maxCount
     ? [step.minCount, step.maxCount] as const
     : step.minCount;
@@ -209,11 +195,8 @@ interface HeatStepProps {
   step: HeatStep;
 }
 
-const HeatStep = (props: HeatStepProps): ReactElement => {
-  const {step} = props;
-
-  const {methodSprites} = useGameData();
-
+const HeatStep = ({ step }: HeatStepProps): ReactElement => {
+  const { methodSprites } = useGameData();
   return (
     <li className='recipe_step recipe_step--simple'>
       <RawSprite position={methodSprites.heat!} alt=''/>
@@ -226,11 +209,8 @@ interface HeatMixtureStepProps {
   step: HeatMixtureStep;
 }
 
-const HeatMixtureStep = (props: HeatMixtureStepProps): ReactElement => {
-  const {step} = props;
-
-  const {methodSprites} = useGameData();
-
+const HeatMixtureStep = ({ step }: HeatMixtureStepProps): ReactElement => {
+  const { methodSprites } = useGameData();
   return (
     <li className='recipe_step recipe_step--simple'>
       <RawSprite position={methodSprites.heatMixture!} alt=''/>
@@ -248,11 +228,8 @@ interface SimpleStepProps {
   step: SimpleInteractionStep;
 }
 
-const SimpleStep = (props: SimpleStepProps): ReactElement => {
-  const {step} = props;
-
-  const {methodSprites} = useGameData();
-
+const SimpleStep = ({ step }: SimpleStepProps): ReactElement => {
+  const { methodSprites } = useGameData();
   return (
     <li className='recipe_step recipe_step--simple'>
       <RawSprite position={methodSprites[step.type]!} alt=''/>
@@ -272,9 +249,7 @@ interface AlsoMakesStepProps {
   step: AlsoMakesStep;
 }
 
-const AlsoMakesStep = (props: AlsoMakesStepProps): ReactElement => {
-  const {step} = props;
-
+const AlsoMakesStep = ({ step }: AlsoMakesStepProps): ReactElement => {
   // More compact appearance if there's only one other entity
   if (typeof step.entity === 'string') {
     return (

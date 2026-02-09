@@ -1,20 +1,16 @@
-import {CSSProperties, ReactElement} from 'react';
-
-import {Recipe} from '../types';
-
-import {useGameData} from './context';
-import {Tooltip} from './tooltip';
+import { CSSProperties, ReactElement } from 'react';
+import { Recipe } from '../types';
+import { useGameData } from './context';
+import { Tooltip } from './tooltip';
 
 export interface RecipeTraitsProps {
   recipe: Recipe;
 }
 
-export const RecipeTraits = (
-  props: RecipeTraitsProps
-): ReactElement | null => {
-  const {recipe} = props;
-
-  const {entityMap, specialTraits, renderedTraitCache} = useGameData();
+export const RecipeTraits = ({
+  recipe,
+}: RecipeTraitsProps): ReactElement | null => {
+  const { entityMap, specialTraits, renderedTraitCache } = useGameData();
 
   if (!recipe.solidResult) {
     return null;
