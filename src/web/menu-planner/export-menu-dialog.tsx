@@ -26,9 +26,8 @@ export const ExportMenuDialog = ({
 
   const handleCopy = () => {
     setCopyState(null);
-    tryCopyToClipboard(menuExport).then(
-      () => setCopyState('copied'),
-      () => setCopyState('failed')
+    tryCopyToClipboard(menuExport).then(success =>
+      setCopyState(success ? 'copied' : 'failed')
     );
   };
 

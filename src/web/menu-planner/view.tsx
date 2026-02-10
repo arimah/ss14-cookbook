@@ -80,11 +80,14 @@ export const MenuViewer = memo((): ReactElement => {
     }
     const exported = exportMenu(menu);
     const importUrl = location.origin + url.menuImport(exported);
-    tryCopyToClipboard(importUrl).then(
-      () => setExportSuccess(true),
-      // If copying fails, show the ugly dialog
-      () => setExportData(importUrl)
-    );
+    tryCopyToClipboard(importUrl).then(success => {
+      if (success) {
+        setExportSuccess(true);
+      } else {
+        // If copying fails, show the ugly dialog
+        setExportData(importUrl);
+      }
+    });
   }, [menu, url]);
   useEffect(() => {
     if (exportSuccess) {

@@ -1,7 +1,5 @@
 import { customAlphabet } from 'nanoid';
 
-export const CookingMenuVersion = 1;
-
 export interface CookingMenu {
   /** This menu's unique, randomly generated ID.*/
   readonly id: string;
