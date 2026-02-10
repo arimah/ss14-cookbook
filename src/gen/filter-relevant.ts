@@ -258,6 +258,7 @@ const addMetamorphRecipes = (
         case 'IngredientsWithTags': {
           const ingredients = findMetamorphIngredients(
             allEntities,
+            recipe.key,
             foodSequenceElements,
             rule.tags,
             rule.needAll
@@ -277,6 +278,7 @@ const addMetamorphRecipes = (
         case 'LastElementHasTags': {
           const ingredients = findMetamorphIngredients(
             allEntities,
+            recipe.key,
             foodSequenceElements,
             rule.tags,
             rule.needAll
@@ -321,6 +323,7 @@ const addMetamorphRecipes = (
 
 const findMetamorphIngredients = (
   allEntities: ResolvedEntityMap,
+  targetSequence: TagId,
   foodSequenceElements: FoodSequenceElementMap,
   tags: readonly TagId[],
   needAll = true
@@ -363,9 +366,9 @@ const findMetamorphIngredients = (
   }
 
   // Second, let's find all entities that use any of the matching food
-  // sequence elements.
+  // sequence elements in the target sequence.
   const entities = allEntities.values()
-    .filter(ent => entityCanBeFoodSequenceElem(ent, elements))
+    .filter(ent => entityCanBeFoodSequenceElem(ent, elements, targetSequence))
     .map(ent => ent.id)
     .toArray();
   switch (entities.length) {
@@ -380,17 +383,17 @@ const findMetamorphIngredients = (
 
 const entityCanBeFoodSequenceElem = (
   ent: ResolvedEntity,
-  soughtIds: ReadonlySet<FoodSequenceElementId>
+  soughtIds: ReadonlySet<FoodSequenceElementId>,
+  targetSequence: TagId
 ): boolean => {
   if (!ent.foodSequenceElement) {
     return false;
   }
-  for (const elem of ent.foodSequenceElement.values()) {
-    if (soughtIds.has(elem.element)) {
-      return true;
-    }
+  const elem = ent.foodSequenceElement.get(targetSequence);
+  if (!elem) {
+    return false;
   }
-  return false;
+  return soughtIds.has(elem.element);
 };
 
 const tryAddSpecialRecipes = (
