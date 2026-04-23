@@ -555,10 +555,10 @@ const getAllGuaranteedUsableSpawns = (
 ): [EntityId, number][] => {
   return spawned
     .filter(entry =>
-      entry.id != null || // We need an entity ID
-      !entry.orGroup || // We can't handle OR groups
-      (entry.amount ?? 1) > 0 || // We need at least one
-      (entry.prob ?? 1) !== 1 // And the probability has to be 1
+      entry.id != null && // We need an entity ID
+      !entry.orGroup && // We can't handle OR groups
+      (entry.amount ?? 1) > 0 && // We need at least one
+      (entry.prob ?? 1) === 1 // And the probability has to be 1
     )
     .map(entry => [entry.id!, entry.amount ?? 1] as const);
 };
@@ -681,11 +681,6 @@ function* traverseConstructionGraph(
 
   // This construction graph traversal is *extremely* simplified compared to
   // what the game does, because we're only really looking for simple things.
-  //
-  // An entity is considered rollable if the start node (state.node) has an edge
-  // with one single step that uses a 'Rolling' tool with no conditions or
-  // actions that leads to a target node with a different entity. That's it.
-  // Nothing fancy.
   const startNode = graph.graph.find(n => n.node === constr.node);
   if (!startNode || !startNode.edges) {
     // Broken construction graph or we're at an end node with no edges
