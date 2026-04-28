@@ -239,7 +239,7 @@ main {
 
 footer {
   flex: none;
-  margin-top: 8px;
+  margin-top: 32px;
 
   p:not(:first-child) {
     margin-top: 8px;
@@ -259,6 +259,10 @@ a {
   &:active {
     color: var(--link-fg-active);
   }
+}
+
+.text-subtle {
+  color: var(--fg-subtle);
 }
 
 input {
@@ -1995,6 +1999,7 @@ select {
       display: grid;
       grid-template-columns: 1fr;
       gap: 4px;
+      margin-block: 16px;
 
       @media (min-width: 850px) {
         grid-template-columns: 1fr 1fr;

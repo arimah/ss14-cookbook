@@ -25,6 +25,7 @@ import { useStoredMenus } from './storage';
 import {
   CookingMenu,
   genId,
+  Ingredient,
   isReagentIngredient,
   isSolidIngredient,
 } from './types';
@@ -71,18 +72,18 @@ export const MenuEditor = (): ReactElement => {
     reagentMap,
   ]);
 
-  const initialHiddenIngredients = useMemo(() => new Set(
+  const initialIngredientVisibility = useMemo(() => new Map<string, boolean>(
     availableIngredients
-      .filter(ingredient =>
-        // The ingredient is hidden if it's not included.
-        ingredient.type === 'solid'
-          ? !menu?.solidIngredients.includes(ingredient.entityId)
-          : !menu?.reagentIngredients.includes(ingredient.reagentId)
-      )
-      .map(ingredient => ingredient.id)
+      .map(ingredient => [
+        ingredient.id,
+        (ingredient.type === 'solid'
+          ? menu?.solidIngredients.includes(ingredient.entityId)
+          : menu?.reagentIngredients.includes(ingredient.reagentId))
+          ?? false
+      ])
   ), [initialMenu]);
-  const [hiddenIngredients, setHiddenIngredients] = useState(
-    initialHiddenIngredients
+  const [ingredientVisibility, setIngredientVisibility] = useState(
+    initialIngredientVisibility
   );
 
   const exampleName = useMemo(() => {
@@ -125,22 +126,31 @@ export const MenuEditor = (): ReactElement => {
   }, []);
 
   const handleToggleIngredient = useCallback((id: string) => {
-    setHiddenIngredients(produce(draft => {
-      if (!draft.delete(id)) {
-        draft.add(id);
-      }
+    const ingredient = availableIngredients.find(x => x.id === id);
+    if (!ingredient) {
+      console.warn('attempted to toggle visibility of non-ingredient:', id);
+      return;
+    }
+    setIngredientVisibility(produce(draft => {
+      // Precursors are hidden by default.
+      const visible = draft.get(id) ?? !ingredient.precursor;
+      draft.set(id, !visible);
     }));
-  }, []);
+  }, [availableIngredients]);
 
   const saveMenu = () => {
     const recipes = menu!.recipes.filter(id => recipeMap.has(id));
     const solidIngredients = availableIngredients
       .filter(isSolidIngredient)
-      .filter(ingredient => !hiddenIngredients.has(ingredient.id))
+      .filter(ingredient =>
+        ingredientVisibility.get(ingredient.id) ?? !ingredient.precursor
+      )
       .map(ingredient => ingredient.entityId);
     const reagentIngredients = availableIngredients
       .filter(isReagentIngredient)
-      .filter(ingredient => !hiddenIngredients.has(ingredient.id))
+      .filter(ingredient =>
+        ingredientVisibility.get(ingredient.id) ?? !ingredient.precursor
+      )
       .map(ingredient => ingredient.reagentId);
     storage.save({
       ...menu!,
@@ -176,8 +186,9 @@ export const MenuEditor = (): ReactElement => {
     isMenuDirty(
       initialMenu,
       menu,
-      initialHiddenIngredients,
-      hiddenIngredients
+      availableIngredients,
+      initialIngredientVisibility,
+      ingredientVisibility
     );
   useEffect(() => {
     if (isDirty) {
@@ -250,7 +261,7 @@ export const MenuEditor = (): ReactElement => {
       />
       <IngredientList
         availableIngredients={availableIngredients}
-        hiddenIngredients={hiddenIngredients}
+        visibility={ingredientVisibility}
         onToggleVisible={handleToggleIngredient}
         onAddRecipe={handleAddRecipe}
       />
@@ -282,8 +293,9 @@ const newMenu = (forkId: string): CookingMenu => ({
 const isMenuDirty = (
   initialMenu: CookingMenu,
   currentMenu: CookingMenu,
-  initialHiddenIngredients: ReadonlySet<string>,
-  currentHiddenIngredients: ReadonlySet<string>
+  availableIngredients: readonly Ingredient[],
+  initialIngredientVisibility: ReadonlyMap<string, boolean>,
+  currentIngredientVisibility: ReadonlyMap<string, boolean>
 ): boolean => {
   if (initialMenu.name !== currentMenu.name) {
     return true;
@@ -294,11 +306,10 @@ const isMenuDirty = (
   ) {
     return true;
   }
-  if (initialHiddenIngredients.size !== currentHiddenIngredients.size) {
-    return true;
-  }
-  for (const x of initialHiddenIngredients) {
-    if (!currentHiddenIngredients.has(x)) {
+  for (const x of availableIngredients) {
+    const wasVisible = currentIngredientVisibility.get(x.id) ?? !x.precursor;
+    const isVisible = initialIngredientVisibility.get(x.id) ?? !x.precursor;
+    if (wasVisible !== isVisible) {
       return true;
     }
   }

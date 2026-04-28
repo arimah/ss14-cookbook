@@ -36,6 +36,11 @@ export interface BaseIngredient {
   readonly usedBy: ReadonlySet<string>;
   readonly sourceOfReagent: ReadonlySet<string>;
   readonly recipes: readonly string[];
+  /**
+   * If true, the ingredient is a "precursor"; that is, not referenced directly
+   * in any of the menu's recipes, but as an ingredient of another ingredient.
+   */
+  readonly precursor: boolean;
 }
 
 export interface SolidIngredient extends BaseIngredient {

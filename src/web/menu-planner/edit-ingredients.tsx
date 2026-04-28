@@ -12,14 +12,14 @@ import { Ingredient } from './types';
 
 export interface Props {
   availableIngredients: readonly Ingredient[];
-  hiddenIngredients: ReadonlySet<string>,
+  visibility: ReadonlyMap<string, boolean>,
   onToggleVisible: (id: string) => void;
   onAddRecipe: (id: string) => void;
 }
 
 export const IngredientList = memo(({
   availableIngredients,
-  hiddenIngredients,
+  visibility,
   onToggleVisible,
   onAddRecipe,
 }: Props): ReactElement => {
@@ -33,21 +33,45 @@ export const IngredientList = memo(({
     });
   }, [availableIngredients, entityMap, reagentMap]);
 
+  const directIngredients = sortedIngredients.filter(x => !x.precursor);
+  const precursorIngredients = sortedIngredients.filter(x => x.precursor);
+
   return <>
-    <h3>Ingredients</h3>
-    {sortedIngredients.length > 0 ? (
+    <h3>Recipe ingredients</h3>
+    {sortedIngredients.length > 0 ? <>
+      <p className='text-subtle'>
+        These ingredients are used by at least one selected recipe.
+      </p>
       <ul className='planner_editor-ingredient-list'>
-        {sortedIngredients.map(ingredient =>
+        {directIngredients.map(ingredient =>
           <Ingredient
             key={ingredient.id}
             ingredient={ingredient}
-            visible={!hiddenIngredients.has(ingredient.id)}
+            visible={visibility.get(ingredient.id) ?? true}
             onToggleVisible={onToggleVisible}
             onAddRecipe={onAddRecipe}
           />
         )}
       </ul>
-    ) : <>
+
+      {precursorIngredients.length > 0 && <>
+        <h3>Ingredients of ingredients</h3>
+        <p className='text-subtle'>
+          These are ingredients for other ingredients, not directly used by any recipe in the menu.
+        </p>
+        <ul className='planner_editor-ingredient-list'>
+          {precursorIngredients.map(ingredient =>
+            <Ingredient
+              key={ingredient.id}
+              ingredient={ingredient}
+              visible={visibility.get(ingredient.id) ?? false}
+              onToggleVisible={onToggleVisible}
+              onAddRecipe={onAddRecipe}
+            />
+          )}
+        </ul>
+      </>}
+    </> : <>
       <p>When you add recipes to the menu, their ingredients will show up here. This list will also include ingredients used in recipes for other ingredients.</p>
       <p>You can hide ingredients you don’t want to see, and add their recipes (when available) to your menu.</p>
     </>}
