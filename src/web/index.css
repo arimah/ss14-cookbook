@@ -1150,6 +1150,37 @@ select {
     display: flex;
     align-items: center;
     gap: 8px;
+
+    &--actions {
+      flex-wrap: wrap;
+      padding-top: 8px;
+      border-top: 2px solid var(--bg-level-1);
+
+      > button {
+        min-width: 90px;
+      }
+    }
+
+    @media (min-width: 600px) {
+      &--actions {
+        margin: 0 -8px -8px;
+        padding: 8px;
+        justify-self: flex-end;
+        border-radius: 5px;
+        border: none;
+        background-color: var(--bg-level-1);
+
+        > button {
+          min-width: 100px;
+        }
+      }
+    }
+
+    @media (min-width: 850px) {
+      &--actions > button {
+        min-width: 110px;
+      }
+    }
   }
 
   .recipe-search_mode {
@@ -2334,7 +2365,7 @@ select {
       }
   }
 
-.menu-export {
+.copy-to-clipboard {
   width: 720px;
 
   > .dialog_body {
@@ -2346,8 +2377,8 @@ select {
   }
 }
 
-  .menu-export_value-sizer,
-  .menu-export_value {
+  .copy-to-clipboard_value-sizer,
+  .copy-to-clipboard_value {
     grid-row: 2;
     grid-column: 1;
     box-sizing: border-box;
@@ -2360,7 +2391,7 @@ select {
     overflow: hidden;
   }
 
-  .menu-export_value-sizer {
+  .copy-to-clipboard_value-sizer {
     align-self: flex-start;
     padding: 6px 8px;
     visibility: hidden;
@@ -2368,12 +2399,12 @@ select {
     pointer-events: none;
   }
 
-  .menu-export_value {
+  .copy-to-clipboard_value {
     resize: none;
     align-self: stretch;
   }
 
-  .menu-export_action {
+  .copy-to-clipboard_action {
     display: flex;
     gap: 8px;
     align-items: center;

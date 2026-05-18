@@ -16,7 +16,7 @@ import { joinListNatural } from '../helpers';
 import {
   ClearFilterIcon,
   FilterActiveIcon,
-  FilterIcon,
+  FilterOpenIcon,
   SearchIcon,
   SortIcon,
 } from '../icons';
@@ -34,8 +34,10 @@ import { DisplayMethod } from '../types';
 import {
   InitialFilter,
   RecipeFilter,
+  SearchParamName,
   applyFilter,
   isFilterActive,
+  loadFilterFromUrl,
   searchByName,
 } from './filter';
 import { FilterEditor } from './filter-editor';
@@ -62,9 +64,12 @@ export const RecipeList = memo((): ReactElement => {
     sortingIdRewrites,
   } = useGameData();
 
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<RecipeFilter>(
-    location.state ?? InitialFilter
+  const [search, setSearch] = useState(() =>
+    new URLSearchParams(location.search).get(SearchParamName) ?? ''
+  );
+  const [filter, setFilter] = useState<RecipeFilter>(() =>
+    location.state ??
+    loadFilterFromUrl(new URLSearchParams(location.search))
   );
   const [order, setOrder] = useState<SortOrder>('default');
   const [groupByMethod, setGroupByMethod] = useState(true);
@@ -184,7 +189,7 @@ export const RecipeList = memo((): ReactElement => {
             aria-expanded={showFilter}
             onClick={handleToggleFilter}
           >
-            {hasFilter ? <FilterActiveIcon/> : <FilterIcon/>}
+            {hasFilter ? <FilterActiveIcon/> : <FilterOpenIcon/>}
             <span>Filter</span>
           </button>
         </Tooltip>
@@ -206,6 +211,7 @@ export const RecipeList = memo((): ReactElement => {
         <FilterEditor
           open={showFilter}
           filter={filter}
+          search={search}
           setFilter={setFilter}
         />
       </div>

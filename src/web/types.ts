@@ -18,6 +18,22 @@ export type DisplayMethod =
   | 'construct'
   ;
 
+export const isDisplayMethod = (value: unknown): value is DisplayMethod => {
+  switch (value) {
+    case 'microwave':
+    case 'mix':
+    case 'construct':
+    case 'cut':
+    case 'roll':
+    case 'heat':
+    case 'deepFry':
+    case 'construct':
+      return true;
+    default:
+      return false;
+  }
+};
+
 export interface SearchableRecipeData {
   /** The fork ID that this game data is for. */
   readonly forkId: string;

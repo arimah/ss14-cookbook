@@ -20,6 +20,19 @@ export interface UrlGenerator {
 
   migrateExport: string;
   migrateImport(dataJson: string): string;
+
+  /**
+   * Helper function that append serch parameters (a query string) to the end
+   * of a URL. This function *assumes* the provided URL does not end with a
+   * fragment (`#foo`). Normally it will be used with a value produced by the
+   * URL generator.
+   * @param url The URL to append a query string to. Must *not* end with a
+   *        fragment.
+   * @param query The query string to append. If passed as a `URLSearchParams`,
+   *        the value is stringified; otherwise, if passed as a string, it is
+   *        used exactly as passed, with no escaping of any kind.
+   */
+  withSearchParams(url: string, query: URLSearchParams | string): string;
 }
 
 const UrlContext = createContext<UrlGenerator | null>(null);
@@ -47,6 +60,8 @@ export const UrlProvider = ({ children }: UrlProviderProps): ReactElement => {
     migrateExport: '/migrate?export',
     migrateImport: data =>
       `/migrate?import&data=${encodeURIComponent(data)}`,
+
+    withSearchParams,
   }), [query]);
 
   return (
@@ -61,8 +76,19 @@ const withFork = (url: string, query: URLSearchParams): string => {
   if (!fork) {
     return url;
   }
+  return withSearchParams(url, `fork=${encodeURIComponent(fork)}`);
+};
+
+const withSearchParams = (
+  url: string,
+  query: URLSearchParams | string
+): string => {
+  query = String(query);
+  if (!query) {
+    return url;
+  }
   const sep = url.includes('?') ? '&' : '?';
-  return `${url}${sep}fork=${encodeURIComponent(fork)}`;
+  return `${url}${sep}${query}`;
 };
 
 export const useUrl = (): UrlGenerator => {

@@ -14,23 +14,30 @@ import {
 import { Reagent } from '../../types';
 import { Checkbox } from '../checkbox';
 import { useGameData } from '../context';
+import { CopyToClipboardButton } from '../copy-to-clipboard-button';
 import { NeutralCollator } from '../helpers';
 import {
   CollapseIcon,
   ExpandIcon,
+  FilterIcon,
   InformationIcon,
+  LinkIcon,
   ResetIcon,
+  SearchIcon,
   SearchTextIcon,
 } from '../icons';
 import { InputGroup } from '../input-group';
 import { EntitySprite, RawSprite, ReagentSprite } from '../sprites';
 import { Tooltip } from '../tooltip';
 import { DisplayMethod } from '../types';
+import { useUrl } from '../url';
 import {
   IngredientMode,
   RecipeFilter,
+  SearchParamName,
   filterIngredientsByName,
   filterReagentsByName,
+  saveFilterToUrl,
 } from './filter';
 
 const HideRarelyUsedTooltip = 'Hides ingredients that are only used in a single recipe. You can still find all ingredients by name.';
@@ -40,6 +47,7 @@ export interface Props {
   open: boolean;
   filter: RecipeFilter;
   setFilter: Dispatch<SetStateAction<RecipeFilter>>;
+  search: string;
 }
 
 type Updater = (draft: Draft<RecipeFilter>) => void;
@@ -47,11 +55,12 @@ type Updater = (draft: Draft<RecipeFilter>) => void;
 export const FilterEditor = memo(({
   open,
   filter,
+  search,
   setFilter,
 }: Props): ReactElement => {
   const updateFilter = useCallback((updater: Updater) => {
     setFilter(filter => produce(filter, updater));
-  }, []);
+  }, [setFilter]);
 
   const [hideRarelyUsed, setHideRarelyUsed] = useState(true);
 
@@ -91,6 +100,7 @@ export const FilterEditor = memo(({
       <ModeOption filter={filter} update={updateFilter}/>
       <GroupFilter filter={filter} update={updateFilter}/>
       <TraitFilter filter={filter} update={updateFilter}/>
+      <FilterExport filter={filter} search={search}/>
     </div>
   </>;
 });
@@ -100,7 +110,7 @@ interface FilterProps {
   update: (updater: Updater) => void;
 }
 
-const MethodFilter = ({ filter, update }: FilterProps): ReactElement => {
+const MethodFilter = memo(({ filter, update }: FilterProps): ReactElement => {
   const { methods, subtypes } = filter;
 
   const { methodSprites, microwaveRecipeTypes } = useGameData();
@@ -193,7 +203,7 @@ const MethodFilter = ({ filter, update }: FilterProps): ReactElement => {
       )}
     </ul>
   </>;
-};
+});
 
 interface SecondaryMethod {
   readonly method: Exclude<DisplayMethod, 'microwave'>;
@@ -214,7 +224,7 @@ interface IngredientProps {
   hideRarelyUsed: boolean;
 }
 
-const IngredientFilter = ({
+const IngredientFilter = memo(({
   filter,
   hideRarelyUsed,
   update,
@@ -317,9 +327,9 @@ const IngredientFilter = ({
       )}
     </ul>
   </>;
-};
+});
 
-const ReagentFilter = ({
+const ReagentFilter = memo(({
   filter,
   hideRarelyUsed,
   update,
@@ -413,9 +423,9 @@ const ReagentFilter = ({
       )}
     </ul>
   </>;
-};
+});
 
-const ModeOption = ({ filter, update }: FilterProps): ReactElement => {
+const ModeOption = memo(({ filter, update }: FilterProps): ReactElement => {
   const handleChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
     update(draft => {
       draft.ingredientMode = e.target.value as IngredientMode;
@@ -441,9 +451,12 @@ const ModeOption = ({ filter, update }: FilterProps): ReactElement => {
       </select>
     </div>
   </>;
-};
+});
 
-const GroupFilter = ({ filter, update }: FilterProps): ReactElement | null => {
+const GroupFilter = memo(({
+  filter,
+  update,
+}: FilterProps): ReactElement | null => {
   const { recipeGroups } = useGameData();
 
   const toggle = useCallback((group: string, newSelected: boolean) => {
@@ -486,9 +499,9 @@ const GroupFilter = ({ filter, update }: FilterProps): ReactElement | null => {
       </li>
     </ul>
   </>;
-};
+});
 
-const TraitFilter = ({ filter, update }: FilterProps): ReactElement => {
+const TraitFilter = memo(({ filter, update }: FilterProps): ReactElement => {
   const { specialTraits } = useGameData();
 
   const toggle = useCallback((trait: number) => {
@@ -519,7 +532,7 @@ const TraitFilter = ({ filter, update }: FilterProps): ReactElement => {
       )}
     </ul>
   </>;
-};
+});
 
 interface FilterOptionProps<T> {
   selected: boolean;
@@ -589,3 +602,66 @@ const IngredientToolbar = ({
       </button>
     </Tooltip>
   </span>;
+
+interface FilterExportProps {
+  filter: RecipeFilter;
+  search: string;
+}
+
+const FilterExport = ({
+  filter,
+  search,
+}: FilterExportProps): ReactElement => {
+  const url = useUrl();
+
+  const getFilterAndSearch = () => {
+    const query = saveFilterToUrl(filter);
+    if (search.trim()) {
+      query.set(SearchParamName, search.trim());
+    }
+    return location.origin + url.withSearchParams(url.recipes, query);
+  };
+
+  const getFilterOnly = () => {
+    const query = saveFilterToUrl(filter);
+    return location.origin + url.withSearchParams(url.recipes, query);
+  };
+
+  const getSearchOnly = () => {
+    const query = new URLSearchParams();
+    if (search.trim()) {
+      query.set(SearchParamName, search.trim());
+    }
+    return location.origin + url.withSearchParams(url.recipes, query);
+  };
+
+  return (
+    <div className='recipe-search_row recipe-search_row--actions'>
+      <LinkIcon/>
+      <span>Copy link to:</span>
+      <CopyToClipboardButton
+        getContent={getFilterOnly}
+        successTooltip='Link copied to clipboard!'
+        fallbackDialogTitle='Exported filter'
+      >
+        <FilterIcon/>
+        <span>Filter</span>
+      </CopyToClipboardButton>
+      <CopyToClipboardButton
+        getContent={getSearchOnly}
+        successTooltip='Link copied to clipboard!'
+        fallbackDialogTitle='Exported search'
+      >
+        <SearchIcon/>
+        <span>Search</span>
+      </CopyToClipboardButton>
+      <CopyToClipboardButton
+        getContent={getFilterAndSearch}
+        successTooltip='Link copied to clipboard!'
+        fallbackDialogTitle='Exported filter + search'
+      >
+        <span>Filter + search</span>
+      </CopyToClipboardButton>
+    </div>
+  );
+};

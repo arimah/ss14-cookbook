@@ -2,26 +2,21 @@ import {
   ReactElement,
   memo,
   useCallback,
-  useEffect,
-  useMemo,
-  useState,
+  useMemo
 } from 'react';
 import { Link, useParams } from 'react-router';
 import { useGameData } from '../context';
-import { NeutralCollator, tryCopyToClipboard } from '../helpers';
+import { CopyToClipboardButton } from '../copy-to-clipboard-button';
+import { NeutralCollator } from '../helpers';
 import { ArrowLeftIcon, EditIcon, ExportIcon } from '../icons';
 import { Notice } from '../notices';
 import { Recipe, RecipePopup } from '../recipe';
 import { EntitySprite, ReagentSprite } from '../sprites';
-import { Tooltip } from '../tooltip';
 import { useUrl } from '../url';
-import { ExportMenuDialog } from './export-menu-dialog';
 import { findIngredients, ingredientName } from './ingredients';
 import { useStoredMenus } from './storage';
 import { exportMenu } from './transfer';
 import { MenuWarning } from './warning';
-
-const CopySuccessTimeout = 2500;
 
 export const MenuViewer = memo((): ReactElement => {
   const params = useParams();
@@ -71,31 +66,13 @@ export const MenuViewer = memo((): ReactElement => {
     reagentMap,
   ]);
 
-  const [exportData, setExportData] = useState<string | null>(null);
-  const [exportSuccess, setExportSuccess] = useState(false);
-  const handleExport = useCallback(() => {
+  const getMenuExport = useCallback(() => {
     if (!menu) {
-      return;
+      return '';
     }
     const exported = exportMenu(menu);
-    const importUrl = location.origin + url.menuImport(exported);
-    tryCopyToClipboard(importUrl).then(success => {
-      if (success) {
-        setExportSuccess(true);
-      } else {
-        // If copying fails, show the ugly dialog
-        setExportData(importUrl);
-      }
-    });
+    return location.origin + url.menuImport(exported);
   }, [menu, url]);
-  useEffect(() => {
-    if (exportSuccess) {
-      const timeoutId = setTimeout(() => {
-        setExportSuccess(false);
-      }, CopySuccessTimeout);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [exportSuccess]);
 
   const backButton =
     <Link to={url.menuList} className='btn floating'>
@@ -129,12 +106,15 @@ export const MenuViewer = memo((): ReactElement => {
 
         <span className='spacer'/>
 
-        <Tooltip open={exportSuccess} text='Link copied to clipboard!'>
-          <button className='floating' onClick={handleExport}>
-            <ExportIcon/>
-            <span>Export</span>
-          </button>
-        </Tooltip>
+        <CopyToClipboardButton
+          className='floating'
+          getContent={getMenuExport}
+          fallbackDialogTitle='Exported menu'
+          successTooltip='Link copied to clipboard!'
+        >
+          <ExportIcon/>
+          <span>Export</span>
+        </CopyToClipboardButton>
         <Notice kind='info'>
           Your menu is private. Export to share it with others.
         </Notice>
@@ -178,13 +158,6 @@ export const MenuViewer = memo((): ReactElement => {
           </li>
         ) : null)}
       </ul>
-
-      {exportData != null && (
-        <ExportMenuDialog
-          menuExport={exportData}
-          onClose={() => setExportData(null)}
-        />
-      )}
     </div>
   );
 });

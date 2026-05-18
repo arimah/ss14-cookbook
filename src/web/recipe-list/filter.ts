@@ -9,7 +9,7 @@ import {
   recipeHasOnlyIngredients,
   recipeHasOnlyReagents,
 } from '../helpers';
-import { DisplayMethod } from '../types';
+import { DisplayMethod, isDisplayMethod } from '../types';
 
 export interface RecipeFilter {
   /** Empty list = include all methods. */
@@ -53,6 +53,106 @@ export const InitialFilter: RecipeFilter = {
   groups: new Set(),
   specials: 0,
 };
+
+export const SearchParamName = 'q';
+
+const MethodsParamName = 'm'; // *m*ethods
+const SubtypesParamName = 's'; // *s*ubtype
+const IngredientsParamName = 'i'; // *i*ngredients
+const ReagentsParamName = 'r'; // *r*eagents
+const IngredientModeParamName = 'mo'; // *mo*de
+const GroupsParamName = 'g'; // *g*roup
+const SpecialsParamName = 't'; // *t*rait
+
+export const loadFilterFromUrl = (query: URLSearchParams): RecipeFilter => ({
+  methods:
+    tryLoadUrlParam(query, MethodsParamName, parseMethods) ??
+    InitialFilter.methods,
+  subtypes:
+    tryLoadUrlParam(query, SubtypesParamName, x => x.split(',')) ??
+    InitialFilter.subtypes,
+  ingredients:
+    tryLoadUrlParam(query, IngredientsParamName, parseStringSet) ??
+    InitialFilter.ingredients,
+  reagents:
+    tryLoadUrlParam(query, ReagentsParamName, parseStringSet) ??
+    InitialFilter.reagents,
+  ingredientMode:
+    tryLoadUrlParam(query, IngredientModeParamName, parseIngredientMode) ??
+    InitialFilter.ingredientMode,
+  groups:
+    tryLoadUrlParam(query, GroupsParamName, parseStringSet) ??
+    InitialFilter.groups,
+  specials:
+    tryLoadUrlParam(query, SpecialsParamName, x => {
+      const n = parseInt(x, 10);
+      return Number.isFinite(n) ? n : null;
+    }) ??
+    InitialFilter.specials,
+});
+
+const tryLoadUrlParam = <T>(
+  query: URLSearchParams,
+  paramName: string,
+  parse: (value: string) => T
+): T | null => {
+  const param = query.get(paramName);
+  return param ? parse(param) : null;
+};
+
+const parseMethods = (value: string) =>
+  value.split(',').filter(isDisplayMethod);
+
+const parseStringSet = (value: string) => new Set(value.split(','));
+
+const parseIngredientMode = (value: string): IngredientMode | null => {
+  switch (value) {
+    case 'all':
+    case 'any':
+    case 'only':
+      return value;
+    default:
+      return null;
+  }
+};
+
+export const saveFilterToUrl = (
+  filter: RecipeFilter
+): URLSearchParams => {
+  const query = new URLSearchParams();
+  addToQuery(query, MethodsParamName, filter.methods.join(','));
+  addToQuery(query, SubtypesParamName, filter.subtypes.join(','));
+  addToQuery(query, IngredientsParamName, joinStringSet(filter.ingredients));
+  addToQuery(query, ReagentsParamName, joinStringSet(filter.reagents));
+  addToQuery(
+    query,
+    IngredientModeParamName,
+    filter.ingredientMode,
+    filter.ingredientMode !== InitialFilter.ingredientMode
+  );
+  addToQuery(query, GroupsParamName, joinStringSet(filter.groups));
+  addToQuery(
+    query,
+    SpecialsParamName,
+    String(filter.specials),
+    filter.specials !== 0
+  );
+  return query;
+};
+
+const addToQuery = (
+  query: URLSearchParams,
+  paramName: string,
+  value: string,
+  cond?: boolean
+): void => {
+  if (cond ?? value) {
+    query.set(paramName, value);
+  }
+};
+
+const joinStringSet = (value: ReadonlySet<string>) =>
+    Array.from(value).join(',');
 
 export const searchByName = (
   recipes: readonly Recipe[],

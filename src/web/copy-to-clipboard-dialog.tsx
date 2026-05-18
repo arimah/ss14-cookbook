@@ -1,21 +1,23 @@
 import { KeyboardEvent, ReactElement, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { FocusTrap } from '../focus';
-import { tryCopyToClipboard } from '../helpers';
-import { CloseIcon, CopyIcon } from '../icons';
-import { Overlay } from '../overlay';
-import { getPopupRoot } from '../popup';
-import { Tooltip } from '../tooltip';
+import { FocusTrap } from './focus';
+import { tryCopyToClipboard } from './helpers';
+import { CloseIcon, CopyIcon } from './icons';
+import { Overlay } from './overlay';
+import { getPopupRoot } from './popup';
+import { Tooltip } from './tooltip';
 
-export interface ExportMenuDialogProps {
-  menuExport: string;
+export interface CopyToClipboardDialogProps {
+  content: string;
+  title?: string;
   onClose: () => void;
 }
 
-export const ExportMenuDialog = ({
-  menuExport,
+export const CopyToClipboardDialog = ({
+  content,
+  title = 'Copy to clipboard',
   onClose,
-}: ExportMenuDialogProps): ReactElement => {
+}: CopyToClipboardDialogProps): ReactElement => {
   const [copyState, setCopyState] = useState<null | 'copied' | 'failed'>(null);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -26,7 +28,7 @@ export const ExportMenuDialog = ({
 
   const handleCopy = () => {
     setCopyState(null);
-    tryCopyToClipboard(menuExport).then(success =>
+    tryCopyToClipboard(content).then(success =>
       setCopyState(success ? 'copied' : 'failed')
     );
   };
@@ -35,24 +37,24 @@ export const ExportMenuDialog = ({
     <Overlay>
       <FocusTrap onPointerDownOutside={onClose}>
         <section
-          className='dialog dialog--basic menu-export'
+          className='dialog dialog--basic copy-to-clipboard'
           tabIndex={-1}
           onKeyDown={handleKeyDown}
         >
-          <h2>Exported menu</h2>
+          <h2>{title}</h2>
 
           <div className='dialog_body'>
-            <p>The link below couldn’t be copied to your clipboard. You will need to copy it manually.</p>
-            <span className='menu-export_value-sizer'>
-              {menuExport}
+            <p>The text below couldn’t be copied to your clipboard. You will need to copy it manually.</p>
+            <span className='copy-to-clipboard_value-sizer'>
+              {content}
             </span>
             <textarea
-              className='menu-export_value'
+              className='copy-to-clipboard_value'
               readOnly
-              value={menuExport}
+              value={content}
               onFocus={e => e.target.select()}
             />
-            <p className='menu-export_action'>
+            <p className='copy-to-clipboard_action'>
               <button onClick={handleCopy}>
                 <CopyIcon/>
                 <span>Copy</span>
