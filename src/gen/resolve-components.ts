@@ -1,4 +1,4 @@
-import { createDraft, Draft, finishDraft } from 'immer';
+import { castDraft, createDraft, Draft, finishDraft } from 'immer';
 import {
   ButcherableComponent,
   Component,
@@ -9,12 +9,16 @@ import {
   FoodSequenceStartPointComponent,
   SliceableFoodComponent,
   Solution,
+  SolutionComponent,
+  SolutionContainerManagerComponent,
+  SolutionManagerComponent,
   SpriteComponent,
-  StomachComponent,
+  StomachComponent
 } from './components';
 import {
   DefaultButcheringType,
   DefaultFoodSequenceMaxLayers,
+  DefaultSolutionId,
   DefaultTotalSliceCount,
   FoodSolutionName,
 } from './constants';
@@ -27,37 +31,51 @@ import {
   TagId,
 } from './prototypes';
 import { RawGameData } from './read-raw';
+import { findSolution } from './solution-helpers';
 import {
   ResolvedEntity,
   ResolvedEntityMap,
-  ResolvedSolution,
-  ResolvedSpriteLayer,
+  ResolvedSpriteLayer
 } from './types';
 
 export const resolveComponents = (
   raw: RawGameData
 ): ResolvedEntityMap => {
-  const result = new Map<EntityId, ResolvedEntity>();
-
+  // First pass: Collect relevant components from entities.
+  const partial = new Map<EntityId, Draft<ResolvedEntity>>();
   for (const entity of raw.entities.values()) {
-    if (entity.abstract) {
-      continue;
-    }
-
-    const resolved = resolveEntity(
+    const resolved = beginResolveEntity(
       entity,
       raw.entities,
       raw.foodSequenceElements
     );
-    result.set(resolved.id, resolved);
+    partial.set(resolved.id, resolved);
   }
 
-  return result;
+  // Second pass: Calculate reagents on entities with a food solution.
+  // Note: We can't do this as part of the first pass due to the new solution
+  // components. They require us to look up solutions through entity prototype
+  // IDs, which means we need to process every entity's components first.
+  for (const draft of partial.values()) {
+    const foodSolution = findSolution(partial, draft, FoodSolutionName);
+    if (foodSolution?.reagents) {
+      draft.reagents = new Set(foodSolution.reagents.map(r => r.ReagentId));
+    }
+    if (draft.id === 'SolutionLatheLube') {
+      console.log(draft.id);
+    }
+  }
+
+  return new Map(Array.from(
+    partial,
+    ([id, draft]) => [id, finishDraft(draft)]
+  ));
 }
 
 const InitialState: ResolvedEntity = {
   id: '' as EntityId,
   name: '(unknown name)',
+  abstract: false,
   isProduce: false,
   sprite: {
     path: null,
@@ -65,7 +83,7 @@ const InitialState: ResolvedEntity = {
     color: null,
     layers: [],
   },
-  solution: null,
+  solutions: null,
   reagents: new Set(),
   extractable: null,
   foodSequenceStart: null,
@@ -81,15 +99,16 @@ const InitialState: ResolvedEntity = {
 
 const EmptyComponents: Component[] = [];
 
-const resolveEntity = (
+const beginResolveEntity = (
   entity: EntityPrototype,
   allEntities: EntityMap,
   foodSequenceElements: FoodSequenceElementMap
-): ResolvedEntity => {
+): Draft<ResolvedEntity> => {
   const draft = createDraft(InitialState);
   draft.id = entity.id;
+  draft.abstract = entity.abstract ?? false;
 
-  // First walk the entity's inheritance chain and collect component data.
+  // Walk the entity's inheritance chain and collect component data.
   for (const ent of entityAndAncestors(entity, allEntities)) {
     if (ent.name != null) {
       draft.name = ent.name;
@@ -122,8 +141,10 @@ const resolveEntity = (
         case 'SliceableFood':
           resolveSliceableFood(draft, comp);
           break;
+        case 'Solution':
+        case 'SolutionManager':
         case 'SolutionContainerManager':
-          draft.solution = (comp.solutions ?? null) as Draft<ResolvedSolution> | null;
+          resolveSolutions(draft, comp);
           break;
         case 'Sprite':
           resolveSprite(draft, comp);
@@ -140,14 +161,7 @@ const resolveEntity = (
     }
   }
 
-  // Then perform some useful post-processing.
-  if (draft.solution?.[FoodSolutionName]?.reagents) {
-    draft.reagents = new Set(
-      draft.solution[FoodSolutionName].reagents.map(x => x.ReagentId)
-    );
-  }
-
-  return finishDraft(draft);
+  return draft;
 };
 
 const resolveButcherable = (
@@ -267,6 +281,57 @@ const resolveSliceableFood = (
   }
   if (comp.count != null) {
     draft.sliceableFood.count = comp.count;
+  }
+};
+
+type AnySolutionComponent =
+  | SolutionContainerManagerComponent
+  | SolutionManagerComponent
+  | SolutionComponent
+  ;
+
+const resolveSolutions = (
+  draft: Draft<ResolvedEntity>,
+  comp: AnySolutionComponent
+): void => {
+  if (!draft.solutions) {
+    draft.solutions = {
+      ownId: null,
+      ownSolution: null,
+      spawned: null,
+      legacy: null,
+    };
+  }
+
+  switch (comp.type) {
+    case 'SolutionContainerManager':
+      if (comp.solutions) {
+        draft.solutions.legacy = castDraft(comp.solutions);
+      }
+      break;
+    case 'SolutionManager':
+      if (comp.solutions) {
+        draft.solutions.spawned = castDraft(comp.solutions);
+      }
+      break;
+    case 'Solution':
+      // We have to make sure ownId is set if there exists a SolutionComponent,
+      // even if nothing overwrites the ID.
+      if (draft.solutions.ownId === null) {
+        draft.solutions.ownId = DefaultSolutionId;
+      }
+      if (comp.id != null) {
+        draft.solutions.ownId = comp.id;
+      }
+      if (comp.solution != null) {
+        // This is an incorrect implementation of AlwaysPushInheritance, but it
+        // suffices *in practice* for the solutions we care about.
+        draft.solutions.ownSolution = {
+          ...draft.solutions.ownSolution,
+          ...castDraft(comp.solution),
+        };
+      }
+      break;
   }
 };
 

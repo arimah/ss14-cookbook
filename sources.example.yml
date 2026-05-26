@@ -189,10 +189,14 @@ mystation:
   # of entities that the reagent can be obtained from.
   # Note: The source entities will *always* be added to the generated file,
   # even if they are not used as ingredients in any recipe.
+  # TODO: Migrate to deriving automatically from SolutionSpikerComponent.
   # Optional: Default value: []
   forceIncludeReagentSources:
     # Eggs can be trivially cracked into raw egg.
     Egg: [FoodEgg]
+    # Butter can be put into a beaker!
+    Butter: [FoodButter, FoodButterSlice, FoodCannabisButter]
+    THC: [FoodCannabisButter] # lol
   # Some sprites are a little bit strangely aligned, in ways that look ugly in
   # the UI. The idea is to keep the sprite visually centered within its 32x32
   # bounding box.

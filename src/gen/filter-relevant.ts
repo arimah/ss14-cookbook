@@ -22,6 +22,7 @@ import {
 } from './prototypes';
 import { getReagentResult, getSolidResult } from './reaction-helpers';
 import { RawGameData } from './read-raw';
+import { findSolution } from './solution-helpers';
 import {
   ResolvedConstruction,
   ResolvedConstructionRecipe,
@@ -89,6 +90,10 @@ export const filterRelevantPrototypes = (
   do {
     hasAnythingNew = false;
     for (const entity of allEntities.values()) {
+      if (entity.abstract) {
+        continue;
+      }
+
       if (tryAddSpecialRecipes(
         entity,
         specialRecipes,
@@ -221,7 +226,7 @@ const addMetamorphRecipes = (
     // Metamorph recipes are built on food sequences. We need to find the start
     // point of the indicated food sequence.
     const startPoints = allEntities.values()
-      .filter(ent => ent.foodSequenceStart?.key === recipe.key)
+      .filter(ent => !ent.abstract && ent.foodSequenceStart?.key === recipe.key)
       .toArray();
 
     // At present, each food sequence key has exactly one start point. If we
@@ -386,7 +391,7 @@ const entityCanBeFoodSequenceElem = (
   soughtIds: ReadonlySet<FoodSequenceElementId>,
   targetSequence: TagId
 ): boolean => {
-  if (!ent.foodSequenceElement) {
+  if (ent.abstract || !ent.foodSequenceElement) {
     return false;
   }
   const elem = ent.foodSequenceElement.get(targetSequence);
@@ -740,7 +745,7 @@ const findTargetEntityByTag = (
   allEntities: ResolvedEntityMap
 ): OneOrMoreEntities | null => {
   const matching = allEntities.values()
-    .filter(ent => ent.tags.has(tag))
+    .filter(ent => !ent.abstract && ent.tags.has(tag))
     .map(ent => ent.id)
     .toArray();
   switch (matching.length) {
@@ -763,7 +768,15 @@ const collectReagentSources = (
   const result = new Map<ReagentId, EntityId[]>();
 
   for (const entity of allEntities.values()) {
-    const sourceOf = findGrindableProduceReagents(entity, usedReagents);
+    if (entity.abstract) {
+      continue;
+    }
+
+    const sourceOf = findGrindableProduceReagents(
+      entity,
+      usedReagents,
+      allEntities
+    );
     if (sourceOf && sourceOf.length > 0) {
       usedEntities.add(entity.id);
       for (const reagentId of sourceOf) {
@@ -792,13 +805,14 @@ const collectReagentSources = (
 
 const findGrindableProduceReagents = (
   entity: ResolvedEntity,
-  usedReagents: Set<ReagentId>
+  usedReagents: Set<ReagentId>,
+  allEntities: ResolvedEntityMap
 ): ReagentId[] | null => {
-  const { isProduce, extractable, solution } = entity;
+  const { isProduce, extractable, solutions } = entity;
 
   if (
     !extractable ||
-    !solution ||
+    !solutions ||
     // Don't show random grindable objects, just plants that can be grown.
     !isProduce
   ) {
@@ -809,7 +823,7 @@ const findGrindableProduceReagents = (
 
   const grindSolution =
     extractable.grindSolutionName &&
-    solution[extractable.grindSolutionName];
+    findSolution(allEntities, entity, extractable.grindSolutionName);
   if (grindSolution && grindSolution.reagents) {
     foundSolutions.push(grindSolution);
   }
@@ -851,6 +865,7 @@ const collectFoodSequences = (
   const endPoints = new Map<TagId, EntityId[]>();
   for (const entity of allEntities.values()) {
     if (
+      entity.abstract ||
       !entity.foodSequenceElement ||
       entity.foodSequenceElement.size === 0 ||
       ignoredFoodSequenceElements.has(entity.id)

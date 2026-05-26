@@ -71,12 +71,17 @@ export type ResolvedEntityMap = ReadonlyMap<EntityId, ResolvedEntity>;
 export interface ResolvedEntity {
   readonly id: EntityId;
   readonly name: string;
+  /**
+   * True if the entity is abstract (can never be spawned, just used for
+   * inheritance). Abstract entities are pruned in various places.
+   */
+  readonly abstract: boolean;
   /** True if the entity is produce, i.e. grown in a hydroponics tray. */
   readonly isProduce: boolean;
   /** The entity's sprite. */
   readonly sprite: ResolvedSprite;
-  /** All of the entity's solution. */
-  readonly solution: ResolvedSolution | null;
+  /** All of the entity's solutions. */
+  readonly solutions: ResolvedSolutions | null;
   /**
    * The entity's food reagent IDs, extracted from `solution.food`. If the
    * entity has no food solution, this set is empty.
@@ -146,7 +151,27 @@ export interface ResolvedSpriteLayer {
  */
 export type ParsedColor = number;
 
-export type ResolvedSolution = Readonly<Record<string, Solution>>;
+export interface ResolvedSolutions {
+  /** Single-solution ID from the new `SolutionComponent`. */
+  readonly ownId: string | null;
+  /** Single-solution contents from the new `SolutionComponent`. */
+  readonly ownSolution: Solution | null;
+  /**
+   * Solutions spawned "indirectly" alongside the entity. This comes from the
+   * new `SolutionManagerComponent`, which instructs the game to spawn entities
+   * with `SolutionComponent` and `ContainedSolutionComponent` that contain the
+   * actual solutions. The spawned entity prototype IDs are in this list.
+   *
+   * If this list is populated, then we look up solutions through the entity
+   * prototypes that would be spawned alongside the container.
+   */
+  readonly spawned: readonly EntityId[] | null;
+  /**
+   * Solutions from the legacy `SolutionContainerManagerComponent`, which
+   * contains a simple mapping from solution ID to "raw" `Solution` values.
+   */
+  readonly legacy: Readonly<Record<string, Solution>> | null;
+}
 
 export interface ResolvedExtractable {
   readonly grindSolutionName: string | null;

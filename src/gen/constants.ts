@@ -27,6 +27,12 @@ export const DefaultFoodSequenceMaxLayers = 10;
 
 /**
  * MUST MIRROR C#! This matches the default value of the field
+ * `SolutionComponent.DefaultSolutionId`.
+ */
+export const DefaultSolutionId = 'solution';
+
+/**
+ * MUST MIRROR C#! This matches the default value of the field
  * `Butcherable.Type`.`
  */
 export const DefaultButcheringType = 'Knife';
