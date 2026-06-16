@@ -13,7 +13,8 @@ import {
   SolutionContainerManagerComponent,
   SolutionManagerComponent,
   SpriteComponent,
-  StomachComponent
+  StomachComponent,
+  ToolRefinableComponent,
 } from './components';
 import {
   DefaultButcheringType,
@@ -61,9 +62,6 @@ export const resolveComponents = (
     if (foodSolution?.reagents) {
       draft.reagents = new Set(foodSolution.reagents.map(r => r.ReagentId));
     }
-    if (draft.id === 'SolutionLatheLube') {
-      console.log(draft.id);
-    }
   }
 
   return new Map(Array.from(
@@ -89,6 +87,7 @@ const InitialState: ResolvedEntity = {
   foodSequenceStart: null,
   foodSequenceElement: null,
   sliceableFood: null,
+  toolRefinable: null,
   butcherable: null,
   construction: null,
   deepFryOutput: null,
@@ -156,6 +155,9 @@ const beginResolveEntity = (
           if (comp.tags) {
             draft.tags = new Set(comp.tags);
           }
+          break;
+        case 'ToolRefinable':
+          resolveToolRefinable(draft, comp);
           break;
       }
     }
@@ -414,5 +416,24 @@ const resolveStomach = (
     if (whitelist.components) {
       draft.stomach.components = whitelist.components as string[];
     }
+  }
+};
+
+const resolveToolRefinable = (
+  draft: Draft<ResolvedEntity>,
+  comp: ToolRefinableComponent
+): void => {
+  if (!draft.toolRefinable) {
+    draft.toolRefinable = {
+      quality: null,
+      spawned: null,
+    };
+  }
+
+  if (comp.qualityNeeded) {
+    draft.toolRefinable.quality = comp.qualityNeeded;
+  }
+  if (comp.refineResult) {
+    draft.toolRefinable.spawned = comp.refineResult as Draft<EntitySpawnEntry[]>;
   }
 };

@@ -448,58 +448,32 @@ const tryAddSpecialRecipes = (
     entity.butcherable &&
     entity.butcherable.tool === 'Knife' &&
     entity.butcherable.spawned &&
-    usedEntities.has(entity.id)
+    usedEntities.has(entity.id) &&
+    tryAddCuttableSpawns(
+      entity,
+      entity.butcherable.spawned,
+      specialRecipes,
+      usedEntities,
+      usedReagents,
+      allEntities
+    )
   ) {
-    const spawns = getAllGuaranteedUsableSpawns(entity.butcherable.spawned);
-
-    const canUseAtLeastOneSpawnedEntity = spawns.some(([id]) => {
-      // We can use the entity if it is a food and a non-material that is
-      // either an ingredient in some other recipe or is the start of a
-      // food sequence.
-      //
-      // Basically, we want to catch burger buns and essentially no other
-      // butcherables without hardcoding burger buns. There are SO MANY
-      // arbitrary entities that can be butchered.
-      const entity = allEntities.get(id)!;
-      return (
-        isEdible(entity) &&
-        !entity.components.has('Material') &&
-        (
-          usedEntities.has(entity.id) ||
-          entity.foodSequenceStart
-        )
-      );
-    });
-
-    // If we can use at least one, add them all.
-    if (canUseAtLeastOneSpawnedEntity) {
-      for (const [spawnedId, amount] of spawns) {
-        const recipeId = `butcher!${entity.id}:${spawnedId}`;
-        if (specialRecipes.has(recipeId)) {
-          continue;
-        }
-
-        const builder = new ConstructRecipeBuilder()
-          .withSolidResult(spawnedId)
-          .withResultQty(amount)
-          .startWith(entity.id)
-          .cut();
-        const otherSpawns = spawns
-          .filter(e => e[0] !== spawnedId)
-          .map(e => e[0]);
-        if (otherSpawns.length > 0) {
-          builder.alsoMakes(
-            otherSpawns.length === 1
-              ? otherSpawns[0]
-              : otherSpawns
-          );
-        }
-        const recipe = builder.toRecipe();
-        collectRefs(usedEntities, usedReagents, recipe);
-        specialRecipes.set(recipeId, recipe);
-        addedAnything = true;
-      }
-    }
+    addedAnything = true;
+  }
+  if (
+    entity.toolRefinable &&
+    entity.toolRefinable.quality === 'Slicing' &&
+    entity.toolRefinable.spawned &&
+    tryAddCuttableSpawns(
+      entity,
+      entity.toolRefinable.spawned,
+      specialRecipes,
+      usedEntities,
+      usedReagents,
+      allEntities
+    )
+  ) {
+    addedAnything = true;
   }
 
   // If this entity can be constructed into something relevant, then add
@@ -552,6 +526,75 @@ const tryAddSpecialRecipes = (
     }
   }
 
+  return addedAnything;
+};
+
+const tryAddCuttableSpawns = (
+  entity: ResolvedEntity,
+  spawned: readonly EntitySpawnEntry[],
+  specialRecipes: Map<string, ResolvedSpecialRecipe>,
+  usedEntities: Set<EntityId>,
+  usedReagents: Set<ReagentId>,
+  allEntities: ResolvedEntityMap
+): boolean => {
+  if (
+    // Don't add cuttables from mobs - don't want every single butcherable
+    // mob to be present in the cookbook.
+    entity.components.has('Body') ||
+    // Don't add cuttables from *clothing* - you can get cloth from just about
+    // every article of clothing.
+    // ... unless it has the 'Bread' tag, in which case it's a baguette.
+    // This is ugly and stupid.
+    entity.components.has('Clothing') && !entity.tags.has('Bread' as TagId)
+  ) {
+    return false;
+  }
+
+  const spawns = getAllGuaranteedUsableSpawns(spawned);
+
+  const canUseAtLeastOneSpawnedEntity = spawns.some(([id]) => {
+    // We can use the entity if it's edible and used in at least one recipe.
+    //
+    // Basically, we want to catch burger buns, meat, breads and essentially
+    // no other cuttables without hardcoding. There are SO MANY arbitrary
+    // entities that can be cut.
+    const spawned = allEntities.get(id)!;
+    return (
+      isEdible(spawned) &&
+      (usedEntities.has(spawned.id) || spawned.foodSequenceStart)
+    );
+  });
+
+  // If we can use at least one, add them all.
+  let addedAnything = false;
+  if (canUseAtLeastOneSpawnedEntity) {
+    for (const [spawnedId, amount] of spawns) {
+      const recipeId = `butcher!${entity.id}:${spawnedId}`;
+      if (specialRecipes.has(recipeId)) {
+        continue;
+      }
+
+      const builder = new ConstructRecipeBuilder()
+        .withSolidResult(spawnedId)
+        .withResultQty(amount)
+        .startWith(entity.id)
+        .cut();
+      const otherSpawns = spawns
+        .filter(e => e[0] !== spawnedId)
+        .map(e => e[0]);
+      if (otherSpawns.length > 0) {
+        builder.alsoMakes(
+          otherSpawns.length === 1
+            ? otherSpawns[0]
+            : otherSpawns
+        );
+      }
+      const recipe = builder.toRecipe();
+      collectRefs(usedEntities, usedReagents, recipe);
+      specialRecipes.set(recipeId, recipe);
+      addedAnything = true;
+    }
+  }
   return addedAnything;
 };
 

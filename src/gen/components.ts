@@ -29,6 +29,7 @@ export type Component =
   | SpriteComponent
   | StomachComponent
   | TagComponent
+  | ToolRefinableComponent
   ;
 
 export interface ButcherableComponent {
@@ -149,4 +150,10 @@ export interface EntityWhitelist {
 export interface TagComponent {
   readonly type: 'Tag';
   readonly tags?: readonly TagId[];
+}
+
+export interface ToolRefinableComponent {
+  readonly type: 'ToolRefinable';
+  readonly refineResult?: readonly EntitySpawnEntry[];
+  readonly qualityNeeded: string;
 }

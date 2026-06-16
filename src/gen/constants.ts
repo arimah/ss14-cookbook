@@ -33,7 +33,7 @@ export const DefaultSolutionId = 'solution';
 
 /**
  * MUST MIRROR C#! This matches the default value of the field
- * `Butcherable.Type`.`
+ * `ButcherableComponent.Type`.`
  */
 export const DefaultButcheringType = 'Knife';
 

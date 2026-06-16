@@ -105,13 +105,24 @@ export interface ResolvedEntity {
   /**
    * If the entity is a sliceable food, contains the resulting slice entity
    * and count.
+   *
+   * Deprecated, replaced by `ToolRefinable`.
    */
   readonly sliceableFood: ResolvedSlice | null;
   /**
    * If the entity can be butchered, contains the tool required and the
    * entities it will spawn.
+   *
+   * Deprecated, replaced by `ToolRefinable`.
    */
   readonly butcherable: ResolvedButcherable | null;
+  /**
+   * If the entity can be "refined by tool", contains the tool quality required
+   * and the entities it will spawn.
+   *
+   * Replaces `Butcherable`.
+   */
+  readonly toolRefinable: ResolvedToolRefinable | null;
   /** The entity's construction component data, if it has one. */
   readonly construction: ResolvedConstruction | null;
   /**
@@ -189,6 +200,11 @@ export interface ResolvedSlice {
 
 export interface ResolvedButcherable {
   readonly tool: string;
+  readonly spawned: readonly EntitySpawnEntry[] | null;
+}
+
+export interface ResolvedToolRefinable {
+  readonly quality: string | null;
   readonly spawned: readonly EntitySpawnEntry[] | null;
 }
 
