@@ -2,7 +2,7 @@ base:
   name: "WizDen"
   description: "Original, vanilla Space Station 14 à la Wizard's Den."
   path: "../cookbook-sources/base"
-  repo: "space-wizards/space-station-14"
+  repo: "Space-Wizards-Federation/space-station-14"
   default: true
   methodEntities: &baseMethods
     microwave: KitchenMicrowave
