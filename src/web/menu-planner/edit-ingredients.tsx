@@ -40,7 +40,7 @@ export const IngredientList = memo(({
     <h3>Składniki przepisu</h3>
     {sortedIngredients.length > 0 ? <>
       <p className='text-subtle'>
-        These ingredients are used by at least one selected recipe.
+        Te składniki są wykorzystywane w co najmniej jednym wybranym przepisie.
       </p>
       <ul className='planner_editor-ingredient-list'>
         {directIngredients.map(ingredient =>
@@ -55,7 +55,7 @@ export const IngredientList = memo(({
       </ul>
 
       {precursorIngredients.length > 0 && <>
-        <h3>Ingredients of ingredients</h3>
+        <h3>Składniki składników</h3>
         <p className='text-subtle'>
           Są to składniki potrzebne do przygotowania innych składników; nie są one wykorzystywane bezpośrednio w żadnej potrawie z menu.
         </p>

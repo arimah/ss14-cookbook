@@ -662,29 +662,29 @@ const FilterExport = ({
   return (
     <div className='recipe-search_row recipe-search_row--actions'>
       <LinkIcon/>
-      <span>Copy link to:</span>
+      <span>Skopiuj link do:</span>
       <CopyToClipboardButton
         getContent={getFilterOnly}
-        successTooltip='Link copied to clipboard!'
-        fallbackDialogTitle='Exported filter'
+        successTooltip='Link został skopiowany do schowka!'
+        fallbackDialogTitle='Eksportowany filtr'
       >
         <FilterIcon/>
-        <span>Filter</span>
+        <span>Filtr</span>
       </CopyToClipboardButton>
       <CopyToClipboardButton
         getContent={getSearchOnly}
-        successTooltip='Link copied to clipboard!'
-        fallbackDialogTitle='Exported search'
+        successTooltip='Link został skopiowany do schowka!'
+        fallbackDialogTitle='Eksportowane wyniki wyszukiwania'
       >
         <SearchIcon/>
-        <span>Search</span>
+        <span>Wyszukiwanie</span>
       </CopyToClipboardButton>
       <CopyToClipboardButton
         getContent={getFilterAndSearch}
-        successTooltip='Link copied to clipboard!'
-        fallbackDialogTitle='Exported filter + search'
+        successTooltip='Link został skopiowany do schowka!'
+        fallbackDialogTitle='Eksportowany filtr + wyniki wyszukiwania'
       >
-        <span>Filter + search</span>
+        <span>Filtr + wynik wyszukiwania</span>
       </CopyToClipboardButton>
     </div>
   );
