@@ -1,21 +1,27 @@
-import { ReactElement, ReactNode, RefObject, memo, useMemo, useRef } from 'react';
-import { createPortal } from 'react-dom';
+import {
+  memo,
+  ReactElement,
+  ReactNode,
+  RefObject,
+  useMemo,
+  useRef,
+} from 'react';
 import { Link } from 'react-router';
-import { Entity, Recipe as RecipeData } from '../types';
-import { useGameData } from './context';
-import { FavoriteButton, useIsFavorite } from './favorites';
-import { CloseIcon, FoodSequenceIcon, NodeTreeIcon } from './icons';
-import { getPopupRoot, usePopupTrigger } from './popup-impl';
-import { useCurrentExploredRecipe, useExploreRecipe } from './recipe-explorer/hooks';
-import { RecipeIngredients } from './recipe-ingredients';
-import { RecipeInstructions } from './recipe-instructions';
-import { RecipeMethod } from './recipe-method';
-import { RecipeResult } from './recipe-result';
-import { RecipeTraits } from './recipe-traits';
-import { useRecipeVisibility } from './recipe-visibility-context';
-import { EntitySprite } from './sprites';
-import { Tooltip } from './tooltip';
-import { useUrl } from './url';
+import { Entity, Recipe as RecipeData } from '../../types';
+import { useGameData } from '../context';
+import { FavoriteButton, useIsFavorite } from '../favorites';
+import { CloseIcon, FoodSequenceIcon, NodeTreeIcon } from '../icons';
+import { Popup, usePopupTrigger } from '../popup';
+import { useCurrentExploredRecipe, useExploreRecipe } from '../recipe-explorer';
+import { EntitySprite } from '../sprites';
+import { Tooltip } from '../tooltip';
+import { useUrl } from '../url';
+import { RecipeIngredients } from './ingredients';
+import { RecipeInstructions } from './instructions';
+import { RecipeMethod } from './method';
+import { RecipeResult } from './result';
+import { RecipeTraits } from './traits';
+import { useRecipeVisibility } from './visibility-context';
 
 export interface Props {
   className?: string;
@@ -162,32 +168,28 @@ const SeqElemIcon = memo(({
   seqElem,
   seqEnd,
 }: SeqElemIconProps): ReactElement => {
-  const tooltipContent = useMemo(() => <>
-    {seqElem && <>
-      <p>Możesz włożyć to jedzenie do środka:</p>
-      <SeqElemList sequences={seqElem}/>
-    </>}
-    {seqEnd && <>
-      <p>To jedzenie może zakończyć:</p>
-      <SeqElemList sequences={seqEnd}/>
-    </>}
-  </>, [seqElem, seqEnd]);
+  const tooltipContent = useMemo(() => (
+    <div className='popup_foodseq'>
+      {seqElem && <>
+        <p>Możesz włożyć to jedzenie do środka:</p>
+        <SeqElemList sequences={seqElem}/>
+      </>}
+      {seqEnd && <>
+        <p>To jedzenie może zakończyć:</p>
+        <SeqElemList sequences={seqEnd}/>
+      </>}
+    </div>
+  ), [seqElem, seqEnd]);
 
-  const { visible, popupRef, parentRef } = usePopupTrigger<HTMLDivElement>(
-    'above',
-    tooltipContent
-  );
+  const popup = usePopupTrigger<HTMLSpanElement>();
 
   return <>
-    <span className='recipe_info-icon' ref={parentRef}>
+    <span className='recipe_info-icon' ref={popup.triggerRef}>
       <FoodSequenceIcon/>
     </span>
-    {visible && createPortal(
-      <div className='popup popup--foodseq' ref={popupRef}>
-        {tooltipContent}
-      </div>,
-      getPopupRoot()
-    )}
+    <Popup {...popup}>
+      {tooltipContent}
+    </Popup>
   </>;
 });
 

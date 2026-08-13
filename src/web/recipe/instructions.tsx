@@ -10,15 +10,15 @@ import {
   MixStep,
   SimpleInteractionStep,
   StartStep,
-} from '../types';
-import { useGameData } from './context';
+} from '../../types';
+import { useGameData } from '../context';
+import { RawSprite } from '../sprites';
+import { Temperature } from '../temperature';
 import {
   ReagentIngredient,
   RecipeIngredients,
   SolidIngredient,
-} from './recipe-ingredients';
-import { RawSprite } from './sprites';
-import { Temperature } from './temperature';
+} from './ingredients';
 
 export interface RecipeInstructionsProps {
   steps: readonly ConstructionStep[];

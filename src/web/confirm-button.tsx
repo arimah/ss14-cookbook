@@ -4,13 +4,11 @@ import {
   KeyboardEvent,
   PointerEvent,
   ReactElement,
-  Ref,
   useCallback,
   useEffect,
-  useState,
+  useState
 } from 'react';
-import { createPortal } from 'react-dom';
-import { getPopupRoot, usePopupTrigger } from './popup-impl';
+import { Popup, usePopupTrigger } from './popup';
 
 export type Props = {
   timeout?: number;
@@ -97,18 +95,7 @@ export const ConfirmButton = ({
     }
   }, [endHold]);
 
-  const tooltipText =
-    state === 'held' ? usageHint :
-    state === 'ready' ? ReleaseHint :
-    tooltip;
-  const {
-    visible: tooltipVisible,
-    popupRef,
-    parentRef,
-  } = usePopupTrigger<HTMLDivElement>(
-    'above',
-    tooltipText
-  );
+  const popup = usePopupTrigger<HTMLButtonElement>();
 
   useEffect(() => {
     if (state === 'held') {
@@ -121,6 +108,11 @@ export const ConfirmButton = ({
   if (className) {
     realClassName = `${realClassName} ${className}`;
   }
+
+  const tooltipText =
+    state === 'held' ? usageHint :
+    state === 'ready' ? ReleaseHint :
+    tooltip;
 
   return <>
     <button
@@ -136,16 +128,17 @@ export const ConfirmButton = ({
       onKeyDown={handleKeyDown}
       onKeyUp={handleKeyUp}
       onBlur={cancelHold}
-      ref={parentRef as Ref<HTMLButtonElement>}
+      ref={popup.triggerRef}
     >
       {children}
     </button>
-
-    {tooltipVisible && tooltipText != '' && createPortal(
-      <div className='popup popup--tooltip' ref={popupRef}>
+    <Popup
+      {...popup}
+      open={popup.open && tooltipText !== ''}
+    >
+      <div className='popup_tooltip'>
         {tooltipText}
-      </div>,
-      getPopupRoot()
-    )}
+      </div>
+    </Popup>
   </>;
 };

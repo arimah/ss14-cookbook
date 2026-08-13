@@ -1,6 +1,5 @@
 import { ReactElement, Ref, cloneElement } from 'react';
-import { createPortal } from 'react-dom';
-import { PopupPlacement, getPopupRoot, usePopupTrigger } from './popup-impl';
+import { Popup, PopupPlacement, usePopupTrigger } from './popup';
 
 export interface Props {
   text: string;
@@ -22,13 +21,9 @@ export const Tooltip = ({
   children,
   open,
 }: Props): ReactElement => {
-  const { visible, popupRef, parentRef } = usePopupTrigger<HTMLDivElement>(
-    placement,
-    text,
-    { open }
-  );
+  const popup = usePopupTrigger();
 
-  const changedProps: ChildProps = { ref: parentRef };
+  const changedProps: ChildProps = { ref: popup.triggerRef };
   if (provideLabel) {
     changedProps['aria-label'] = text;
   }
@@ -37,11 +32,14 @@ export const Tooltip = ({
 
   return <>
     {childWithRef}
-    {visible && createPortal(
-      <div className='popup popup--tooltip' ref={popupRef}>
+    <Popup
+      {...popup}
+      open={open ?? popup.open}
+      placement={placement}
+    >
+      <div className='popup_tooltip'>
         {text}
-      </div>,
-      getPopupRoot()
-    )}
+      </div>
+    </Popup>
   </>;
 };

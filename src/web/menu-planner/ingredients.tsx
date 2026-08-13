@@ -25,29 +25,46 @@ export const findIngredients = (
         continue;
       }
 
+      const isDirectRecipe = selectedRecipes.includes(recipeId);
+
       for (const entityId of Object.keys(recipe.solids)) {
-        const ingredient = resolveIngredient(result, 'solid', entityId);
+        const ingredient = resolveIngredient(
+          result,
+          'solid',
+          entityId,
+          isDirectRecipe
+        );
         addIngredient(
           ingredient,
           recipeId,
           bySolidResult.get(entityId),
           nextBatch,
-          visited,
+          visited
         );
       }
       for (const reagentId of Object.keys(recipe.reagents)) {
-        const ingredient = resolveIngredient(result, 'reagent', reagentId);
+        const ingredient = resolveIngredient(
+          result,
+          'reagent',
+          reagentId,
+          isDirectRecipe
+        );
         addIngredient(
           ingredient,
           recipeId,
           byReagentResult.get(reagentId),
           nextBatch,
-          visited,
+          visited
         );
 
         const reagent = reagents.get(reagentId)!;
         for (const source of reagent.sources) {
-          const sourceIngredient = resolveIngredient(result, 'solid', source);
+          const sourceIngredient = resolveIngredient(
+            result,
+            'solid',
+            source,
+            false
+          );
           sourceIngredient.sourceOfReagent.add(reagentId);
         }
       }
@@ -74,7 +91,8 @@ export const findIngredients = (
 const resolveIngredient = (
   ingredients: Map<string, Draft<Ingredient>>,
   type: 'solid' | 'reagent',
-  id: string
+  id: string,
+  isDirect: boolean
 ): Draft<Ingredient> => {
   const ingredientId = `${type}:${id}`;
   let ingredient = ingredients.get(ingredientId);
@@ -84,11 +102,15 @@ const resolveIngredient = (
       recipes: [],
       usedBy: new Set(),
       sourceOfReagent: new Set(),
+      precursor: true, // until proven otherwise
     };
     ingredient = type === 'solid'
       ? { type, entityId: id, ...baseIngredient }
       : { type, reagentId: id, ...baseIngredient };
     ingredients.set(ingredientId, ingredient);
+  }
+  if (isDirect) {
+    ingredient.precursor = false;
   }
   return ingredient;
 };

@@ -2,7 +2,7 @@ import { ReactElement, memo, useMemo } from 'react';
 import { Entity } from '../../types';
 import { useGameData } from '../context';
 import { NeutralCollator } from '../helpers';
-import { RecipePopup } from '../recipe-popup';
+import { RecipePopup } from '../recipe';
 import { EntitySprite } from '../sprites';
 
 export interface SeqStartPointProps {

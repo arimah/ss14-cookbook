@@ -23,10 +23,13 @@ export type Component =
   | FoodSequenceStartPointComponent
   | ProduceComponent
   | SliceableFoodComponent
+  | SolutionComponent
+  | SolutionManagerComponent
   | SolutionContainerManagerComponent
   | SpriteComponent
   | StomachComponent
   | TagComponent
+  | ToolRefinableComponent
   ;
 
 export interface ButcherableComponent {
@@ -84,9 +87,23 @@ export interface SliceableFoodComponent {
   readonly count?: number;
 }
 
+/** Old solution container, still used by most forks. */
 export interface SolutionContainerManagerComponent {
   readonly type: 'SolutionContainerManager';
   readonly solutions?: Readonly<Record<string, Solution>>;
+}
+
+/** New solution manager component. */
+export interface SolutionManagerComponent {
+  readonly type: 'SolutionManager';
+  readonly solutions?: readonly EntityId[];
+}
+
+/** New single-solution component. */
+export interface SolutionComponent {
+  readonly type: 'Solution';
+  readonly id?: string;
+  readonly solution?: Solution;
 }
 
 export interface Solution {
@@ -133,4 +150,10 @@ export interface EntityWhitelist {
 export interface TagComponent {
   readonly type: 'Tag';
   readonly tags?: readonly TagId[];
+}
+
+export interface ToolRefinableComponent {
+  readonly type: 'ToolRefinable';
+  readonly refineResult?: readonly EntitySpawnEntry[];
+  readonly qualityNeeded: string;
 }

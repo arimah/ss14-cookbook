@@ -1,8 +1,8 @@
 import { ReactElement, memo } from 'react';
-import { Recipe } from '../types';
-import { useGameData } from './context';
-import { EntitySprite, ReagentSprite } from './sprites';
-import { Tooltip } from './tooltip';
+import { Recipe } from '../../types';
+import { useGameData } from '../context';
+import { EntitySprite, ReagentSprite } from '../sprites';
+import { Tooltip } from '../tooltip';
 
 export interface RecipeResultProps {
   recipe: Recipe;

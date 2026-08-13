@@ -7,7 +7,7 @@ import {
   useMemo,
 } from 'react';
 import { ErrorIcon, InformationIcon, StarOnIcon, WarningIcon } from '../icons';
-import { RecipePopup } from '../recipe-popup';
+import { RecipePopup } from '../recipe';
 import { FirstVisitKey, useStorage } from '../storage';
 import { NoticeData, NoticeIcon } from '../types';
 import { NoticesContext } from './context';

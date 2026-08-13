@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router';
 import { FocusTrap } from './focus';
 import { ArrowRightIcon, CloseIcon, InformationIcon } from './icons';
-import { getPopupRoot } from './popup-impl';
+import { getPopupRoot } from './popup';
 import { hasImportantStoredData } from './storage';
 import { Tooltip } from './tooltip';
 import { useUrl } from './url';

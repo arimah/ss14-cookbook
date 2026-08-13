@@ -1,9 +1,8 @@
 import { ReactElement, memo, useMemo } from 'react';
-import { createPortal } from 'react-dom';
 import { useGameData } from '../context';
 import { NeutralCollator, dedupe } from '../helpers';
 import { AddIcon, EyeIcon, EyeOffIcon, InformationIcon } from '../icons';
-import { getPopupRoot, usePopupTrigger } from '../popup-impl';
+import { Popup, usePopupTrigger } from '../popup';
 import { Recipe } from '../recipe';
 import { getRecipeName } from '../sort';
 import { EntitySprite, ReagentSprite } from '../sprites';
@@ -13,14 +12,14 @@ import { Ingredient } from './types';
 
 export interface Props {
   availableIngredients: readonly Ingredient[];
-  hiddenIngredients: ReadonlySet<string>,
+  visibility: ReadonlyMap<string, boolean>,
   onToggleVisible: (id: string) => void;
   onAddRecipe: (id: string) => void;
 }
 
 export const IngredientList = memo(({
   availableIngredients,
-  hiddenIngredients,
+  visibility,
   onToggleVisible,
   onAddRecipe,
 }: Props): ReactElement => {
@@ -34,21 +33,45 @@ export const IngredientList = memo(({
     });
   }, [availableIngredients, entityMap, reagentMap]);
 
+  const directIngredients = sortedIngredients.filter(x => !x.precursor);
+  const precursorIngredients = sortedIngredients.filter(x => x.precursor);
+
   return <>
-    <h3>Składniki</h3>
-    {sortedIngredients.length > 0 ? (
+    <h3>Składniki przepisu</h3>
+    {sortedIngredients.length > 0 ? <>
+      <p className='text-subtle'>
+        These ingredients are used by at least one selected recipe.
+      </p>
       <ul className='planner_editor-ingredient-list'>
-        {sortedIngredients.map(ingredient =>
+        {directIngredients.map(ingredient =>
           <Ingredient
             key={ingredient.id}
             ingredient={ingredient}
-            visible={!hiddenIngredients.has(ingredient.id)}
+            visible={visibility.get(ingredient.id) ?? true}
             onToggleVisible={onToggleVisible}
             onAddRecipe={onAddRecipe}
           />
         )}
       </ul>
-    ) : <>
+
+      {precursorIngredients.length > 0 && <>
+        <h3>Ingredients of ingredients</h3>
+        <p className='text-subtle'>
+          Są to składniki potrzebne do przygotowania innych składników; nie są one wykorzystywane bezpośrednio w żadnej potrawie z menu.
+        </p>
+        <ul className='planner_editor-ingredient-list'>
+          {precursorIngredients.map(ingredient =>
+            <Ingredient
+              key={ingredient.id}
+              ingredient={ingredient}
+              visible={visibility.get(ingredient.id) ?? false}
+              onToggleVisible={onToggleVisible}
+              onAddRecipe={onAddRecipe}
+            />
+          )}
+        </ul>
+      </>}
+    </> : <>
       <p>Kiedy dodasz przepisy do menu, ich składniki pojawią się tutaj. Ta lista będzie również zawierać składniki użyte w przepisach na inne składniki.</p>
       <p>Możesz ukryć składniki, których nie chcesz widzieć, i dodać ich przepisy (jeśli są dostępne) do swojego menu.</p>
     </>}
@@ -154,10 +177,7 @@ const AddRecipeButton = memo(({
   totalCount,
   onAdd,
 }: AddRecipeButtonProps): ReactElement => {
-  const { parentRef, popupRef, visible } = usePopupTrigger<
-    HTMLDivElement,
-    HTMLButtonElement
-  >('above');
+  const popup = usePopupTrigger<HTMLButtonElement>();
 
   const n = index + 1;
 
@@ -170,19 +190,18 @@ const AddRecipeButton = memo(({
       className='planner_editor-ingredient-add-recipe'
       aria-label={ariaLabel}
       onClick={() => onAdd(recipeId)}
-      ref={parentRef}
+      ref={popup.triggerRef}
     >
       <AddIcon/>
       {totalCount > 1 && <span>{n}</span>}
     </button>
-    {visible && createPortal(
-      <div className='popup popup--recipe' ref={popupRef}>
+    <Popup {...popup} interactive>
+      <div className='popup_recipe'>
         <Recipe id={recipeId} canFavorite={false} canExplore={false}/>
-        <span className='popup--tooltip'>
+        <span className='popup_tooltip'>
           Add this recipe to the menu.
         </span>
-      </div>,
-      getPopupRoot()
-    )}
+      </div>
+    </Popup>
   </>;
 });

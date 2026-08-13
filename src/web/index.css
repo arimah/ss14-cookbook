@@ -7,24 +7,21 @@
   color: var(--fg);
 
   --checkbox-size: 20px;
+  --popup-gap: 6px;
   --tooltip-font-size: 14px;
   --shadow-basic: 0 1px 4px var(--shadow-color);
-}
 
   @media (min-width: 600px) {
-    :root {
-      font-size: 16px;
-      --tooltip-font-size: 16px;
-      --checkbox-size: 22px;
-    }
+    font-size: 16px;
+    --tooltip-font-size: 16px;
+    --checkbox-size: 22px;
   }
 
   @media (min-width: 850px) {
-    :root {
-      font-size: 18px;
-      --checkbox-size: 24px;
-    }
+    font-size: 18px;
+    --checkbox-size: 24px;
   }
+}
 
 .theme-dark {
   --fg: #ffffff;
@@ -205,27 +202,25 @@ body.overlay-open {
 
 .thin-scroll {
   scrollbar-width: thin;
-}
 
   @supports selector(::-webkit-scrollbar) {
-    .thin-scroll {
-      scrollbar-width: unset;
-    }
+    scrollbar-width: unset;
 
-    .thin-scroll::-webkit-scrollbar {
+    &::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
 
-    .thin-scroll::-webkit-scrollbar-track {
+    &::-webkit-scrollbar-track {
       background: transparent;
     }
 
-    .thin-scroll::-webkit-scrollbar-thumb {
+    &::-webkit-scrollbar-thumb {
       background: var(--scroll-thumb);
       border-radius: 16px;
     }
   }
+}
 
 .app-root {
   box-sizing: border-box;
@@ -244,50 +239,54 @@ main {
 
 footer {
   flex: none;
-  margin-top: 8px;
-}
+  margin-top: 32px;
 
-  footer p:not(:first-child) {
+  p:not(:first-child) {
     margin-top: 8px;
   }
-
-a:link,
-a:visited {
-  color: var(--link-fg);
 }
 
-  a:hover {
+a {
+  &:link,
+  &:visited {
+    color: var(--link-fg);
+  }
+
+  &:hover {
     color: var(--link-fg-hover);
   }
 
-  a:active {
+  &:active {
     color: var(--link-fg-active);
   }
+}
+
+.text-subtle {
+  color: var(--fg-subtle);
+}
 
 input {
   font: inherit;
-}
 
-  input[type=text],
-  input[type=search] {
+  &[type=text],
+  &[type=search] {
     padding: 4px 6px;
     border-radius: 5px;
     border: 2px solid var(--input-border);
     background-color: var(--input-bg);
     color: var(--input-fg);
-  }
 
-    input[type=text]:focus,
-    input[type=search]:focus {
+    &:focus {
       outline: none;
       border-color: var(--focus-color);
     }
 
-    input[type=text]::placeholder,
-    input[type=search]::placeholder {
+    &::placeholder {
       color: currentColor;
       opacity: 0.7;
     }
+  }
+}
 
 textarea {
   padding: 4px 6px;
@@ -297,12 +296,12 @@ textarea {
   border: 2px solid var(--input-border);
   background-color: var(--input-bg);
   color: var(--input-fg);
-}
 
-  textarea:focus {
+  &:focus {
     outline: none;
     border-color: var(--focus-color);
   }
+}
 
 .input-group {
   display: inline-flex;
@@ -311,44 +310,46 @@ textarea {
   border: 2px solid var(--input-border);
   background-color: var(--input-bg);
   cursor: text;
-}
 
-  .input-group:focus-within {
+  &:focus-within {
     border-color: var(--focus-color);
   }
 
-  .input-group > input {
+  > input {
     flex: 1 1 auto;
     border: none;
   }
 
-  .input-group > .icon:first-child {
-    margin-left: 6px;
-  }
+  > .icon {
+    &:first-child {
+      margin-left: 6px;
+    }
 
-  .input-group > .icon:last-child {
-    margin-right: 6px;
+    &:last-child {
+      margin-right: 6px;
+    }
   }
+}
 
 .checkbox {
   display: flex;
   align-items: center;
   gap: 4px;
   position: relative;
-}
 
-  .checkbox > input {
+  > input {
     appearance: none;
     position: absolute;
     top: calc(50% - var(--checkbox-size) / 2);
     left: 0;
     width: var(--checkbox-size);
     height: var(--checkbox-size);
-  }
 
-    .checkbox > input:focus {
+    &:focus {
       outline: none;
     }
+  }
+}
 
   .checkbox_marker {
     flex: none;
@@ -361,14 +362,13 @@ textarea {
     border-radius: 3px;
     background-color: var(--checkbox-bg);
     color: var(--checkbox-fg);
-  }
 
-    input:focus + .checkbox_marker {
+    input:focus + & {
       border-color: var(--focus-color);
     }
 
-    input:checked + .checkbox_marker::before,
-    .checkbox_marker--checked::before {
+    input:checked + &::before,
+    &--checked::before {
       content: '';
       position: absolute;
       top: 50%;
@@ -379,6 +379,7 @@ textarea {
       border-bottom: 3px solid currentColor;
       transform: translate(-50%, -75%) rotate(-45deg);
     }
+  }
 
   .checkbox_label {
     flex: 1 1 auto;
@@ -396,102 +397,87 @@ button,
   border: 2px solid var(--button-border);
   background-color: var(--button-bg);
   color: var(--button-fg);
-}
 
-  a.btn {
-    text-decoration: none;
-    color: var(--button-fg);
-  }
-
-  button.confirm,
-  .btn.confirm {
+  &.confirm {
     background-position: 100% 0;
     transition: background-position 0s linear;
     --confirm-time: 0ms;
   }
 
-  button.floating,
-  .btn.floating {
+  &.floating {
     --button-border: var(--button-bg);
     --button-border-hover: var(--button-bg-hover);
     box-shadow: var(--shadow-basic);
   }
 
-  button[aria-pressed=true],
-  .btn[aria-pressed=true] {
+  &[aria-pressed=true] {
     border-color: var(--button-border-pressed);
   }
 
-  button:hover,
-  .btn:hover {
+  &:hover {
     background-color: var(--button-bg-hover);
     border-color: var(--button-border-hover);
     color: var(--button-fg);
   }
 
-  button:active,
-  .btn:active {
+  &:active {
     background-color: var(--button-bg-active);
     color: var(--button-fg);
   }
 
-    button.confirm:active,
-    .btn.confirm:active {
-      background-color: var(--button-bg);
-    }
+  &.confirm:active {
+    background-color: var(--button-bg);
+  }
 
-    button.confirm.confirm--held,
-    .btn.confirm.confirm--held {
-      background: linear-gradient(
-        90deg,
-        var(--button-bg-active) 50%,
-        var(--button-bg) 50%
-      );
-      background-size: 200% 100%;
-      background-position: 0 0;
-      transition-duration: var(--confirm-time);
-    }
+  &.confirm.confirm--held {
+    background: linear-gradient(
+      90deg,
+      var(--button-bg-active) 50%,
+      var(--button-bg) 50%
+    );
+    background-size: 200% 100%;
+    background-position: 0 0;
+    transition-duration: var(--confirm-time);
+  }
 
-  button[aria-pressed=true],
-  .btn[aria-pressed=true] {
+  &[aria-pressed=true] {
     background-color: var(--button-bg-pressed);
   }
 
-  button:focus,
-  .btn:focus {
+  &:focus {
     outline: none;
     border-color: var(--focus-color);
   }
 
-  button:disabled,
-  .btn:disabled {
+  &:disabled {
     border-color: var(--button-bg-disabled);
     background-color: var(--button-bg-disabled);
     color: var(--button-fg-disabled);
     --icon-fg: currentColor;
   }
 
-  :is(button, .btn) > :is(.icon, .sprite, .reagent) {
+  > :where(.icon, .sprite, .reagent) {
     flex: none;
     margin-top: -4px;
     margin-bottom: -4px;
-  }
 
-    /* :where for lower specificity - avoids various problems in other places */
-
-    :is(button, .btn) > :where(.icon, .sprite, .reagent):first-child {
+    &:first-child {
       margin-left: -4px;
     }
 
-    :is(button, .btn) > :where(.icon, .sprite, .reagent):last-child {
+    &:last-child {
       margin-right: -4px;
     }
+  }
 
   @media (min-width: 600px) {
-    button,
-    .btn {
-      padding-inline: 10px;
-    }
+    padding-inline: 10px;
+  }
+}
+
+  a.btn {
+    text-decoration: none;
+    color: var(--button-fg);
   }
 
 select {
@@ -502,12 +488,12 @@ select {
   background-color: var(--input-bg);
   color: var(--input-fg);
   font: inherit;
-}
 
-  select:focus {
+  &:focus {
     outline: none;
     border-color: var(--focus-color);
   }
+}
 
 .select-group {
   display: inline-flex;
@@ -515,13 +501,12 @@ select {
   border-radius: 5px;
   border: 2px solid var(--input-border);
   background-color: var(--input-bg);
-}
 
-  .select-group:focus-within {
+  &:focus-within {
     border-color: var(--focus-color);
   }
 
-  .select-group > select {
+  > select {
     flex: 1 1 auto;
     margin: -2px;
     padding: 5px 8px;
@@ -529,37 +514,33 @@ select {
     background: transparent;
   }
 
-    .select-group--icon-before > select {
-      margin-left: -32px;
-      padding-left: 38px;
-    }
-
-  .select-group option {
+  option {
     background-color: var(--input-bg);
     color: var(--input-fg);
   }
 
-  .select-group > .icon {
+  > .icon {
     pointer-events: none;
-  }
 
-    .select-group > .icon:first-child {
+    &:first-child {
       margin-left: 6px;
     }
 
-    .select-group > .icon:last-child {
+    &:last-child {
       margin-right: 6px;
     }
+  }
+}
 
 .dropdown {
   display: flex;
   flex-shrink: 0;
   position: relative;
-}
 
-  .dropdown > button {
+  > button {
     flex: 1 1 auto;
   }
+}
 
   .dropdown_trigger {
     justify-content: flex-start;
@@ -569,11 +550,11 @@ select {
     --button-bg-hover: var(--input-bg);
     --button-bg-active: var(--input-bg);
     --button-border: var(--input-border);
-  }
 
-    .dropdown--open > .dropdown_trigger {
+    .dropdown--open > & {
       border-color: var(--focus-color);
     }
+  }
 
   .dropdown_prefix {
     opacity: 0.75;
@@ -583,17 +564,17 @@ select {
     flex: 1 0 auto;
     display: grid;
     justify-items: flex-start;
-  }
 
-    .dropdown_label > span {
+    > span {
       grid-row: 1;
       grid-column: 1;
       visibility: hidden;
-    }
 
-      .dropdown_label > span.current {
+      &.current {
         visibility: visible;
       }
+    }
+  }
 
   .dropdown_arrow {
     margin-left: -2px;
@@ -617,16 +598,16 @@ select {
     box-shadow: 0 2px 5px var(--shadow-color);
     cursor: default;
     user-select: none;
-  }
 
-    .dropdown_list--above {
+    &--above {
       top: auto;
       bottom: 100%;
     }
 
-    .dropdown_list:focus {
+    &:focus {
       outline: none;
     }
+  }
 
   .dropdown_item {
     display: grid;
@@ -636,16 +617,21 @@ select {
     gap: 4px 8px;
     align-items: center;
     white-space: nowrap;
-  }
 
-    .dropdown_list--icon > .dropdown_item {
+    .dropdown_list--icon > & {
       grid-template-columns: 24px 1fr;
     }
 
-    .dropdown_item--current {
+    &--current {
       background-color: var(--dropdown-bg-hover);
       --checkbox-border: var(--checkbox-bg);
     }
+
+    @media (min-width: 600px) {
+      padding: 6px 8px;
+      gap: 2px 4px;
+    }
+  }
 
   .dropdown_item-name {
     grid-column: -2;
@@ -660,13 +646,6 @@ select {
 
   .dropdown_sep {
     border-top: 2px solid var(--dropdown-border);
-  }
-
-  @media (min-width: 600px) {
-    .dropdown_item {
-      padding: 6px 8px;
-      gap: 2px 4px;
-    }
   }
 
 .spacer {
@@ -701,17 +680,16 @@ select {
     --button-bg: var(--bg-level-1);
     --button-bg-hover: var(--bg-level-2);
     --button-bg-active: var(--bg-level-0);
-  }
 
-    .tabs_tab:focus {
+    &:focus {
       outline: 2px solid var(--focus-color);
     }
 
-    .tabs_tab--current {
+    &--current {
       --button-bg: var(--bg-level-2);
     }
 
-    .tabs_tab::after {
+    &::after {
       content: '';
       position: absolute;
       bottom: 2px;
@@ -722,9 +700,10 @@ select {
       transition: width 125ms ease;
     }
 
-      .tabs_tab--current::after {
-        width: calc(100% - 8px);
-      }
+    &--current::after {
+      width: calc(100% - 8px);
+    }
+  }
 
   .tabs_secondary {
     display: flex;
@@ -742,13 +721,13 @@ select {
       display: flex;
       flex: none;
       position: relative;
-    }
 
-      .tabs_settings > button {
+      > button {
         min-width: 44px;
         min-height: 34px;
         box-shadow: var(--shadow-basic);
       }
+    }
 
   @media (min-width: 600px) {
     .tabs {
@@ -794,11 +773,11 @@ select {
   width: 32px;
   height: 32px;
   vertical-align: -8px;
-}
 
-  .reagent > .sprite {
+  > .sprite {
     display: block;
   }
+}
 
   .reagent_fill {
     position: absolute;
@@ -825,13 +804,12 @@ select {
   background-color: var(--recipe-bg);
   color: var(--recipe-fg);
   box-shadow: var(--shadow-basic);
-}
 
-  .recipe--fav {
+  &--fav {
     --recipe-bg-title: var(--recipe-bg-title-fav);
   }
 
-  .recipe--new-fav::before {
+  &--new-fav::before {
     content: '';
     position: absolute;
     inset: -3px;
@@ -851,15 +829,16 @@ select {
     background-position: 50% 0%;
     pointer-events: none;
   }
+}
 
-    @keyframes new-fav-shimmer {
-      0% {
-        background-position: 50% 100%;
-      }
-      100% {
-        background-position: 50% 0%;
-      }
+  @keyframes new-fav-shimmer {
+    0% {
+      background-position: 50% 100%;
     }
+    100% {
+      background-position: 50% 0%;
+    }
+  }
 
   .recipe_title {
     grid-column: 1 / -1;
@@ -878,12 +857,11 @@ select {
 
     --button-bg: var(--recipe-bg-title);
     --button-border: var(--recipe-bg-title);
-  }
 
-    .recipe_title > button,
-    .recipe_title > .btn {
+    & > :is(button, .btn) {
       padding-inline: 6px;
     }
+  }
 
     .recipe_info-icon {
       padding: 4px;
@@ -962,15 +940,15 @@ select {
       padding: 4px;
       border-radius: 3px;
       cursor: help;
-    }
 
-      .recipe_ingredient-help:hover {
+      &:hover {
         background-color: var(--recipe-help-bg-hover);
       }
 
-      .recipe_ingredient-help > .icon {
+      > .icon {
         display: block;
       }
+    }
 
   .recipe_instructions {
     list-style-type: decimal;
@@ -982,40 +960,40 @@ select {
     max-height: 380px;
     scrollbar-width: thin;
     scrollbar-color: var(--input-border) var(--input-bg);
-  }
 
-    .recipe_instructions:last-child {
+    &:last-child {
       grid-column: span 2;
     }
+  }
 
     .recipe_step {
       margin-left: 22px;
       padding-left: 6px;
-    }
 
-      .recipe_step::marker {
+      &::marker {
         color: var(--fg-subtle);
       }
 
-      .recipe_step--compact > .recipe_ingredient {
+      &--compact > .recipe_ingredient {
         display: contents;
       }
 
-        .recipe_step--compact > .recipe_ingredient > :is(.sprite, .reagent) {
+        &--compact > .recipe_ingredient > :is(.sprite, .reagent) {
           margin-right: 2px;
         }
 
-      .recipe_step--simple > .sprite {
+      &--simple > .sprite {
         margin-right: 4px;
       }
 
-      .recipe_step--also {
+      &--also {
         list-style-type: disc;
       }
 
-        .recipe_step--also::marker {
+        &--also::marker {
           content: '+ ';
         }
+    }
 
   .recipe_method {
     align-self: center;
@@ -1035,12 +1013,12 @@ select {
   gap: 0 8px;
   background: var(--bg-level-1);
   box-shadow: var(--shadow-basic);
-}
 
-  .recipe-search > .input-group {
+  & > .input-group {
     grid-column: 1 / -1;
     margin-bottom: 8px;
   }
+}
 
   .recipe-search_filter-toggle--active {
     --button-bg: var(--filter-bg-selected);
@@ -1054,10 +1032,9 @@ select {
     z-index: 1;
     height: 8px;
     background-color: var(--bg-level-2);
-  }
 
-    .recipe-search_filter-wedge::before,
-    .recipe-search_filter-wedge::after {
+    &::before,
+    &::after {
       content: '';
       position: absolute;
       top: 0;
@@ -1066,15 +1043,16 @@ select {
       background-color: var(--bg-level-1);
     }
 
-    .recipe-search_filter-wedge::before {
+    &::before {
       left: 0;
       border-bottom-right-radius: 7px;
     }
 
-    .recipe-search_filter-wedge::after {
+    &::after {
       right: 0;
       border-bottom-left-radius: 7px;
     }
+  }
 
   .recipe-search_filter {
     grid-column: 1 / -1;
@@ -1087,11 +1065,11 @@ select {
     border-radius: 7px;
     background-color: var(--bg-level-2);
     box-shadow: var(--shadow-basic);
-  }
 
-    .recipe-search_filter--open {
+    &--open {
       display: grid;
     }
+  }
 
   .recipe-search_label {
     grid-column: 1;
@@ -1104,22 +1082,22 @@ select {
     flex-wrap: wrap;
     margin-top: -12px;
     position: relative;
-  }
 
-    .recipe-search_opt-filter > span {
+    > span {
       position: absolute;
       bottom: calc(100% + 4px);
       right: 0;
       color: var(--filter-fg-selected);
     }
 
-    .recipe-search_opt-filter > .input-group {
+    > .input-group {
       flex: 1 0 auto;
     }
 
-    .recipe-search_opt-filter > button {
+    > button {
       flex: none;
     }
+  }
 
   .recipe-search_options {
     grid-column: 1 / -1;
@@ -1130,21 +1108,21 @@ select {
     overflow: auto;
     max-height: 160px;
     list-style-type: none;
-  }
 
-    .recipe-search_options--compact {
+    &--compact {
       grid-column: auto;
       display: flex;
       flex-wrap: wrap;
     }
 
-    .recipe-search_options--expanded {
+    &--expanded {
       max-height: none;
     }
 
-    .recipe-search_options > li {
+    > li {
       flex: none;
     }
+  }
 
     .recipe-search_no-match {
       grid-column: 1 / -1;
@@ -1160,43 +1138,74 @@ select {
     position: relative;
     --button-bg: var(--filter-bg);
     --button-bg-pressed: var(--filter-bg-selected);
-  }
 
-    .recipe-search_opt:focus {
+    &:focus {
       outline: 2px solid var(--focus-color);
       outline-offset: -2px;
     }
+  }
 
   .recipe-search_row {
     grid-column: 1 / -1;
     display: flex;
     align-items: center;
     gap: 8px;
+
+    &--actions {
+      flex-wrap: wrap;
+      padding-top: 8px;
+      border-top: 2px solid var(--bg-level-1);
+
+      > button {
+        min-width: 90px;
+      }
+    }
+
+    @media (min-width: 600px) {
+      &--actions {
+        margin: 0 -8px -8px;
+        padding: 8px;
+        justify-self: flex-end;
+        border-radius: 5px;
+        border: none;
+        background-color: var(--bg-level-1);
+
+        > button {
+          min-width: 100px;
+        }
+      }
+    }
+
+    @media (min-width: 850px) {
+      &--actions > button {
+        min-width: 110px;
+      }
+    }
   }
 
   .recipe-search_mode {
     display: flex;
     gap: 4px;
     margin-top: -12px;
-  }
 
-    .recipe-search_mode > select {
+    > select {
       flex: 0 1 auto;
     }
 
-    .recipe-search_mode > button {
+    > button {
       flex: none;
     }
+  }
 
   @media (min-width: 600px) {
     .recipe-search {
       grid-template-columns: 1fr minmax(100px, auto) auto auto;
-    }
 
-      .recipe-search > .input-group {
+      > .input-group {
         grid-column: auto;
         margin-bottom: 0;
       }
+    }
 
       .recipe-search_filter-wedge {
         grid-column: 2;
@@ -1213,17 +1222,17 @@ select {
       .recipe-search_opt-filter {
         margin-block: -4px;
         justify-content: flex-end;
-      }
 
-        .recipe-search_opt-filter > span {
+        > span {
           flex: 0 1 auto;
           align-self: center;
           position: static;
         }
 
-        .recipe-search_opt-filter > .input-group {
+        > .input-group {
           max-width: 270px;
         }
+      }
 
       .recipe-search_options--compact,
       .recipe-search_mode {
@@ -1249,48 +1258,48 @@ select {
     padding: 4px;
     border-radius: 3px;
     cursor: help;
-  }
 
-    .recipe-search_help:hover {
+    &:hover {
       background-color: var(--bg-level-1);
     }
 
-    .recipe-search_help > .icon {
+    > .icon {
       display: block;
     }
+  }
 
 .recipe-ingredients {
   display: flex;
   gap: 8px;
   align-items: center;
-}
 
-  .recipe-ingredients > span {
+  > span {
     flex: none;
   }
+}
 
   .recipe-ingredients_list {
     display: flex;
     gap: 4px;
     list-style-type: none;
     overflow: hidden;
-  }
 
-    .recipe-ingredients_list > li {
+    > li {
       flex: none;
     }
 
-    .recipe-ingredients_list button {
+    button {
       padding-inline: 4px 8px;
       vertical-align: top;
       border: none;
       --button-bg-pressed: var(--filter-bg-selected);
-    }
 
-      .recipe-ingredients_list button:focus {
+      &:focus {
         outline: 2px solid var(--focus-color);
         outline-offset: -2px;
       }
+    }
+  }
 
 .recipe-count {
   margin-block: 16px;
@@ -1317,19 +1326,19 @@ select {
 .fav {
   --button-bg-pressed: var(--button-bg);
   --button-border-pressed: var(--button-border);
-}
 
-  .fav[aria-pressed=true] {
+  &[aria-pressed=true] {
     --icon-fg: var(--fg-fav);
-  }
 
-    .fav[aria-pressed=true]:hover {
+    &:hover {
       background-color: var(--button-bg-hover);
     }
 
-    .fav[aria-pressed=true]:active {
+    &:active {
       background-color: var(--button-bg-pressed);
     }
+  }
+}
 
 .explorer {
   position: fixed;
@@ -1342,16 +1351,16 @@ select {
   overflow: auto;
   background-color: var(--bg-level-0);
   color: var(--fg);
-}
 
-  .explorer:focus {
+  &:focus {
     outline: none;
   }
 
-  .explorer .recipe {
+  .recipe {
     min-width: 300px;
     max-width: 400px;
   }
+}
 
   .explorer_main > .recipe {
     outline: 2px solid var(--explorer-line);
@@ -1373,13 +1382,13 @@ select {
       grid-template-rows: auto auto 1fr;
       grid-template-columns: 1fr 1fr;
       height: 100%;
-    }
 
-      .explorer_main > .recipe {
+      > .recipe {
         justify-self: center;
         grid-row: 1;
         grid-column: 1 / span 2;
       }
+    }
 
     .explorer_arrow {
       grid-row: 2;
@@ -1387,24 +1396,23 @@ select {
       width: 125px;
       margin-block: 8px;
       text-align: center;
-    }
 
-      .explorer_arrow--before {
+      &--before {
         grid-column: 1;
         justify-self: flex-end;
       }
 
-      .explorer_arrow--after {
+      &--after {
         grid-column: 2;
         justify-self: flex-start;
       }
+    }
 
       .explorer_arrow-label {
         position: relative;
         cursor: default;
-      }
 
-        .explorer_arrow-label::before {
+        &::before {
           content: '';
           position: absolute;
           top: calc(100% + 2px);
@@ -1420,19 +1428,19 @@ select {
           transition-delay: 125ms;
         }
 
-          .explorer_arrow:hover > .explorer_arrow-label::before {
-            width: 80px;
-            opacity: 0.8;
-            transition-delay: 0s;
-          }
+        .explorer_arrow:hover > &::before {
+          width: 80px;
+          opacity: 0.8;
+          transition-delay: 0s;
+        }
 
-          .explorer_arrow--current.explorer_arrow--current > .explorer_arrow-label::before {
-            width: 110px;
-            opacity: 1;
-            transition-delay: 0s;
-          }
+        .explorer_arrow--current.explorer_arrow--current > &::before {
+          width: 110px;
+          opacity: 1;
+          transition-delay: 0s;
+        }
 
-        .explorer_arrow-label::after {
+        &::after {
           content: '';
           position: absolute;
           top: calc(100% + 10px);
@@ -1447,16 +1455,17 @@ select {
           transition-delay: 0s;
         }
 
-          .explorer_arrow:hover > .explorer_arrow-label::after {
-            opacity: 0.8; /* better transition from hovered state */
-          }
+        .explorer_arrow:hover > &::after {
+          opacity: 0.8; /* better transition from hovered state */
+        }
 
-          .explorer_arrow--current.explorer_arrow--current > .explorer_arrow-label::after {
-            top: calc(100% + 4px);
-            height: 12px;
-            opacity: 1;
-            transition-delay: 175ms;
-          }
+        .explorer_arrow--current.explorer_arrow--current > &::after {
+          top: calc(100% + 4px);
+          height: 12px;
+          opacity: 1;
+          transition-delay: 175ms;
+        }
+      }
 
     .explorer_list {
       display: none;
@@ -1466,13 +1475,12 @@ select {
       flex-direction: column;
       padding: 10px 10px 16px;
       position: relative;
-    }
 
-      .explorer_list--current {
+      &--current {
         display: flex;
       }
 
-      .explorer_list::before {
+      &::before {
         content: '';
         position: absolute;
         top: 0;
@@ -1485,6 +1493,7 @@ select {
         border-top-left-radius: 13px;
         pointer-events: none;
       }
+    }
 
       .explorer_list-inner {
         flex: 1 1 100%;
@@ -1506,12 +1515,12 @@ select {
 
       --button-bg: var(--bg-level-1);
       --button-border: var(--button-bg);
-    }
 
-      .explorer_close > .icon {
+      > .icon {
         display: block;
         margin: 0;
       }
+    }
   }
 
   @media (min-width: 700px) and (max-width: 999px) {
@@ -1534,17 +1543,17 @@ select {
 
     .explorer_list {
       display: flex;
-    }
 
-      .explorer_list--before {
+      &--before {
         grid-column: 1;
         justify-self: flex-end;
       }
 
-      .explorer_list--after {
+      &--after {
         grid-column: 2;
         justify-self: flex-start;
       }
+    }
   }
 
   @media (min-width: 1000px) {
@@ -1559,11 +1568,11 @@ select {
       transform: translate(-50%, -50%);
       --x: 0px;
       --y: 0px;
-    }
 
-      .explorer_main--collapsed > .recipe {
+      &--collapsed > .recipe {
         outline-color: transparent;
       }
+    }
 
     .explorer_arrow {
       position: absolute;
@@ -1572,22 +1581,21 @@ select {
       border-top: 2px solid var(--explorer-line);
       transform: translateY(-50%);
       transition: opacity 175ms ease-in-out;
-    }
 
-      .explorer_arrow--before {
+      &--before {
         right: calc(100% + 2px);
       }
 
-      .explorer_arrow--after {
+      &--after {
         left: calc(100% + 2px);
       }
 
-      .explorer_main--collapsed .explorer_arrow {
+      .explorer_main--collapsed & {
         opacity: 0;
         pointer-events: none;
       }
 
-      .explorer_arrow::before {
+      &::before {
         content: '';
         box-sizing: border-box;
         position: absolute;
@@ -1600,6 +1608,7 @@ select {
         transform: translate(-50%, -50%) rotate(45deg);
         box-shadow: 4px -4px 0 0 var(--bg-level-0);
       }
+    }
 
       .explorer_arrow-label {
         position: absolute;
@@ -1618,22 +1627,21 @@ select {
       max-height: calc(100vh - 48px);
       transform: translateY(-50%);
       transition: opacity 175ms ease-in-out;
-    }
 
-      .explorer_list--before {
+      &--before {
         right: calc(100% + 112px);
       }
 
-      .explorer_list--after {
+      &--after {
         left: calc(100% + 112px);
       }
 
-      .explorer_main--collapsed .explorer_list {
+      .explorer_main--collapsed & {
         opacity: 0;
         pointer-events: none;
       }
 
-      .explorer_list::before {
+      &::before {
         content: '';
         position: absolute;
         top: 0;
@@ -1643,19 +1651,20 @@ select {
         pointer-events: none;
       }
 
-        .explorer_list--before::before {
-          right: 0;
-          border-left-style: none;
-          border-top-right-radius: 13px;
-          border-bottom-right-radius: 13px;
-        }
+      &--before::before {
+        right: 0;
+        border-left-style: none;
+        border-top-right-radius: 13px;
+        border-bottom-right-radius: 13px;
+      }
 
-        .explorer_list--after::before {
-          left: 0;
-          border-right-style: none;
-          border-top-left-radius: 13px;
-          border-bottom-left-radius: 13px;
-        }
+      &--after::before {
+        left: 0;
+        border-right-style: none;
+        border-top-left-radius: 13px;
+        border-bottom-left-radius: 13px;
+      }
+    }
 
     /* Due to fiddliness around flex-wrap and absolute positioning, we have to
      * put a margin on recipes in the .explorer_list instead of using gap.
@@ -1671,11 +1680,11 @@ select {
       margin: -4px;
       height: var(--list-height);
       --list-height: auto;
-    }
 
-      .explorer_list-inner > .recipe {
+      > .recipe {
         margin: 4px;
       }
+    }
   }
 
 .foodseq {
@@ -1683,29 +1692,27 @@ select {
   padding: 16px;
   background-color: var(--bg-level-1);
   box-shadow: var(--shadow-basic);
-}
 
   @media (min-width: 650px) {
-    .foodseq {
-      margin-inline: 0;
-      border-radius: 7px;
-    }
+    margin-inline: 0;
+    border-radius: 7px;
   }
+}
 
   .foodseq_list {
     list-style-type: none;
-  }
 
-    .foodseq_list > li {
+    > li {
       display: flex;
       flex-direction: column;
       gap: 4px;
       margin-top: 16px;
     }
 
-    .foodseq_start .sprite {
+    .sprite {
       margin-right: 4px;
     }
+  }
 
   .foodseq_elements {
     list-style-type: none;
@@ -1749,21 +1756,21 @@ select {
     --button-bg-active: var(--bg-level-0);
     --button-border: var(--bg-level-1);
     --button-border-hover: var(--bg-level-2);
-  }
 
-    .planner_list-menu > :is(button, .btn) {
+    > :is(button, .btn) {
       padding: 8px 12px;
     }
 
-    .planner_list-menu > :is(button, .btn):not(:first-child) {
+    > :is(button, .btn):not(:first-child) {
       border-top-left-radius: 0;
       border-bottom-left-radius: 0;
     }
 
-    .planner_list-menu > :is(button, .btn):not(:last-child) {
+    > :is(button, .btn):not(:last-child) {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
     }
+  }
 
     .planner_view-menu-button {
       flex-direction: column;
@@ -1808,32 +1815,28 @@ select {
     column-gap: 4px;
     row-gap: 8px;
     flex-wrap: wrap;
-  }
 
-    .planner_view-actions > .notice {
+    > .notice {
       max-width: 100%;
       flex-shrink: 0;
     }
+  }
 
   .planner_view-ingredients {
     list-style-type: none;
-  }
 
-    .planner_view-ingredients > li > :is(.sprite, .reagent) {
+    li > :is(.sprite, .reagent) {
       margin-right: 4px;
     }
 
     @media (min-width: 600px) {
-      .planner_view-ingredients {
-        column-count: 2;
-      }
+      column-count: 2;
     }
 
     @media (min-width: 1000px) {
-      .planner_view-ingredients {
-        column-count: 3;
-      }
+      column-count: 3;
     }
+  }
 
   .planner_editor p {
     margin-bottom: 8px;
@@ -1852,27 +1855,27 @@ select {
     gap: 8px;
     background-color: var(--bg-level-1);
     box-shadow: var(--shadow-basic);
-  }
 
-    .planner_editor-header > label {
+    > label {
       flex: none;
     }
 
-    .planner_editor-header > input {
+    > input {
       flex: 10 1 auto;
       max-width: 500px;
     }
+  }
 
     .planner_editor-actions {
       flex: 0 1 100%;
       display: flex;
       justify-content: flex-end;
       gap: 4px;
-    }
 
-      .planner_editor-actions > :is(button, .btn) {
+      :is(button, .btn) {
         flex: 0 1 95px;
       }
+    }
 
     @media (min-width: 600px) {
       .planner_editor-actions {
@@ -1895,6 +1898,11 @@ select {
     .planner_editor-recipe {
       position: relative;
       z-index: 1;
+
+      > .recipe {
+        position: relative;
+        z-index: 2;
+      }
     }
 
       .planner_editor-recipe-header {
@@ -1915,31 +1923,26 @@ select {
         --button-bg: var(--recipe-bg-title);
         --button-bg-disabled: var(--recipe-bg-title);
         --button-border: var(--recipe-bg-title);
-      }
 
-        .planner_editor-recipe:hover > .planner_editor-recipe-header {
+        .planner_editor-recipe:hover > & {
           transition-delay: 250ms;
         }
 
-        .planner_editor-recipe-header.planner_editor-recipe-header:focus-within {
+        &&:focus-within {
           transition-delay: 0s;
         }
 
-        .planner_editor-recipe:is(:hover, :focus-within) > .planner_editor-recipe-header {
+        .planner_editor-recipe:is(:hover, :focus-within) > & {
           transform: translateY(-100%) translateY(8px);
         }
 
-        .planner_editor-recipe-header > :is(button, .btn) {
+        > :is(button, .btn) {
           padding: 6px;
-        }
 
-          .planner_editor-recipe-header > :is(button, .btn):disabled {
+          &:disabled {
             opacity: 0.75;
           }
-
-      .planner_editor-recipe > .recipe {
-        position: relative;
-        z-index: 2;
+        }
       }
 
     .planner_editor-search {
@@ -1967,10 +1970,9 @@ select {
         border-left: 2px solid var(--explorer-line);
         border-bottom: 2px solid var(--explorer-line);
         border-bottom-left-radius: 7px;
-      }
 
-        .planner_editor-results-wrapper::before,
-        .planner_editor-results-wrapper::after {
+        &::before,
+        &::after {
           content: '';
           box-sizing: border-box;
           position: absolute;
@@ -1979,7 +1981,7 @@ select {
           pointer-events: none;
         }
 
-        .planner_editor-results-wrapper::before {
+        &::before {
           left: -2px;
           bottom: 100%;
           height: 10px;
@@ -1989,7 +1991,7 @@ select {
           border-top-left-radius: 7px;
         }
 
-        .planner_editor-results-wrapper::after {
+        &::after {
           right: -10px;
           bottom: -2px;
           width: 10px;
@@ -1998,6 +2000,7 @@ select {
           border-bottom-style: solid;
           border-bottom-right-radius: 7px;
         }
+      }
 
       .planner_editor-results {
         flex: 1 1 auto;
@@ -2007,34 +2010,33 @@ select {
         gap: 8px;
         list-style-type: none;
         overflow: auto;
-      }
 
-        .planner_editor-results > li {
+        > li {
           flex: none;
         }
+
+        .recipe {
+          min-width: 250px;
+          max-width: 400px;
+        }
+      }
 
         .planner_editor-no-matches {
           flex: 1 1 auto;
           max-width: 100%;
         }
 
-        .planner_editor-results .recipe {
-          min-width: 250px;
-          max-width: 400px;
-        }
-
     .planner_editor-ingredient-list {
       display: grid;
       grid-template-columns: 1fr;
       gap: 4px;
-    }
+      margin-block: 16px;
 
       @media (min-width: 850px) {
-        .planner_editor-ingredient-list {
-          grid-template-columns: 1fr 1fr;
-          gap: 8px;
-        }
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
       }
+    }
 
       .planner_editor-ingredient {
         display: flex;
@@ -2051,12 +2053,12 @@ select {
 
         --button-border: var(--button-bg);
         --button-border-hover: var(--button-bg);
-      }
 
-        .planner_editor-ingredient--off {
+        &--off {
           background-color: var(--planner-ingredient-bg-hidden);
           box-shadow: none;
         }
+      }
 
       .planner_editor-ingredient-toggle {
         margin: -2px;
@@ -2072,11 +2074,11 @@ select {
       .planner_editor-ingredient-add-recipe {
         padding: 2px 4px;
         gap: 0;
-      }
 
-        .planner_editor-ingredient-add-recipe > .icon:only-child {
+        > .icon:only-child {
           margin: 0;
         }
+      }
 
       .planner_editor-ingredient-name {
         flex: 1 0 auto;
@@ -2089,25 +2091,25 @@ select {
         border-radius: 3px;
         opacity: 0.7;
         cursor: help;
-      }
 
-        .planner_editor-ingredient-info:hover {
+        &:hover {
           background-color: var(--recipe-help-bg-hover);
           opacity: 1;
         }
 
-        .planner_editor-ingredient-info > .icon {
+        > .icon {
           display: block;
         }
+      }
 
 .more-info {
   border-bottom: 1px dashed var(--help-fg);
   cursor: help;
-}
 
-  .more-info:hover {
+  &:hover {
     border-bottom-style: solid;
   }
+}
 
 .notice {
   box-sizing: border-box;
@@ -2119,47 +2121,47 @@ select {
   border-radius: 7px;
   background-color: var(--notice-bg);
   box-shadow: var(--shadow-basic);
-}
 
-  .notice--info {
+  &--info {
     --notice-fg-icon: var(--notice-info-fg-icon);
     --notice-bg: var(--notice-info-bg);
     --notice-bg-hover: var(--notice-info-bg-hover);
   }
 
-  .notice--warning {
+  &--warning {
     --notice-fg-icon: var(--notice-warning-fg-icon);
     --notice-bg: var(--notice-warning-bg);
     --notice-bg-hover: var(--notice-warning-bg-hover);
   }
 
-  .notice--error {
+  &--error {
     --notice-fg-icon: var(--notice-error-fg-icon);
     --notice-bg: var(--notice-error-bg);
     --notice-bg-hover: var(--notice-error-bg-hover);
   }
+}
 
   .notice_icon {
     flex: none;
     --icon-fg: var(--notice-fg-icon);
-  }
 
-    .notice_icon > .icon {
+    > .icon {
       display: block;
     }
+  }
 
   .notice_content {
     flex: 1 1 auto;
     align-self: center;
-  }
 
-    .notice_content > h3 {
+    > h3 {
       font-size: 1rem;
     }
 
-    .notice_content > p {
+    > p {
       margin-block: 0;
     }
+  }
 
   .notice_dismiss {
     flex: none;
@@ -2172,21 +2174,42 @@ select {
     --button-bg-hover: var(--notice-bg-hover);
     --button-border: var(--notice-bg);
     --button-border-hover: var(--notice-bg-hover);
-  }
 
-    .notice_dismiss > .icon {
+    > .icon {
       margin: 0;
     }
+  }
 
 .popup {
   position: fixed;
   z-index: 1000; /* on top of everything else */
+  width: max-content;
   animation-name: popup-enter;
   animation-duration: 100ms;
   pointer-events: none;
+
+  &--above {
+    padding-bottom: var(--popup-gap);
+  }
+
+  &--below {
+    padding-top: var(--popup-gap);
+  }
+
+  &--left {
+    padding-right: var(--popup-gap);
+  }
+
+  &--right {
+    padding-left: var(--popup-gap);
+  }
+
+  &--interactive {
+    pointer-events: all;
+  }
 }
 
-  .popup--tooltip {
+  .popup_tooltip {
     padding: 4px 8px;
     max-width: 300px;
     font-size: var(--tooltip-font-size);
@@ -2197,7 +2220,7 @@ select {
     box-shadow: 0 3px 7px var(--shadow-color);
   }
 
-  .popup--recipe {
+  .popup_recipe {
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -2208,16 +2231,16 @@ select {
     pointer-events: auto;
   }
 
-    .popup--recipe > .recipe {
+    .popup_recipe > .recipe {
       box-shadow: 0 2px 7px 1px var(--shadow-color);
     }
 
-    .popup--recipe > .popup--tooltip {
+    .popup_recipe > .popup_tooltip {
       align-self: center;
       max-width: none;
     }
 
-  .popup--foodseq {
+  .popup_foodseq {
     padding: 8px 12px;
     max-width: 300px;
     white-space: pre-wrap;
@@ -2227,12 +2250,12 @@ select {
     box-shadow: 0 3px 7px var(--shadow-color);
   }
 
-    .popup_entity {
-      display: flex;
-      flex-direction: row;
-      gap: 4px;
-      align-items: center;
-    }
+  .popup_entity {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    align-items: center;
+  }
 
   @keyframes popup-enter {
     0% { opacity: 0; }
@@ -2258,13 +2281,12 @@ select {
   background-color: var(--bg-level-1);
   color: var(--fg);
   box-shadow: 0 2px 7px var(--shadow-color);
-}
 
-  .dialog:focus {
+  &:focus {
     outline: none;
   }
 
-  .dialog--basic {
+  &--basic {
     top: 50%;
     left: 50%;
     width: max-content;
@@ -2273,7 +2295,7 @@ select {
     transform: translate(-50%, -50%);
   }
 
-  .dialog h2 {
+  h2 {
     flex: none;
     font-size: 1.5rem;
     line-height: 1.2rem;
@@ -2281,12 +2303,13 @@ select {
     font-style: normal;
   }
 
-  .dialog h3 {
+  h3 {
     font-size: 1.1rem;
     font-weight: bold;
     font-style: normal;
     text-align: center;
   }
+}
 
   .dialog_body {
     flex: 1 1 auto;
@@ -2298,15 +2321,15 @@ select {
     flex: none;
     display: flex;
     gap: 8px;
-  }
 
-    .dialog_actions > :is(button, .btn) {
+    > :is(button, .btn) {
       min-width: 90px;
     }
 
-    .dialog_actions > .spacer {
+    > .spacer {
       margin-left: -8px;
     }
+  }
 
   .dialog_close {
     display: block;
@@ -2318,22 +2341,22 @@ select {
 
     --button-bg: var(--bg-level-1);
     --button-border: var(--button-bg);
-  }
 
-    .dialog_close > .icon {
+    > .icon {
       display: block;
       margin: 0;
     }
+  }
 
   @media (min-width: 850px) {
     .dialog {
       padding: 16px;
       gap: 16px;
-    }
 
-      .dialog--basic {
+      &--basic {
         max-width: calc(100vw - 32px);
       }
+    }
 
       .dialog_actions > :is(button, .btn) {
         min-width: 140px;
@@ -2345,20 +2368,20 @@ select {
       }
   }
 
-.menu-export {
+.copy-to-clipboard {
   width: 720px;
-}
 
-  .menu-export > .dialog_body {
+  > .dialog_body {
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
     justify-items: stretch;
     gap: 8px;
   }
+}
 
-  .menu-export_value-sizer,
-  .menu-export_value {
+  .copy-to-clipboard_value-sizer,
+  .copy-to-clipboard_value {
     grid-row: 2;
     grid-column: 1;
     box-sizing: border-box;
@@ -2371,7 +2394,7 @@ select {
     overflow: hidden;
   }
 
-  .menu-export_value-sizer {
+  .copy-to-clipboard_value-sizer {
     align-self: flex-start;
     padding: 6px 8px;
     visibility: hidden;
@@ -2379,12 +2402,12 @@ select {
     pointer-events: none;
   }
 
-  .menu-export_value {
+  .copy-to-clipboard_value {
     resize: none;
     align-self: stretch;
   }
 
-  .menu-export_action {
+  .copy-to-clipboard_action {
     display: flex;
     gap: 8px;
     align-items: center;
@@ -2392,13 +2415,13 @@ select {
 
 .menu-import {
   width: 600px;
-}
 
-  .menu-import > .dialog_body {
+  > .dialog_body {
     display: flex;
     flex-direction: column;
     gap: 16px;
   }
+}
 
   .menu-import_actions {
     list-style-type: none;
@@ -2437,9 +2460,8 @@ select {
   border-radius: 7px;
   background-color: var(--bg-level-2);
   box-shadow: 0 2px 7px var(--shadow-color);
-}
 
-  .settings::after {
+  &::after {
     content: '';
     position: absolute;
     bottom: 100%;
@@ -2450,9 +2472,10 @@ select {
     clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
   }
 
-  .settings:focus {
+  &:focus {
     outline: none;
   }
+}
 
   .settings_name {
     font-weight: bold;
@@ -2484,11 +2507,11 @@ select {
         left: 1px;
         height: 100%;
         aspect-ratio: 1;
-      }
 
-        .settings_input:focus {
+        &:focus {
           outline: none;
         }
+      }
 
     .settings_marker {
       box-sizing: border-box;
@@ -2498,9 +2521,8 @@ select {
       border: 2px solid var(--input-border);
       border-radius: 50%;
       background-color: var(--input-bg);
-    }
 
-      .settings_input:checked + .settings_marker::before {
+      .settings_input:checked + &::before {
         content: '';
         position: absolute;
         inset: 2px;
@@ -2508,10 +2530,11 @@ select {
         background-color: var(--input-fg);
       }
 
-      .settings_input:focus + .settings_marker {
+      .settings_input:focus + & {
         outline: 2px solid var(--focus-color);
         outline-offset: 2px;
       }
+    }
 
     @media (min-width: 600px) {
       .settings_option {
@@ -2540,19 +2563,24 @@ select {
   width: calc(100% - 16px);
   max-width: 850px;
   transform: translateX(-50%);
-}
 
-  .attributions:focus {
+  &:focus {
     outline: none;
   }
 
-  .attributions a:not(:hover) {
+  @media (min-width: 850px) {
+    top: 16px;
+    bottom: 16px;
+  }
+
+  a:not(:hover) {
     text-decoration: none;
   }
 
-  .attributions p {
+  p {
     margin-block: 2px 0;
   }
+}
 
   .attributions_list {
     overflow: auto;
@@ -2571,13 +2599,6 @@ select {
     flex-wrap: wrap;
   }
 
-  @media (min-width: 850px) {
-    .attributions {
-      top: 16px;
-      bottom: 16px;
-    }
-  }
-
 .privacy {
   top: 50%;
   left: 50%;
@@ -2593,10 +2614,10 @@ select {
     margin-right: -4px;
     word-break: break-word;
     line-height: 1.3;
-  }
 
-  .privacy_text p:not(:first-child) {
-    margin-top: 16px;
+    p:not(:first-child) {
+      margin-top: 16px;
+    }
   }
 
 .migrate {
@@ -2608,16 +2629,16 @@ select {
   border-radius: 7px;
   background-color: var(--bg-level-1);
   box-shadow: var(--shadow-basic);
-}
 
-  .migrate p:not(:first-child) {
+  p:not(:first-child) {
     margin-top: 16px;
   }
 
-  .migrate a > .icon {
+  a > .icon {
     vertical-align: -6px;
     color: inherit;
   }
+}
 
 .redirect {
   width: calc(100% - 16px);
@@ -2644,11 +2665,11 @@ select {
     gap: 8px;
     border-radius: 7px;
     background-color: var(--bg-level-2);
-  }
 
-    .redirect_data > .icon {
+    & > .icon {
       color: var(--notice-info-fg-icon);
     }
+  }
 
     .redirect_data-body {
       display: flex;

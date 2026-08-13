@@ -22,6 +22,7 @@ import {
 } from './prototypes';
 import { getReagentResult, getSolidResult } from './reaction-helpers';
 import { RawGameData } from './read-raw';
+import { findSolution } from './solution-helpers';
 import {
   ResolvedConstruction,
   ResolvedConstructionRecipe,
@@ -89,6 +90,10 @@ export const filterRelevantPrototypes = (
   do {
     hasAnythingNew = false;
     for (const entity of allEntities.values()) {
+      if (entity.abstract) {
+        continue;
+      }
+
       if (tryAddSpecialRecipes(
         entity,
         specialRecipes,
@@ -221,7 +226,7 @@ const addMetamorphRecipes = (
     // Metamorph recipes are built on food sequences. We need to find the start
     // point of the indicated food sequence.
     const startPoints = allEntities.values()
-      .filter(ent => ent.foodSequenceStart?.key === recipe.key)
+      .filter(ent => !ent.abstract && ent.foodSequenceStart?.key === recipe.key)
       .toArray();
 
     // At present, each food sequence key has exactly one start point. If we
@@ -386,7 +391,7 @@ const entityCanBeFoodSequenceElem = (
   soughtIds: ReadonlySet<FoodSequenceElementId>,
   targetSequence: TagId
 ): boolean => {
-  if (!ent.foodSequenceElement) {
+  if (ent.abstract || !ent.foodSequenceElement) {
     return false;
   }
   const elem = ent.foodSequenceElement.get(targetSequence);
@@ -443,58 +448,32 @@ const tryAddSpecialRecipes = (
     entity.butcherable &&
     entity.butcherable.tool === 'Knife' &&
     entity.butcherable.spawned &&
-    usedEntities.has(entity.id)
+    usedEntities.has(entity.id) &&
+    tryAddCuttableSpawns(
+      entity,
+      entity.butcherable.spawned,
+      specialRecipes,
+      usedEntities,
+      usedReagents,
+      allEntities
+    )
   ) {
-    const spawns = getAllGuaranteedUsableSpawns(entity.butcherable.spawned);
-
-    const canUseAtLeastOneSpawnedEntity = spawns.some(([id]) => {
-      // We can use the entity if it is a food and a non-material that is
-      // either an ingredient in some other recipe or is the start of a
-      // food sequence.
-      //
-      // Basically, we want to catch burger buns and essentially no other
-      // butcherables without hardcoding burger buns. There are SO MANY
-      // arbitrary entities that can be butchered.
-      const entity = allEntities.get(id)!;
-      return (
-        isEdible(entity) &&
-        !entity.components.has('Material') &&
-        (
-          usedEntities.has(entity.id) ||
-          entity.foodSequenceStart
-        )
-      );
-    });
-
-    // If we can use at least one, add them all.
-    if (canUseAtLeastOneSpawnedEntity) {
-      for (const [spawnedId, amount] of spawns) {
-        const recipeId = `butcher!${entity.id}:${spawnedId}`;
-        if (specialRecipes.has(recipeId)) {
-          continue;
-        }
-
-        const builder = new ConstructRecipeBuilder()
-          .withSolidResult(spawnedId)
-          .withResultQty(amount)
-          .startWith(entity.id)
-          .cut();
-        const otherSpawns = spawns
-          .filter(e => e[0] !== spawnedId)
-          .map(e => e[0]);
-        if (otherSpawns.length > 0) {
-          builder.alsoMakes(
-            otherSpawns.length === 1
-              ? otherSpawns[0]
-              : otherSpawns
-          );
-        }
-        const recipe = builder.toRecipe();
-        collectRefs(usedEntities, usedReagents, recipe);
-        specialRecipes.set(recipeId, recipe);
-        addedAnything = true;
-      }
-    }
+    addedAnything = true;
+  }
+  if (
+    entity.toolRefinable &&
+    entity.toolRefinable.quality === 'Slicing' &&
+    entity.toolRefinable.spawned &&
+    tryAddCuttableSpawns(
+      entity,
+      entity.toolRefinable.spawned,
+      specialRecipes,
+      usedEntities,
+      usedReagents,
+      allEntities
+    )
+  ) {
+    addedAnything = true;
   }
 
   // If this entity can be constructed into something relevant, then add
@@ -550,15 +529,84 @@ const tryAddSpecialRecipes = (
   return addedAnything;
 };
 
+const tryAddCuttableSpawns = (
+  entity: ResolvedEntity,
+  spawned: readonly EntitySpawnEntry[],
+  specialRecipes: Map<string, ResolvedSpecialRecipe>,
+  usedEntities: Set<EntityId>,
+  usedReagents: Set<ReagentId>,
+  allEntities: ResolvedEntityMap
+): boolean => {
+  if (
+    // Don't add cuttables from mobs - don't want every single butcherable
+    // mob to be present in the cookbook.
+    entity.components.has('Body') ||
+    // Don't add cuttables from *clothing* - you can get cloth from just about
+    // every article of clothing.
+    // ... unless it has the 'Bread' tag, in which case it's a baguette.
+    // This is ugly and stupid.
+    entity.components.has('Clothing') && !entity.tags.has('Bread' as TagId)
+  ) {
+    return false;
+  }
+
+  const spawns = getAllGuaranteedUsableSpawns(spawned);
+
+  const canUseAtLeastOneSpawnedEntity = spawns.some(([id]) => {
+    // We can use the entity if it's edible and used in at least one recipe.
+    //
+    // Basically, we want to catch burger buns, meat, breads and essentially
+    // no other cuttables without hardcoding. There are SO MANY arbitrary
+    // entities that can be cut.
+    const spawned = allEntities.get(id)!;
+    return (
+      isEdible(spawned) &&
+      (usedEntities.has(spawned.id) || spawned.foodSequenceStart)
+    );
+  });
+
+  // If we can use at least one, add them all.
+  let addedAnything = false;
+  if (canUseAtLeastOneSpawnedEntity) {
+    for (const [spawnedId, amount] of spawns) {
+      const recipeId = `butcher!${entity.id}:${spawnedId}`;
+      if (specialRecipes.has(recipeId)) {
+        continue;
+      }
+
+      const builder = new ConstructRecipeBuilder()
+        .withSolidResult(spawnedId)
+        .withResultQty(amount)
+        .startWith(entity.id)
+        .cut();
+      const otherSpawns = spawns
+        .filter(e => e[0] !== spawnedId)
+        .map(e => e[0]);
+      if (otherSpawns.length > 0) {
+        builder.alsoMakes(
+          otherSpawns.length === 1
+            ? otherSpawns[0]
+            : otherSpawns
+        );
+      }
+      const recipe = builder.toRecipe();
+      collectRefs(usedEntities, usedReagents, recipe);
+      specialRecipes.set(recipeId, recipe);
+      addedAnything = true;
+    }
+  }
+  return addedAnything;
+};
+
 const getAllGuaranteedUsableSpawns = (
   spawned: readonly EntitySpawnEntry[]
 ): [EntityId, number][] => {
   return spawned
     .filter(entry =>
-      entry.id != null || // We need an entity ID
-      !entry.orGroup || // We can't handle OR groups
-      (entry.amount ?? 1) > 0 || // We need at least one
-      (entry.prob ?? 1) !== 1 // And the probability has to be 1
+      entry.id != null && // We need an entity ID
+      !entry.orGroup && // We can't handle OR groups
+      (entry.amount ?? 1) > 0 && // We need at least one
+      (entry.prob ?? 1) === 1 // And the probability has to be 1
     )
     .map(entry => [entry.id!, entry.amount ?? 1] as const);
 };
@@ -681,11 +729,6 @@ function* traverseConstructionGraph(
 
   // This construction graph traversal is *extremely* simplified compared to
   // what the game does, because we're only really looking for simple things.
-  //
-  // An entity is considered rollable if the start node (state.node) has an edge
-  // with one single step that uses a 'Rolling' tool with no conditions or
-  // actions that leads to a target node with a different entity. That's it.
-  // Nothing fancy.
   const startNode = graph.graph.find(n => n.node === constr.node);
   if (!startNode || !startNode.edges) {
     // Broken construction graph or we're at an end node with no edges
@@ -745,7 +788,7 @@ const findTargetEntityByTag = (
   allEntities: ResolvedEntityMap
 ): OneOrMoreEntities | null => {
   const matching = allEntities.values()
-    .filter(ent => ent.tags.has(tag))
+    .filter(ent => !ent.abstract && ent.tags.has(tag))
     .map(ent => ent.id)
     .toArray();
   switch (matching.length) {
@@ -768,7 +811,15 @@ const collectReagentSources = (
   const result = new Map<ReagentId, EntityId[]>();
 
   for (const entity of allEntities.values()) {
-    const sourceOf = findGrindableProduceReagents(entity, usedReagents);
+    if (entity.abstract) {
+      continue;
+    }
+
+    const sourceOf = findGrindableProduceReagents(
+      entity,
+      usedReagents,
+      allEntities
+    );
     if (sourceOf && sourceOf.length > 0) {
       usedEntities.add(entity.id);
       for (const reagentId of sourceOf) {
@@ -797,13 +848,14 @@ const collectReagentSources = (
 
 const findGrindableProduceReagents = (
   entity: ResolvedEntity,
-  usedReagents: Set<ReagentId>
+  usedReagents: Set<ReagentId>,
+  allEntities: ResolvedEntityMap
 ): ReagentId[] | null => {
-  const { isProduce, extractable, solution } = entity;
+  const { isProduce, extractable, solutions } = entity;
 
   if (
     !extractable ||
-    !solution ||
+    !solutions ||
     // Don't show random grindable objects, just plants that can be grown.
     !isProduce
   ) {
@@ -814,7 +866,7 @@ const findGrindableProduceReagents = (
 
   const grindSolution =
     extractable.grindSolutionName &&
-    solution[extractable.grindSolutionName];
+    findSolution(allEntities, entity, extractable.grindSolutionName);
   if (grindSolution && grindSolution.reagents) {
     foundSolutions.push(grindSolution);
   }
@@ -856,6 +908,7 @@ const collectFoodSequences = (
   const endPoints = new Map<TagId, EntityId[]>();
   for (const entity of allEntities.values()) {
     if (
+      entity.abstract ||
       !entity.foodSequenceElement ||
       entity.foodSequenceElement.size === 0 ||
       ignoredFoodSequenceElements.has(entity.id)

@@ -15,7 +15,7 @@ import { FocusTrap } from './focus';
 import { GitHubFolderUrl } from './helpers';
 import { CloseIcon } from './icons';
 import { Overlay } from './overlay';
-import { getPopupRoot } from './popup-impl';
+import { getPopupRoot } from './popup';
 import { RawSprite } from './sprites';
 import { Tooltip } from './tooltip';
 

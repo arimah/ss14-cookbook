@@ -1,9 +1,9 @@
 import { ReactElement, memo } from 'react';
-import { ReagentIngredient as ReagentIngredientData } from '../types';
-import { useGameData } from './context';
-import { RecipePopup } from './recipe-popup';
-import { EntitySprite, ReagentSprite } from './sprites';
-import { Tooltip } from './tooltip';
+import { ReagentIngredient as ReagentIngredientData } from '../../types';
+import { useGameData } from '../context';
+import { EntitySprite, ReagentSprite } from '../sprites';
+import { Tooltip } from '../tooltip';
+import { RecipePopup } from './popup';
 
 export interface RecipeIngredientsProps {
   visible: boolean;

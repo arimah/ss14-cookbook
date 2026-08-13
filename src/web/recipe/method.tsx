@@ -1,9 +1,9 @@
 import { ReactElement, memo } from 'react';
-import { Recipe, SpritePoint } from '../types';
-import { useGameData } from './context';
-import { displayMethod } from './helpers';
-import { RawSprite } from './sprites';
-import { Temperature } from './temperature';
+import { Recipe, SpritePoint } from '../../types';
+import { useGameData } from '../context';
+import { displayMethod } from '../helpers';
+import { RawSprite } from '../sprites';
+import { Temperature } from '../temperature';
 
 export interface RecipeMethodProps {
   recipe: Recipe;

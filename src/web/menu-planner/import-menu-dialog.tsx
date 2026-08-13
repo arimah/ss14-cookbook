@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { FocusTrap } from '../focus';
 import { AddIcon, CloseIcon, ImportIcon } from '../icons';
 import { Overlay } from '../overlay';
-import { getPopupRoot } from '../popup-impl';
+import { getPopupRoot } from '../popup';
 import { useStoredMenus } from './storage';
 import { CookingMenu, genId } from './types';
 
