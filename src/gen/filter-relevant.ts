@@ -68,6 +68,7 @@ export const filterRelevantPrototypes = (
     usedEntities,
     usedReagents,
     raw.stacks,
+    allEntities,
     params.ignoredRecipes
   );
 
@@ -180,6 +181,7 @@ const collectMicrowaveRecipes = (
   usedEntities: Set<EntityId>,
   usedReagents: Set<ReagentId>,
   stacks: StackMap,
+  allEntities: ResolvedEntityMap,
   ignoredRecipes: ReadonlySet<string>
 ): MicrowaveMealRecipe[] => {
   const relevantRecipes = allRecipes.filter(r => !ignoredRecipes.has(r.id));
@@ -192,7 +194,9 @@ const collectMicrowaveRecipes = (
     if (recipe.solids) {
       for (const id of Object.keys(recipe.solids)) {
         const stack = stacks.get(id as StackId);
-        if (stack) {
+        // POLONIUM CHANGE --->
+        if (stack && !allEntities.has(id as EntityId)) {
+        // <--- POLONIUM CHANGE
           usedEntities.add(stack.spawn);
         } else {
           usedEntities.add(id as EntityId);
