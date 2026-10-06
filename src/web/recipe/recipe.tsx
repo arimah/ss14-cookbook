@@ -187,7 +187,7 @@ const SeqElemIcon = memo(({
     <span className='recipe_info-icon' ref={popup.triggerRef}>
       <FoodSequenceIcon/>
     </span>
-    <Popup {...popup}>
+    <Popup {...popup} interactive>
       {tooltipContent}
     </Popup>
   </>;

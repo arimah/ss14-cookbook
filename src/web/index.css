@@ -2232,12 +2232,14 @@ select {
       box-shadow: 0 2px 7px 1px var(--shadow-color);
     }
 
-    .popup_recipe > .popup_tooltip {
+    .popup_recipe > .popup_tooltip,
+    .popup_recipe > .popup_foodseq {
       align-self: center;
       max-width: none;
     }
 
   .popup_foodseq {
+    /* basically .popup_tooltip with more padding and normal font size */
     padding: 8px 12px;
     max-width: 300px;
     white-space: pre-wrap;

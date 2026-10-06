@@ -1,9 +1,10 @@
 import { ReactElement, memo } from 'react';
-import { ReagentIngredient as ReagentIngredientData } from '../../types';
+import { Reagent, ReagentIngredient as ReagentIngredientData } from '../../types';
 import { useGameData } from '../context';
+import { Popup, usePopupTrigger } from '../popup';
 import { EntitySprite, ReagentSprite } from '../sprites';
 import { Tooltip } from '../tooltip';
-import { RecipePopup } from './popup';
+import { ReagentInfoPopup, RecipePopup } from './popup';
 
 export interface RecipeIngredientsProps {
   visible: boolean;
@@ -82,7 +83,7 @@ export const SolidIngredient = ({
 export interface ReagentIngredientProps {
   id: string;
   /** Single amount (in units), or [min, max]. */
-  amount: number | readonly [number, number];
+  amount: number | readonly [min: number, max: number];
   catalyst?: boolean;
 }
 
@@ -104,12 +105,15 @@ export const ReagentIngredient = ({
       <ReagentSprite id={id}/>
       <span>
         {formattedAmount}
-        {relatedRecipes ? (
-          <RecipePopup id={relatedRecipes}>
+        {relatedRecipes || reagent.sources.length > 0 ? (
+          <ReagentInfoPopup
+            recipes={relatedRecipes}
+            sources={reagent.sources}
+          >
             <span className='more-info'>
               {reagent.name}
             </span>
-          </RecipePopup>
+          </ReagentInfoPopup>
         ) : reagent.name}
         {catalyst && <>
           {' '}

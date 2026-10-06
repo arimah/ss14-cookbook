@@ -827,7 +827,7 @@ const collectReagentSources = (
           continue;
         }
 
-        appendAtKey(result, reagentId, entity.id);
+        appendAtKey(result, reagentId, entity.id, true);
       }
     }
   }
@@ -839,7 +839,7 @@ const collectReagentSources = (
 
     for (const entityId of sources) {
       usedEntities.add(entityId);
-      appendAtKey(result, reagentId, entityId);
+      appendAtKey(result, reagentId, entityId, true);
     }
   }
 
@@ -928,11 +928,18 @@ const collectFoodSequences = (
   return { startPoints, elements, endPoints };
 };
 
-const appendAtKey = <K, V>(map: Map<K, V[]>, key: K, value: V): void => {
+const appendAtKey = <K, V>(
+  map: Map<K, V[]>,
+  key: K,
+  value: V,
+  unique = false
+): void => {
   let values = map.get(key);
   if (!values) {
     values = [];
     map.set(key, values);
   }
-  values.push(value);
+  if (!unique || !values.includes(value)) {
+    values.push(value);
+  }
 };
