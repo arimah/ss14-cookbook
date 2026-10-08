@@ -189,7 +189,15 @@ frontier:
     - SentientSlimeCore
     - SentientSlimesCore
   ignoreSourcesOf: *ignoredSources
-  forceIncludeReagentSources: *reagentSources
+  forceIncludeReagentSources:
+    # Eggs can be trivially cracked into raw egg.
+    Egg: [FoodEgg]
+    # Butter can be put into a beaker!
+    Butter: [FoodButter, FoodButterSlice, FoodCannabisButter]
+    THC: [FoodCannabisButter] # lol
+    # Salt ore is extremely common on roids, not everyone even knows it can be
+    # ground into salt.
+    TableSalt: [SaltOre]
   spriteOffsets: &legacySpriteOffsets
     # Table-mounted machines are all weirdly high up
     KitchenMicrowave: [0, 5] # not updated to the new microwave sprite yet
