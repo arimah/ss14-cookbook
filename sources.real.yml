@@ -198,23 +198,7 @@ frontier:
     # Salt ore is extremely common on roids, not everyone even knows it can be
     # ground into salt.
     TableSalt: [SaltOre]
-  spriteOffsets: &legacySpriteOffsets
-    # Table-mounted machines are all weirdly high up
-    KitchenMicrowave: [0, 5] # not updated to the new microwave sprite yet
-    KitchenElectricGrill: [0, 5]
-    KitchenAssembler: [0, 5]
-    ChemistryHotplate: [0, 5]
-
-    # Same with these two burgers
-    FoodBurgerSuper: [0, 5] # super bite burger
-    FoodBurgerBig: [0, 4] # big bite burger
-
-    # Aloe is weirdly low down
-    FoodAloe: [0, -4]
-    AloeCream: [0, -2]
-
-    # Let's lower the shaker a few pixels too
-    DrinkShaker: [0, 3]
+  spriteOffsets: *standardSpriteOffsets
 
 delta-v:
   name: "Delta-V"
@@ -257,7 +241,23 @@ rmc-14:
   ignoredFoodSequenceElements: *ignoredFoodSequenceElements
   ignoreSourcesOf: *ignoredSources
   forceIncludeReagentSources: *reagentSources
-  spriteOffsets: *legacySpriteOffsets
+  spriteOffsets: &legacySpriteOffsets
+    # Table-mounted machines are all weirdly high up
+    KitchenMicrowave: [0, 5] # not updated to the new microwave sprite yet
+    KitchenElectricGrill: [0, 5]
+    KitchenAssembler: [0, 5]
+    ChemistryHotplate: [0, 5]
+
+    # Same with these two burgers
+    FoodBurgerSuper: [0, 5] # super bite burger
+    FoodBurgerBig: [0, 4] # big bite burger
+
+    # Aloe is weirdly low down
+    FoodAloe: [0, -4]
+    AloeCream: [0, -2]
+
+    # Let's lower the shaker a few pixels too
+    DrinkShaker: [0, 3]
 
 floof:
   name: "Floof"
